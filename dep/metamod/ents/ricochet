@@ -1,0 +1,27 @@
+// vim: set ft=cpp :
+
+// Ricochet
+//    from Valve
+
+// in HL 1.1.1.0
+//
+// From: "Noplay" <noplay@djeyl.net>
+// Date: Wed, 19 Jun 2002 13:10:32 +0200
+//
+// From: "Alfred" <alfred@mazuma.net.au>
+// Date: Tue, 25 Jun 2002 20:47:06 +1000
+
+disc
+disc_arena
+discarena
+func_disctoggle
+func_plat_toggleremove
+info_player_spectator
+item_powerup
+player_weaponship
+trigger_discerturn
+trigger_discreturn
+trigger_fall
+trigger_jump
+trip_beam
+weapon_disc

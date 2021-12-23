@@ -1,0 +1,77 @@
+// vim: set ft=cpp :
+
+// Half-Life Paintball
+//    http://www.paintball-mod.net/
+//
+// Version 2.0 (?)
+//
+// From: "mike" <mikewilsman@mediaone.net>
+// Date: Mon, 2 Apr 2001 17:45:32 -0400
+//
+// "from the Entity File for HLPB" (FGD)
+// "More entities and function will be added in as further development are
+// made to the MOD."
+
+item_flag_ctf
+item_flag_atde
+item_flag_cf
+info_player_team1
+info_player_team2
+func_buyzone
+func_goal_zone
+
+// From: "mike" <mikewilsman@mediaone.net>
+// Date: Sat, 14 Apr 2001 12:16:06 -0400
+//
+// "OK....... Finally i got all them!!!"
+
+weapon_angel
+weapon_autococker
+weapon_automag
+weapon_maverick
+weapon_model98
+weapon_pgp
+weapon_phantom
+weapon_shocker2k
+weapon_spyder
+weapon_stingray2
+weapon_sniper3
+// weapon_bushwacker
+// weapon_paintgernade
+weapon_paintball
+info_player_team1
+info_player_team2
+item_flag_team2
+item_flag_team1
+info_hlpaintctfdetect
+item_atde_object
+item_flag_ctf
+item_flag_cf
+pballblue
+pballred
+carried_flag_team1
+carried_flag_team2
+func_goal_zone
+
+// From: "mike" <mikewilsman@mediaone.net>
+// Date: Mon, 30 Apr 2001 23:03:29 -0400
+//
+// "things needing updates.... these entities were wrong.."
+
+weapon_bushmaster
+weapon_paintgrenade
+
+// Note, from hlcenter.com:
+//
+// HL-Paintball Files Chapter 11
+// Reported by: DeltaMidway
+// Saturday, June 23
+//
+// For those of you wondering what happened to HL-Paintball, well lemme
+// tell you a story. The leader of HL-Paintball, Spawn, hadn't worked on
+// the mod for quite some time so when the coder, ToonCop, left because he
+// got busy in life - Spawn was left once again with the spotlight on him.
+// After that, the interest in HLPB dropped a lot after no updates and no
+// communication with the leader. Now HLPB fans are only left with a few
+// stragglers that linger in the IRC channel. So if you totally missed the
+// mod then you can still download it at FilePlanet.

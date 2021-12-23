@@ -1,0 +1,56 @@
+// vim: set ft=cpp :
+
+// Point of No Return
+//    http://ponr.half-life.hu/
+
+// Version Beta 4.0
+//
+// From: atom@floppy.hu                                  
+// Date: Thu, 31 Jul 2003 10:05:45 +0200
+//
+ammo_ak47
+ammo_awp
+ammo_beretta
+ammo_deagle
+ammo_dsr1
+ammo_exploder
+ammo_famas
+ammo_fiveseven
+ammo_g11
+ammo_g36
+ammo_galil
+ammo_glock18
+ammo_jackhammer
+ammo_m134
+ammo_m4a1
+ammo_m79
+ammo_mac10
+ammo_mp5
+ammo_p99
+ammo_pdw
+ammo_rockets
+ammo_trigun
+ammo_usp
+equipment_parachute
+info_flash
+item_kevlar
+item_parachute
+m72_rocket
+monster_c4
+weapon_bang
+weapon_beretta
+weapon_dsr1
+weapon_exploder
+weapon_famas
+weapon_g11
+weapon_g36
+weapon_galil
+weapon_jackhammer
+weapon_m134
+weapon_m72
+weapon_m79
+weapon_p99
+weapon_pdw
+weapon_shield
+weapon_spas12
+weapon_trigun

@@ -1,0 +1,71 @@
+// vim: set ft=cpp :
+//
+// GoldenEye
+//    http://www.goldeneye-mod.net/
+
+// Version 1.1b
+ammo_AK47clip
+ammo_colt45clip
+ammo_d5kclip
+ammo_deagleclip
+ammo_p99clip
+ammo_rcp90clip
+ammo_veprclip
+carried_book_team1
+carried_book_team2
+info_mapdetect
+item_book_team1
+item_book_team2
+spawnfar
+weapon_colt45
+weapon_d5k
+weapon_p99
+weapon_proximity
+weapon_rcp90
+weapon_triplaser
+weapon_vepr
+
+// Version 1.5
+monster_proximity
+weapon_kf7
+ammo_kf7clip
+weapon_dd44
+ammo_dd44clip
+weapon_goldpp7
+ammo_goldpp7clip
+weapon_phantom
+ammo_phantomclip
+weapon_silverpp7
+ammo_silverpp7clip
+weapon_slappers
+weapon_zmg
+ammo_zmgclip
+
+// Version 1.6
+monster_mine
+item_armor
+knife_bolt
+ammo_knife
+weapon_pmine
+weapon_rmine
+guard_info
+info_goldeneye
+weapon_tmine
+random_weapon
+random_ammo
+spy_escape
+
+// Version 1.7
+ammo_cloaker
+ammo_areaammo
+
+// Version 1.9C
+//
+// From: "Mike Kalen" <g_whao@hotmail.com>
+// Date: Wed, 24 Apr 2002 21:33:57 +0000
+weapon_cougar
+ammo_cougarclip
+weapon_ar33
+ammo_ar33clip
+weapon_srifle
+ammo_srifleclip

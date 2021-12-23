@@ -1,0 +1,19 @@
+// vim: set ft=cpp :
+
+// Zombie Panic
+//    http://www.zombiepanic.org/
+//
+// Game directory: zp
+// Win32 DLL name: mp.dll
+// Linux DSO name: none
+
+// Version 0.91a Beta
+//
+// From: BAILOPAN
+// Date: Sun, 31 Oct 2004 22:41:00 -0500
+//
+ammo_556AR
+ammo_556box
+ammo_M16grenades
+trigger_endround
+weapon_556AR

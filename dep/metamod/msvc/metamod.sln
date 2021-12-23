@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "metamod", "metamod.vcproj", "{6E21CBF5-1316-4F39-A207-FF618D00AB4E}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{6E21CBF5-1316-4F39-A207-FF618D00AB4E}.Debug.ActiveCfg = Debug|Win32
+		{6E21CBF5-1316-4F39-A207-FF618D00AB4E}.Debug.Build.0 = Debug|Win32
+		{6E21CBF5-1316-4F39-A207-FF618D00AB4E}.Release.ActiveCfg = Release|Win32
+		{6E21CBF5-1316-4F39-A207-FF618D00AB4E}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

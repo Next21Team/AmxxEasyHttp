@@ -1,0 +1,49 @@
+// vim: set ft=cpp :
+
+// Azure Sheep
+//    http://www.halflifeitalia.com/azuresheep/
+
+// Version 1.0
+//
+// From: "Pierre-Marie Baty" <pm@racc-ai.com>
+// Date: Mon, 25 Nov 2002 22:40:38 +0100
+
+env_spawnereffect
+monster_adrian
+monster_adrian_dead
+monster_alien_panther
+monster_archer
+monster_barniel
+monster_barniel_dead
+monster_bodypart
+monster_exp_alien_slave
+monster_garbage
+monster_gordon
+monster_gordon_dead
+monster_hevbarn
+monster_hevbarn_dead
+monster_human_spforce
+monster_human_terror
+monster_kate
+monster_kate_dead
+monster_myself
+monster_myself_dead
+monster_spforce_dead
+monster_spforce_repel
+monster_terror_dead
+monster_terror_repel
+monster_worker
+monster_worker_dead
+monster_zbarney
+trigger_die
+trigger_katehealth
+trigger_loadhazard
+trigger_sound
+weapon_9mmm41a
+weapon_barney9mmar
+weapon_barney9mmhg
+weapon_barneyhandgrenade
+weapon_barneyshotgun
+weapon_kmedkit
+weapon_poolstick
+weapon_toad

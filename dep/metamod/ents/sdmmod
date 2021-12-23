@@ -1,0 +1,19 @@
+// vim: set ft=cpp :
+
+// Special Death Match
+//     http://sdm.cyberguerrier.info/
+//
+// Game directory: sdmmod
+// Win32 DLL name: sdmmod.dll
+// Linux DSO name: sdmmod_i386.so
+
+// Version Alpha 0.20
+//
+// From: cyberguerrier AT@ free DOT. fr
+// Date: Sun, 05 Feb 2006 23:55:06 +0100
+//
+smoking_grenade
+weapon_medikit
+tgrenade
+weapon_teleporter
+ammo_WTELEPORTERgrenades

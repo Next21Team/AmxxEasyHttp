@@ -1,0 +1,162 @@
+// vim: set ft=cpp :
+
+// Firearms
+//    http://www.firearmsmod.com/
+
+// Version rc1
+ammo_anaconda
+ammo_benelli
+ammo_ber92f
+ammo_ber93r
+ammobox
+ammo_coltgov
+ammo_desert
+ammo_famas
+ammo_frag
+ammo_g36e
+ammo_g3a3
+ammo_m11
+ammo_m112
+ammo_m16
+ammo_m203
+ammo_m4
+ammo_m60
+ammo_m79
+ammo_m82
+ammo_mp5a5
+ammo_mp5k
+ammo_psg1
+ammo_saiga
+ammo_stg24
+bullet
+fa_drop_zone
+fa_parachute
+fa_push_flag
+fa_push_point
+fa_team_goal
+fa_team_item
+info_firearms_detect
+info_playerstart_blue
+info_playerstart_red
+item_bandage
+item_claymore
+item_flashbang
+item_frag
+item_stg24
+weapon_benelli
+weapon_ber92f
+weapon_ber93r
+weapon_claymore
+weapon_coltgov
+weapon_desert
+weapon_famas
+weapon_g36e
+weapon_g3a3
+weapon_m11
+weapon_m16
+weapon_m4
+weapon_m60
+weapon_m79
+weapon_m82
+weapon_mp5a5
+weapon_mp5k
+weapon_psg1
+weapon_saiga
+weapon_stg24
+ammo_mc51
+weapon_mc51
+
+// Version 2.2
+weapon_launcher
+ammo_launcher
+ammo_40mm
+ammo_762mmbox
+hospital
+marker
+weapmortar
+
+// Version 2.3
+weapon_bizon
+ammo_bizon
+
+// Version 2.5
+vote_llama
+fa_sd_object
+weapon_sterling
+ammo_sterling
+
+// Version 2.6
+//
+// From: alfred <alfred@mazuma.net.au>
+// Date: Sun, 05 May 2002 12:04:31 +1000
+ammo_ak74
+ammo_concussion
+ammo_gp25
+ammo_nato308
+ammo_pkm
+ammo_sks
+ammo_ssg3000
+ammo_svd
+ammo_wa2000
+item_concussion
+mortarshell
+player_helmet
+weapon_ak74
+weapon_sks
+weapon_ssg3000
+weapon_svd
+
+// Version 2.6
+//
+// Additional ents from fa_i386.so.
+//    (willday, Wed May 29 18:33:42 EDT 2002)
+ammo_ak47
+ammo_uzi
+weapon_ak47
+weapon_anaconda
+weapon_concussion
+weapon_frag
+weapon_knife
+weapon_pkm
+weapon_uzi
+
+// Version 2.6.5
+//
+// based on info at:
+//    http://forums.firearmsmod.com/showthread.php?s=&threadid=26022
+env_spriteshooter
+medevac
+medivac
+trigger_zone
+
+// Version 2.7
+//
+// From: "Brian M. Schkerke" <bmschkerke@netcotitle.com>   
+// Date: Mon, 24 Mar 2003 14:12:37 -0600   
+ammo_m249
+env_fog
+my_monster
+trip_beam
+weapon_m249
+
+// Version 2.8
+//
+// From: "[FFM2D1]Tyler_Durden" <tylerdurden@ffm2d1-clan.de>
+// Date: Sat, 18 Oct 2003 13:20:53 +0200
+ammo_remington
+weapon_remington
+
+// Versoin 2.9
+// 
+// From: "SirCampalot" <sir@firearmsmod.com>
+// Date: Mon, 12 Apr 2004 15:33:56 -0400
+//
+env_precip
+trigger_reinforcements
+weapon_m14
+
+// Version 3.0
+//
+// From: "[FFM2D1]Tyler_Durden" <tylerdurden@ffm2d1-clan.de>
+// Date: Thu, 05 May 2005 23:21:15 +0100
+trigger_noclaymores

@@ -1,0 +1,27 @@
+// vim: set ft=cpp :
+
+// Out Break
+//   http://www.geocities.com/bigman10in/outbreak/
+//
+// Game directory: outbreak
+// Win32 DLL name: hl.dll
+// Linux DSO name: None
+
+// Version: 1.0
+//
+// From: Scott Bell <bigman10in@yahoo.com>
+// Date: Sat, 14 Aug 2004 20:43:47 -0700 (PDT)
+//
+info_next_map
+info_player_team1
+info_player_team2
+item_body
+item_corpse
+item_megavirus
+item_radio
+monster_missle
+monster_morter
+monster_shotgun
+weapon_energy
+weapon_hammer
+weapon_supershotgun

@@ -1,0 +1,98 @@
+// vim: set ft=cpp :
+
+// WormsHL
+//    http://www.wormshl.fr.st/
+//    http://www.wormshl.com/
+
+// Version Beta 2.0
+//
+// From: <udoheld@web.de>
+// Date: Thu, 18 Apr 2002 23:58:37 +0200
+
+balle
+flamme
+info_caisse_128
+info_caisse_16
+info_caisse_256
+info_caisse_32
+info_caisse_64
+info_player_observer
+info_zone_caisse
+item_baril
+item_caisse_arme
+item_caisse_mega
+item_caisse_outil
+item_caisse_vie
+item_mine
+item_tombe_bleu
+item_tombe_rouge
+monster_mouton
+rocket_air_strike
+rocket_croix
+rocket_napalm
+rocket_pigeon
+rocket_snipe
+trigger_baril
+trigger_hurt_bleu
+trigger_hurt_rouge
+trigger_mine
+trigger_zone_bleu
+trigger_zone_rouge
+trip_beam
+weapon_air_strike
+weapon_banane
+weapon_batte
+weapon_bazooka
+weapon_camera
+weapon_cluster
+weapon_croix
+weapon_dynamite
+weapon_fusil
+weapon_grappin
+weapon_grenade
+weapon_hache
+weapon_jetpack
+weapon_kamikaze
+weapon_laser
+weapon_mine
+weapon_minicanon
+weapon_molotov
+weapon_mortier
+weapon_morve
+weapon_mouton
+weapon_napalm
+weapon_pigeon
+weapon_sainte
+weapon_snipe
+weapon_super_mouton
+weapon_teleporteur
+weapon_trident
+
+// Version Beta 2.1
+//
+// From: anybody <anybody@udoheld.de>
+// Date: Fri, 19 Jul 2002 13:36:48 +0200
+
+info_bananier
+item_baril_bleu
+item_baril_rouge
+trigger_point_controle
+weapon_helico
+weapon_kameha
+
+// Version Beta 3.0
+//
+// From: "europium" <europium@laposte.net>
+// Date: Thu, 10 Apr 2003 21:23:15 +0200
+//
+
+fire_ball
+func_water_up
+info_elephant
+info_marguerite
+info_sapin
+item_grappin
+rocket_phoenix
+weapon_lanceflamme
+weapon_phoenix
+weapon_ruche

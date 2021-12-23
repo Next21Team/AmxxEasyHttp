@@ -1,0 +1,66 @@
+// vim: set ft=cpp :
+
+// Project Timeless
+//    http://www.project-timeless.de/
+//    http://www.planethalflife.com/project-timeless/
+
+// Version Beta 1.0
+//
+// From: Rockefeller <rockefeller@bonanzastudios.de>
+// Date: Mon, 03 Nov 2003 12:50:46 +0100
+//
+pt_change_attribute
+pt_startpoint
+pt_round_info
+pt_campaign_end
+pt_mission_target
+pt_control_area
+pt_bomb_zone
+pt_defeat_victory
+pt_trigger_zone
+pt_trigger_bomb
+pt_entity_reset
+pt_score_award
+pt_toggle_respawnmode
+pt_hostage
+pt_rescue_zone
+pt_model
+env_fog
+pt_parachute_area
+pt_timer
+pt_trigger_loader
+func_vehicle
+func_modelvehicle
+func_modelvehiclemodel
+func_vehiclecontrols
+func_vehicletankcontrols
+func_modeltank
+monster_c4
+monster_pipebomb
+monster_poison
+weapon_amp
+weapon_deagle
+weapon_flamer
+weapon_g36c
+weapon_c4
+weapon_he
+weapon_pipebomb
+weapon_poison
+weapon_horar1
+weapon_horar2
+weapon_horg1
+weapon_horg2
+weapon_hormg1
+weapon_hormg2
+weapon_knife
+weapon_m4
+weapon_minigun
+weapon_mp5k
+weapon_mp5ktac
+weapon_remington
+weapon_sig
+weapon_socom
+weapon_socomtac
+weapon_spas12
+weapon_stoner
+weapon_uzi

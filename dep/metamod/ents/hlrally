@@ -1,0 +1,19 @@
+// vim: set ft=cpp :
+
+// HL-Rally
+//    http://www.hlrally.net/
+
+// Version Beta 1.0
+//
+// From: "Michael Danzo" <creme@hlrally.net>
+// Date: Thu, 7 Aug 2003 07:05:18 +0800
+//
+info_camera
+bot
+info_waypoint
+info_checkpoint
+weapon_rallyhp
+info_player_deathmatch_reverse
+info_player_start_reverse
+info_player_respawn
+info_vgui_start

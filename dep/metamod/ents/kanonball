@@ -1,0 +1,21 @@
+// vim: set ft=cpp :
+
+// Kanonball
+//    http://www.planethalflife.com/kanonball/
+
+// Version 1.01
+//
+// From: "sinistar" <sinistar@planethalflife.com>
+// Date: Mon, 13 Oct 2003 11:45:13 -0700
+//
+crowd
+firework
+kb_fireworklauncher
+gameclock
+team_goal
+ball_launcher
+score_multiplier
+particle
+scoreboard
+scripted
+info_kb_deathmatch

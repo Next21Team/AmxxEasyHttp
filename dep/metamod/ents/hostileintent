@@ -1,0 +1,50 @@
+// vim: set ft=cpp :
+
+// Hostile Intent
+//    http://www.planethalflife.com/hostileintent/
+//
+// Gamedir: hostileintent
+// Win32  : hl.dll
+// Linux  : hl_i386.so
+
+// Version 1.1
+// From: David Anderson <bailopan@amxmodx.org>
+// Date: Wed, 07 Apr 2004 02:03:37 -0500
+//
+debris
+hi_bomb_zone
+hi_button_load
+hi_coop_tango
+hi_global
+hi_hostage
+hi_hostage_rescue
+hi_hostage_respawn
+hi_nameposition
+hi_objective
+hi_objective_manager
+hi_round_timer
+hi_spawn_hostage
+hi_spawn_nato
+hi_spawn_observer
+hi_spawn_tango
+hi_fog
+item_nvg
+tango_sniper
+tango_sentinel
+tango_nomad
+weapon_ak47
+weapon_aks74u
+weapon_cougar
+weapon_flashbang
+weapon_m11
+weapon_m11sd
+weapon_m16a2
+weapon_m4a1
+weapon_m67
+weapon_m76
+weapon_mp5a4
+weapon_mp5sd5
+weapon_psg1
+weapon_rem1100
+weapon_rgd5
+weapon_spas12

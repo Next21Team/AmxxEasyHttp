@@ -1,0 +1,13 @@
+// vim: set ft=cpp :
+
+// Bumper Cars
+//    http://www.planethalflife.com/bumpercars/
+//
+// From: "Sy F" <g0tsyf@hotmail.com>
+// Date: Tue, 22 Apr 2003 09:02:12 -0600
+//
+// Version "Alpha"
+
+item_powerup
+trigger_crash
+bumper_car_start

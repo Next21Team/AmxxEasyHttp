@@ -1,0 +1,48 @@
+// vim: set ft=cpp :
+
+// Oz Deathmatch
+//    http://www.planethalflife.com/oz/
+
+// Oz
+ctf_blueflag
+ctf_bluespawn
+ctf_cloak
+ctf_crowbar
+ctf_cycle
+ctf_frag
+ctf_hook
+ctf_lowgrav
+ctf_protect
+ctf_redflag
+ctf_redspawn
+ctf_regen
+ctf_superglock
+ctf_trap
+ctf_vamp
+grapple_bolt
+
+// Version 2.3
+//
+// From: "Dave R. Meyers" <drmeyers242@hotmail.com>
+// Date: Mon, 16 Jul 2001 14:17:51 -1000
+
+ctf_blueflag
+ctf_bluespawn
+ctf_redflag
+ctf_redspawn
+ctf_rune
+grapple_bolt
+trip_beam
+
+// Version 2.4.1
+//
+// Additional entities, as guessed from symbol list of linux .so ...
+//    (willday, Fri Dec 21 18:47:25 EST 2001)
+flying_crowbar
+
+// Version 2.5
+//
+// From: "CheatingDeath" <cheatingdeath@cheating-death.com>
+// Date: Thu, 14 Feb 2002 02:44:57 -0600
+oz_logo
+oz_rune

@@ -1,0 +1,48 @@
+// vim: set ft=cpp :
+
+// Monkeystrike
+//    http://www.monkeystrike.com/
+
+// Version 1.1
+//
+// From: Pat Magnan <pat@sluggo.org>
+// Date: Tue, 29 Jul 2003 19:08:57 -0400
+//
+arcade_points
+arrow
+banana
+env_fog
+fruit_sacrifice_point_team_green
+fruit_sacrifice_point_team_red
+func_vine
+info_banana_green_capture
+info_banana_red_capture
+info_monkey_start_team_green
+info_monkey_start_team_red
+info_msdetect
+info_observer_start
+info_particles
+item_ammoicon
+item_banana
+item_bonustime
+item_bonustime2
+item_bonustime3
+item_energy
+item_fruit
+monster_cat
+monster_skunk
+palm_tree
+pineapple
+skunk_fart
+testparticles
+trip_beam
+weapon_banana
+weapon_blowpipe
+weapon_cat
+weapon_chainsaw
+weapon_cocolauncher
+weapon_gatling
+weapon_machinegun
+weapon_plauncher
+weapon_sabers
+weapon_skunk

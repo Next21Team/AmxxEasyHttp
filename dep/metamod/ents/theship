@@ -1,0 +1,44 @@
+// vim: set ft=cpp :
+
+// The Ship
+//     http://www.theshiponline.com/
+//
+// Game directory: Ship
+// Win32 DLL name: ship.dll
+// Linux DSO name: ship_i386.so
+
+// Version V0052
+//
+// From: Ed Wilson
+// Date: Tue, 19 Oct 2004 06:24:57 -0700
+//
+authenticationmanager
+bankinterest
+func_bankteller
+func_corruptsecurity
+func_needs
+func_needs_boredom
+func_needs_dirty
+func_needs_drink
+func_needs_eat
+func_needs_fatigue
+func_needs_lonely
+func_needs_pee
+func_needs_poo
+func_securityzone
+func_sickbay_bed
+func_sickbay_psych
+func_wardrobe
+jailer
+judge
+misterx
+monster_player
+my_monster
+poison_injected
+sanity
+securitymanager
+shipAI_shipmate
+trip_beam
+weapon_pushhands
+weapon_syringe
+weapon_umbrella

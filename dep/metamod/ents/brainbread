@@ -1,0 +1,72 @@
+// vim: set ft=cpp :
+
+// Brain Bread
+//     http://www.ironoak.de/BB/
+//
+// Game directory: brainbread
+// Win32 DLL name: bb.dll
+// Linux DSO name: bb_i386.so
+
+// Version 1.2
+//
+// From: a203xi <a203.xi@gmail.com>
+// Date: Wed, 26 Jan 2005 19:01:56 -0800
+//
+bb_ammo
+bb_custommission
+bb_equipment
+bb_escape_final
+bb_escape_radar
+bb_escapeair
+bb_funk
+bb_healthkit
+bb_mapmission
+bb_mission_zone
+bb_objectives
+bb_spawn_player
+bb_spawn_zombie
+bb_tank
+bb_waypoint
+bb_zombie_player
+mapobject_jaguar
+mapobject_npc_crow
+pe_light
+pe_light_ref
+pe_objectclip
+pe_radar_mark
+weapon_44sw
+weapon_ak47
+weapon_benelli
+weapon_beretta
+weapon_beretta_a
+weapon_deagle
+weapon_flame
+weapon_glock_auto_a
+weapon_hand
+weapon_knife
+weapon_m16
+weapon_microuzi
+weapon_microuzi_a
+weapon_minigun
+weapon_p225
+weapon_sawed
+weapon_stoner
+weapon_tavor
+weapon_usp
+weapon_winchester
+
+
+// From: Florian Zschocke
+// Date: Fri, 20 Jan 2006 15:38:00 +0100
+//
+bb_objective_item
+mapobject_npc_bum
+mapobject_npc_bum1
+mapobject_npc_bum2
+mapobject_npc_bum3
+mapobject_npc_slavebot
+monster_hgrunt
+monster_hgrunt_shotgun
+monster_player
+pe_rain
+weapon_canister

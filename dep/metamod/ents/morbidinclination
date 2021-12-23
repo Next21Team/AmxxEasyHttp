@@ -1,0 +1,65 @@
+// vim: set ft=cpp :
+
+// Morbid Inclination
+//    http://www.planethalflife.com/morbid
+//
+// From: "Dimitri Gillis" <darbura666@pandora.be>
+// Date: Sun, 4 May 2003 14:47:29 +0200 (Romance (zomertijd))
+
+// Version 1.0
+Electro_Bolt
+SA_Model
+ammo_FTclip
+ammo_flameclip
+ammo_freezeclip
+blade
+bone_follow
+bot
+entity_botcam
+env_rain
+fire_ball
+freeze_gel
+func_jail_release
+func_particle_system
+human_flashgrenade
+info_alien_return
+info_alien_start
+info_bone
+info_bone_spawn
+info_escape_start
+info_human_return
+info_human_start
+info_jail_start
+info_model
+info_monster_return
+info_monster_start
+info_morbid
+info_morbid_start
+info_robot_return
+info_robot_start
+info_team_base
+monster_player
+my_monster
+plasma
+proj_blaster
+return_axe
+trip_beam
+weapon_FT
+weapon_axe
+weapon_blaster
+weapon_bola
+weapon_claws
+weapon_electro
+weapon_flamethrower
+weapon_flashbang
+weapon_freeze
+weapon_jumpjet
+weapon_kawauso
+weapon_killsaw
+weapon_knife
+weapon_laser_rifle
+weapon_m21
+weapon_m96
+weapon_powerblade
+weapon_throwaxe
+weapon_warhammer

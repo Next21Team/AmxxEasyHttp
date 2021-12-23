@@ -1,0 +1,24 @@
+// vim: set ft=cpp :
+
+// Holy Wars
+//    http://www.planethalflife.com/holywars/
+
+// Version Beta2
+//
+// From: Satan <MrSatan@Comcast.net>
+// Date: Thu, 19 Sep 2002 19:27:59 -0500
+ammo_doubleshotgun
+ammo_machinegun
+ammo_railgun
+ammo_rocketlauncher
+halo_base
+holywars_rocket
+info_jumppad_target
+item_armor
+jumppad_sign
+trigger_jumppad
+weapon_doubleshotgun
+weapon_jackhammer
+weapon_machinegun
+weapon_railgun
+weapon_rocketlauncher

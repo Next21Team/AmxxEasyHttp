@@ -1,0 +1,15 @@
+// vim: set ft=cpp :
+
+// Scientist Hunt
+//    http://www.telefragged.com/thefatal/scihunt.shtml
+
+// Version 1.2
+//
+// From: Jussi Heikki Tapio Kivilinna <kijuhe00@students.oamk.fi>
+// Date: Sat, 15 Sep 2001 17:22:35 +0300 (EEST)
+
+info_player_team1
+info_player_team2
+weapon_hammer
+weapon_handcannon
+weapon_chainsaw

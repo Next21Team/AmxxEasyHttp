@@ -1,0 +1,33 @@
+// vim: set ft=cpp :
+
+// Dragon Mod Z
+//    http://dmz.flagrun.net/
+
+// Version 1.7
+//
+// From: Satan <MrSatan@Comcast.net>
+// Date: Thu, 19 Sep 2002 19:16:45 -0500
+beam_attack
+big_bang
+big_disk
+burning_attack
+carried_flag_team1
+carried_flag_team2
+charge
+ctf_blueflag
+ctf_redflag
+death_ball
+final_flash
+finish
+homing_balls
+info_Waterdetect
+info_player_team1
+info_player_team2
+item_flag_team1
+item_flag_team2
+kamehameha
+mazo
+mazoold
+rage
+specailbc
+spirit_bomb

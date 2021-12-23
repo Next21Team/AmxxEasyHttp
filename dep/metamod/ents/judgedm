@@ -1,0 +1,47 @@
+// vim: set ft=cpp :
+
+// Judgement DM
+//    http://justicedepartment.co.uk/
+//
+// Version 1.0 (?)
+//
+// From: "Paul 'MoOg' Samways" <moog@moogisland.co.uk>
+// Date: Fri, 23 Mar 2001 13:45:25 -0000
+//
+// "I think a load are leftovers from HL that we never bothered removing"
+
+// Removed valve ents; these should be the Judgement-only ents.
+// 	(willday, Sat May 26 00:49:43 EDT 2001)
+ammo_grenades
+ammo_lgclip
+ammo_lrclip
+ammo_powercell
+ammo_scatterclip
+ammo_spitcarb
+ammo_spitclip
+ammo_stubcoolant
+ammo_stumpbox
+env_model
+env_sun
+func_laddertype
+game_levelmusic
+gr_shell
+in_shell
+info_defaultammo
+info_player_judge
+info_player_perp
+item_armour
+laserbolt
+powerup_candy
+rr_shell
+trip_beam
+weapon_daystick
+weapon_disintegrator
+weapon_dummy
+weapon_lawgiver
+weapon_lawrod
+weapon_scattergun
+weapon_spitcarbine
+weapon_spitpistol
+weapon_stubgun
+weapon_stumpgun

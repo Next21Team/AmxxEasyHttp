@@ -1,0 +1,75 @@
+// vim: set ft=cpp :
+ 
+// Counter-Strike: Condition Zero
+//    http://www.cs-conditionzero.com/
+//
+// Game directory: czero
+// Win32 DLL name: mp.dll
+// Linux SO name:  cs_i386.so
+//
+
+// Version 1.0
+//
+ammo_338magnum
+ammo_357sig
+ammo_45acp
+ammo_50ae
+ammo_556nato
+ammo_556natobox
+ammo_57mm
+ammo_762nato
+ammo_9mm
+armoury_entity
+env_bombglow
+env_rain
+env_snow
+func_bomb_target
+func_buyzone
+func_escapezone
+func_grencatch
+func_hostage_rescue
+func_rain
+func_snow
+func_vehicle
+func_vehiclecontrols
+func_vip_safetyzone
+func_weaponcheck
+hostage_entity
+info_bomb_target
+info_hostage_rescue
+info_map_parameters
+info_vip_start
+item_assaultsuit
+item_kevlar
+item_thighpack
+trip_beam
+weapon_ak47
+weapon_aug
+weapon_awp
+weapon_c4
+weapon_deagle
+weapon_elite
+weapon_famas
+weapon_fiveseven
+weapon_flashbang
+weapon_g3sg1
+weapon_galil
+weapon_glock18
+weapon_hegrenade
+weapon_knife
+weapon_m249
+weapon_m3
+weapon_m4a1
+weapon_mac10
+weapon_mp5navy
+weapon_p228
+weapon_p90
+weapon_scout
+weapon_sg550
+weapon_sg552
+weapon_shield
+weapon_smokegrenade
+weapon_tmp
+weapon_ump45
+weapon_usp
+weapon_xm1014

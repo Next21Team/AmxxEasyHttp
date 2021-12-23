@@ -1,0 +1,77 @@
+// vim: set ft=cpp :
+
+// International Online Soccer
+//    http://www.planethalflife.com/ios/
+//
+// Game directory: ios
+// Win32 DLL name: ios.dll
+// Linux SO name: ios_i386.so
+//
+// From: "Mark Gornall" <routetwo@planethalflife.com>
+// Date: Sun, 4 May 2003 19:41:34 +0100
+
+// Version 1.0
+football
+info_ball_start
+info_draw_slayerswin
+info_draw_vampireswin
+info_player_slayer
+info_player_vampire
+info_stadium
+info_team1_corner0
+info_team1_corner1
+info_team1_corner_player0
+info_team1_corner_player1
+info_team1_goalkick0
+info_team1_goalkick1
+info_team1_penalty_spot
+info_team1_player1
+info_team1_player10
+info_team1_player11
+info_team1_player2
+info_team1_player3
+info_team1_player4
+info_team1_player5
+info_team1_player6
+info_team1_player7
+info_team1_player8
+info_team1_player9
+info_team2_corner0
+info_team2_corner1
+info_team2_corner_player0
+info_team2_corner_player1
+info_team2_goalkick0
+info_team2_goalkick1
+info_team2_penalty_spot
+info_team2_player1
+info_team2_player10
+info_team2_player11
+info_team2_player2
+info_team2_player3
+info_team2_player4
+info_team2_player5
+info_team2_player6
+info_team2_player7
+info_team2_player8
+info_team2_player9
+info_throw_in
+trigger_GoalLine
+trigger_PenaltyBox
+trigger_SideLine
+trigger_goal
+
+// Version 2.0
+//
+// From: "Mark Gornall" <routetwo@planethalflife.com>
+// Date: Thu, 10 Jul 2003 20:50:32 +0100
+//
+trigger_ball
+
+// Version 3.0
+//
+// From: "Mr. Satan" <mrsatan@comcast.net>
+// Date: Fri, 16 Jan 2004 18:00:44 -0500
+//
+func_breakpoints
+item_flag_slayer
+item_flag_vampire

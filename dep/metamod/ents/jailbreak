@@ -1,0 +1,23 @@
+// vim: set ft=cpp :
+
+// Open-Source Jailbreak
+//    http://zetafleet.com/osjb/
+//    http://www.planethalflife.com/jailbreak/
+//    http://www.eatsleepcode.ca/~osjb/
+//
+// Version 0.95a
+
+// Removed valve ents; these should be the jailbreak-only ents.
+// 	(willday, Sat May 26 00:52:59 EDT 2001)
+ammo_flameammo
+func_nobuild
+info_player_jail
+jail_execute
+jail_team_master
+proj_flame
+trigger_armory
+trigger_jail
+trigger_jail_release
+trip_beam
+weapon_flamethrower
+weapon_nightstick

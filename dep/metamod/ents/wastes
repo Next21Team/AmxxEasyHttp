@@ -1,0 +1,58 @@
+// vim: set ft=cpp :
+
+// The Wastes
+//    http://planethalflife.com/thewastes/
+
+// Version RC 1.2
+//
+// From: insaneo@gladiatorarenas.net
+// Date: Mon, 23 Jun 2003 16:05:08 -0400
+//
+ammo_beretta
+ammo_boltrifle
+ammo_colt
+ammo_deagle
+ammo_fnfal
+ammo_g11
+ammo_handcannon
+ammo_jackhammer
+ammo_ruger
+ammo_smg9
+ammo_sten
+ammo_tommygun
+ammo_winchester
+extra_ammo
+frag_grenade
+molotov
+pipe_bomb
+thrown_object
+trip_beam
+weapon_akimboberettas
+weapon_akimbocolts
+weapon_akimbodeagles
+weapon_akimbosawedoffs
+weapon_baseballbat
+weapon_beretta
+weapon_boltrifle
+weapon_cattleprod
+weapon_colt
+weapon_combatknife
+weapon_deagle
+weapon_fnfal
+weapon_fraggrenade
+weapon_g11
+weapon_handcannon
+weapon_jackhammer
+weapon_katana
+weapon_molotov
+weapon_mossberg
+weapon_pipebomb
+weapon_ruger
+weapon_sawedoff
+weapon_sledgehammer
+weapon_smg9
+weapon_spear
+weapon_sten
+weapon_throwingknife
+weapon_tommygun
+weapon_winchester

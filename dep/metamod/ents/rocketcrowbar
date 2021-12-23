@@ -1,0 +1,129 @@
+// vim: set ft=cpp :
+
+// Rocket Crowbar
+//    http://www.planethalflife.com/rocketcrowbar/
+//
+// From: "De Leon" <EDELEON1@satx.rr.com>
+// Date: Fri, 22 Jun 2001 21:37:08 -0500
+//
+// Version 18 (?)
+
+IsoBomb
+PythRound
+acidgib
+alien_slave_energy_ball
+alien_slave_sapper
+asl_charge_flare
+barneymine
+base_drive_ent
+basecurse
+bubgren
+controller_charge_ball
+controller_charged_ball
+controller_health_ball
+controller_throw_ball
+curse_spawner
+db_spawner
+deathball
+dg_streak_spiral
+dmgmirrorcurse
+dmgscalecurse
+drive_agrunt
+drive_agrunt_spawner
+drive_apache
+drive_apache_spawner
+drive_asl
+drive_assassin
+drive_assassin_spawner
+drive_bm
+drive_bm_spawner
+drive_bullsquid
+drive_bullsquid_spawner
+drive_chumtoad
+drive_controller
+drive_controller_spawner
+drive_garg
+drive_garg_spawner
+drive_headcrab
+drive_houndeye
+drive_houndeye_spawner
+drive_icky
+drive_icky_spawner
+drive_panth
+drive_panth_spawner
+drive_slave_spawner
+drive_turret
+drive_turret_spawner
+drunkcurse
+drv_hvr_rocket
+egon_mirv
+env_fadeone
+fading_corpse
+flag
+freeze_timer
+friction_timer
+func_tankgib
+func_tankgib_gib
+gonarch_headcrabifier
+he_charge_flare
+he_eye_flare
+headcrab_teather
+impail_arrow
+impgren
+info_deathball_spawn
+info_drive_agrunt_spawn
+info_drive_apache_spawn
+info_drive_assassin_spawn
+info_drive_bm_spawn
+info_drive_bullsquid_spawn
+info_drive_controller_spawn
+info_drive_garg_spawn
+info_drive_houndeye_spawn
+info_drive_icky_spawn
+info_drive_panth_spawn
+info_drive_slave_spawn
+info_drive_turret_spawn
+info_flagspawn
+info_semi_null
+info_teamspawn
+killerrat
+lc_init_ent
+lc_respawner
+lc_spawner
+monster_killerbabycrab
+my_monster
+nuke_rocket
+pickup_drive_agrunt
+pickup_drive_apache
+pickup_drive_assassin
+pickup_drive_bm
+pickup_drive_bullsquid
+pickup_drive_controller
+pickup_drive_garg
+pickup_drive_houndeye
+pickup_drive_icky
+pickup_drive_panth
+pickup_drive_slave
+pickup_drive_turret
+pipebomb
+player_corpse
+promagcurse
+reversecurse
+sci_spawner
+scientistbomb
+sdcurse
+slowcurse
+slowrefirecurse
+snark_cam
+suck_mine
+telebecon
+trip_beam
+
+// Version 1.9
+//
+// From: "Steven Linn" <steven@kamelsoftware.com>
+// Date: Sun, 27 Oct 2002 09:03:50 -0500
+//
+// No entity changes, but dllnames changed:
+//    hl_i386.so -> rc_i386.so
+//    mp.dll -> rc.dll

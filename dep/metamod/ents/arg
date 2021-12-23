@@ -1,0 +1,35 @@
+// vim: set ft=cpp :
+
+// Arg 0.50
+weapon_cocogrenade
+weapon_not_in_use_grenade
+item_antidotee
+hallucgrenade
+weapon_tdagger
+weapon_longsword
+weapon_stupid
+FOOT_bolt
+ammo_FOOT
+weapon_flute
+weapon_ndagger
+FISHINGROD_bolt
+weapon_fishingrod
+ammo_FISHINGROD
+weapon_bsword
+whiskey_whisk
+weapon_whiskey
+ammo_whiskey
+weapon_mop
+
+// Arg 1.0
+item_beans
+BALLS_airball
+weapon_discoballs
+ammo_BALLS
+weapon_ga2uss
+weapon_holybsword
+weapon_aandagger
+weapon_musket
+weapon_rumgun
+monster_llama
+weapon_tucan

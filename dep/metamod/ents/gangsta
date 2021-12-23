@@ -1,0 +1,114 @@
+// vim: set ft=cpp :
+
+// Gangsta Wars
+//     http://www.zone.ee/gangstawars/
+//
+// Game directory: gangstawars
+// Win32 DLL name: hl.dll
+// Linux DSO name: gangsta_i386.so
+
+// Version 2.6
+//
+bot_waypoint
+weapon_glock17
+weapon_smkgrenade
+weapon_baretta
+ammo_baretta
+weapon_ak101
+ammo_ak101
+weapon_akimbo_glocks
+weapon_bat
+weapon_baton
+item_briefcase
+item_cash
+weapon_colt
+ammo_colt
+weapon_dblshot
+weapon_dbshot
+ammo_dbshot
+info_gwars_map
+weapon_mg36
+weapon_g36k
+ammo_mg36
+ammo_g36k
+ammo_glock17
+weapon_longslide
+ammo_longslide
+weapon_mac
+ammo_mac
+ammo_mac10
+weapon_mossberg
+ammo_mossberg
+info_gangsta_dm_start
+info_italian_start
+info_russian_start
+deal_italian_start
+deal_columbian_start
+deal_swat_start
+weapon_tec9
+ammo_tec9
+item_flag1
+item_flag2
+weapon_tommygun
+ammo_tommy
+ammo_tommygun
+turf_zone
+weapon_uzi
+ammo_uzi
+
+// Version 2.7
+//
+// Win32 DLL name: gwars27.dll
+// Linux DSO name:
+//
+// From: "Ets nolastname" <masqo@hotmail.com>
+// Date: Mon, 17 Jan 2005 19:37:26 +0200
+//
+ammo_ak47
+ammo_beretta
+ammo_psg1
+ammo_steyr_m40
+arms_dealer
+bot
+dealer
+load_wpt
+remove_all_wpts
+remove_wpt
+save_wpt
+sell_ak101
+sell_ak47
+sell_baretta
+sell_beretta
+sell_dblshot
+sell_dbshot
+sell_glock17
+sell_longslide
+sell_mac
+sell_mac10
+sell_molotov_cocktail
+sell_mossberg
+sell_psg1
+sell_steyr_m40
+sell_tec9
+sell_tommy
+sell_tommygun
+sell_uzi
+show_wpt
+tag_camp
+tag_crouch_jump
+tag_door
+tag_duck
+tag_jump
+tag_run
+tag_snipe
+tag_walk
+weapon_ak47
+weapon_beretta
+weapon_flashbang
+weapon_knife
+weapon_mac10
+weapon_molotov_cocktail
+weapon_psg1
+weapon_smokegrenade
+weapon_steyr_m40
+weapon_tommy

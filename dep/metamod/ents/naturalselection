@@ -1,0 +1,152 @@
+// vim: set ft=cpp :
+
+// Natural Selection
+//    http://www.natural-selection.org/
+//    http://www.readyroom.org/
+//
+// Gamedir: ns
+// Win32  : ns.dll
+// Linux  : ns_i386.so
+
+// Version 1.0
+//
+// From: "Charles Cleveland" <flayra@overmind.org>
+// Date: Wed, 10 Jul 2002 20:49:25 +0000
+//
+alienresourcetower
+defensechamber
+env_fog
+env_gamma
+env_particles
+env_particles_custom
+func_nobuild
+func_resource
+func_seethrough
+func_seethroughdoor
+func_weldable
+gren_projectile
+info_gameplay
+info_join_autoassign
+info_join_team
+info_leave_game
+info_location
+info_mapinfo
+info_spectate
+info_team_start
+item_genericammo
+item_health
+movementchamber
+nuke
+offensechamber
+phasegate
+resourcetower
+scan
+sensorychamber
+siegeturret
+spitgunprojectile
+sporegunprojectile
+target_mp3audio
+team_advarmory
+team_armory
+team_armslab
+team_chemlab
+team_command
+team_hive
+team_infportal
+team_medlab
+team_nukeplant
+team_observatory
+team_prototypelab
+team_turretfactory
+team_webstrand
+trigger_presence
+trigger_random
+trigger_script
+turret
+umbracloud
+weapon_acidrocket
+weapon_acidrocketgun
+weapon_babblergun
+weapon_babblerprojectile
+weapon_bilebomb
+weapon_bilebombgun
+weapon_bite2gun
+weapon_bitegun
+weapon_blink
+weapon_charge
+weapon_claws
+weapon_divinewind
+weapon_flamegun
+weapon_grenade
+weapon_grenadegun
+weapon_healingspray
+weapon_heavymachinegun
+weapon_knife
+weapon_leap
+weapon_machinegun
+weapon_mine
+weapon_nukegun
+weapon_paralysis
+weapon_parasite
+weapon_pistol
+weapon_primalscream
+weapon_shotgun
+weapon_spikegun
+weapon_spit
+weapon_spore
+weapon_swipe
+weapon_umbra
+weapon_webspinner
+weapon_welder
+webgunprojectile
+
+// Version 1.0 add'l
+//
+// From: "Charlie Cleveland" <flayra@overmind.org>
+// Date: Mon, 16 Sep 2002 12:46:55 -0400
+//
+item_heavyarmor
+item_jetpack
+
+// Version 1.0 add'l
+//
+// From: "Charlie Cleveland" <flayra@overmind.org>
+// Date: Fri, 27 Sep 2002 10:57:54 -0400
+//
+team_advturretfactory
+
+// Version 1.1
+//
+// From: "Prodigy" <jcouzens@uhfco.net>
+// Date: Mon, 28 Apr 2003 02:57:33 -0700
+//
+kwSpikeProjectile
+umbraprojectile
+weapon_devour
+weapon_stomp
+
+// Version 2.0
+//
+// From: "Charlie Cleveland" <flayra@overmind.org>
+// Date: Tue, 8 Jul 2003 16:19:59 -0400
+//
+item_mine
+weapon_metabolize
+
+// Version 3.0
+//
+// Date: Thu, 4 Mar 2004 15:47:40 -0500
+// From: "Cheesy Peteza" <cheesy@yoclan.com>
+//
+// Gamedir changed to nsp for Beta version
+//
+item_catalyst
+
+// Version 3.0 beta5
+//
+// From: "[MoD] Cha0s C0ntr0L" <modchaoscontrol@hotmail.com>
+// Date: Thu, 09 Sep 2004 22:42:45 +0000
+//
+// Gamedir changed to ns again
+//
+item_ammopack

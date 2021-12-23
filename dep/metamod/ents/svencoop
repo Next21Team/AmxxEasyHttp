@@ -1,0 +1,98 @@
+// vim: set ft=cpp :
+
+// Sven Coop
+//    http://www.svencoop.com/
+//
+// Gamedir: svencoop
+// Win32  : hl.dll
+// Linux  : hl_i386.so
+
+// Svencoop 1.9
+monster_chumtoad
+squadmaker
+trigger_random
+trigger_random_time
+weapon_uziakimbo
+
+// Svencoop 2.0
+//
+// From: Eric Gisse <jowr@sdf.lonestar.org>
+// Date: Sat, 22 Dec 2001 18:53:11 -0900
+
+monster_babygarg
+monster_hwgrunt
+trigger_respawn
+trigger_secret
+
+// Version 2.1
+//
+// From: Daisuke Takeda <f_91@yahoo.com>
+// Date: Wed, 9 Apr 2003 12:15:29 -0700 (PDT)
+
+custom_precache
+env_xenmaker
+monster_assassin_repel
+monster_gonome
+monster_male_assassin
+monster_otis
+monster_otis_dead
+monster_pitdrone
+monster_robogrunt
+monster_robogruntrepel
+monster_shockroach
+monster_shocktrooper
+monster_zombie_barney
+monster_zombie_soldier
+weapon_medkit
+weapon_pipewrench
+weapon_uzi
+
+// Version 3.0
+//
+// From: David Anderson <bailopan@amxmodx.org>
+// Date: Sun, 14 Mar 2004 04:13:08 -0500 (EST)
+
+ammo_556
+ammo_762
+env_fog
+env_sentence
+env_spritetrain
+info_player_dm2
+monster_alien_babyvoltigore
+monster_alien_voltigore
+monster_blkop_ospray
+monster_cleansuit_scientist
+monster_human_grunt_ally
+monster_human_grunt_ally_dead
+monster_human_medic_ally
+monster_human_torch_ally
+monster_hwgrunt_repel
+monster_medic_ally_repel
+monster_torch_ally_repel
+player_respawn_zone
+trigger_random_unique
+weapon_grapple
+weapon_minigun
+weapon_sniperrifle
+
+//
+// From: "Sniper" <sniper@rochester.rr.com>
+// Date: Sun, 6 Jun 2004 00:58:19 -0400
+
+_squadfix
+gonomespit
+grappletongue
+monster_grunt_ally_medic_dead
+monster_grunt_ally_torch_dead
+monster_human_medic_ally_dead
+monster_human_torch_ally_dead
+monster_robogrunt_dead
+monster_robogrunt_repel
+path_monster
+pitdronespike
+playerhornet
+shock_beam
+sporegrenade
+trigger_setorigin
+voltigoreshock
+weapon_crowbar_electric

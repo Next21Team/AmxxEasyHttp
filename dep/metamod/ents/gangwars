@@ -1,0 +1,39 @@
+// vim: set ft=cpp :
+
+// Gangwars
+//    http://www.gangwars.net/
+
+// Version Beta 1.0
+//
+// From: "Nawfel Tricha" <tricha.nawfel@ensco.com>
+// Date: Wed, 17 Apr 2002 16:28:21 -0500
+
+weapon_1911
+weapon_92d
+weapon_ak47
+weapon_ak5
+weapon_ak5s
+weapon_aug
+weapon_b93r
+weapon_dsr1
+weapon_g36c
+weapon_g36cs
+weapon_g3sg1
+weapon_hegrenade
+weapon_knife
+weapon_lr300
+weapon_lr300s
+weapon_m16
+weapon_m3
+weapon_m4a1
+weapon_mac10
+weapon_mp5navy
+weapon_p90
+weapon_scout
+weapon_sg550
+weapon_sg552
+weapon_smokegrenade
+weapon_tmp
+weapon_ump45
+weapon_usp
+weapon_xm1014

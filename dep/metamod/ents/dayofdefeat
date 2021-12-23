@@ -1,0 +1,179 @@
+// vim: set ft=cpp :
+
+// Day of Defeat 1.0
+weapon_handgrenade_ex
+weapon_amerknife
+weapon_germanknife
+dod_object
+dod_score_ent
+dod_secondary
+func_destroy_objective
+weapon_stickgrenade_ex
+info_player_axis
+info_player_allies
+info_initial_player_axis
+info_initial_player_allies
+weapon_stickgrenade
+dod_object_goal
+trigger_control
+dod_control_point
+dod_control_point_master
+weapon_garand
+ammo_garand
+weapon_gewehr
+ammo_gewehr
+weapon_kar
+ammo_kar
+weapon_luger
+ammo_luger
+weapon_mp40
+weapon_mp44
+ammo_mp44
+ammo_mp40
+weapon_spring
+ammo_spring
+weapon_thompson
+ammo_thompson
+weapon_bar
+ammo_bar
+
+// Day of Defeat
+//    http://www.dayofdefeatmod.com/
+
+
+// Version Beta1.1
+// Additional entities, as guessed from symbol list of linux .so ...
+//    (willday, Sat May 26 00:47:29 EDT 2001)
+ammo_colt
+func_tankdrive
+info_player_observer
+weapon_colt
+weapon_knife
+
+// Version Beta 1.3
+// No additional entities.
+
+// Version Beta 2.0
+//
+// From: "Mugsy" <mugsy@captured.com>
+// Date: Fri, 8 Feb 2002 17:31:00 -0800
+ammo_30cal
+ammo_m1carbine
+ammo_mg34
+ammo_mg42
+dod_ammo_depot
+dod_capture_area
+dod_point_relay
+dod_round_timer
+dod_trigger_sandbag
+env_state
+info_alias
+info_group
+multi_alias
+trigger_changealias
+weapon_30cal
+weapon_gerknife
+weapon_m1carbine
+weapon_mg34
+weapon_mg42
+weapon_spade
+
+// More for Beta 2.0
+//
+// From: "CheatingDeath" <cheatingdeath@cheating-death.com>
+// Date: Thu, 14 Feb 2002 02:44:57 -0600
+env_customize
+env_rain
+env_warpball
+monster_allied_barney
+monster_allied_grunt
+monster_alliedgrunt_dead
+monster_axis_grunt
+monster_axisgrunt_dead
+multi_watcher
+scripted_action
+trigger_lightstyle
+trigger_startpatrol
+watcher
+
+// Version Beta 3.0
+//
+// From: "dJeyL" <djeyl@djeyl.net>
+// Date: Fri, 12 Jul 2002 00:40:58 +0200
+ammo_fg42
+ammo_greasegun
+ammo_k43
+ammo_scopedkar
+dod_camera
+dod_location
+dod_stats
+env_model
+info_doddetect
+info_gameplaylogic
+monster_sarge_allies
+para_roundtimer
+weapon_fg42
+weapon_greasegun
+weapon_k43
+weapon_scopedfg42
+weapon_scopedkar
+
+// Version 1.0
+//
+// From: Tim Holt <TimH@valvesoftware.com>
+// Date: Sat, 26 Apr 2003 16:35:43 -0700
+
+ammo_bazooka
+ammo_bren
+ammo_enfield
+ammo_piat
+ammo_pschreck
+ammo_sten
+dod_preround
+weapon_bazooka
+weapon_bren
+weapon_enfield
+weapon_piat
+weapon_pschreck
+weapon_sten
+
+// Version 1.0 add'l
+//
+// From: Alfred Reynolds <Alfred@valvesoftware.com>
+// Date: Sat, 26 Apr 2003 16:17:17 -0700
+//
+// From: "Prodigy" <jcouzens@uhfco.net>
+// Date: Thu, 1 May 2003 21:27:08 -0700
+
+ammo_generic_american
+ammo_generic_british
+ammo_generic_german
+ammo_webley
+dod_ammo
+weapon_scopedenfield
+weapon_webley
+
+// Version 1.0 add'l
+//
+// From: Alfred Reynolds <Alfred@valvesoftware.com>
+// Date: Sat, 3 May 2003 02:56:53 -0700
+
+shell_bazooka
+shell_piat
+shell_pschreck
+
+// Version 1.0 add'l
+//
+// From: Fractal <fractal323@comcast.net>
+// Date: Sat, 03 May 2003 11:27:24 -0400
+
+func_tankbase
+func_tankcannon
+func_tankmg
+func_tanktarget
+particle_shooter
+
+// Version 1.1
+
+dod_mapmarker
+env_rocketshooter

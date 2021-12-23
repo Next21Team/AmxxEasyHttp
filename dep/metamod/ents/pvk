@@ -1,0 +1,58 @@
+// vim: set ft=cpp :
+
+// Pirates, Vikings and Knights
+//     http://www.pvkmod.com/
+//
+// Gamedir  : pvk
+// Linux dso: hl_i386.so
+// Win32 dll: hl.dll
+
+// Version Beta 2.1
+// 
+// From: "Pierre-Marie Baty" <pm@bots-united.com>
+// Date: Mon, 28 Jun 2004 16:51:33 +0200
+//
+ammo_axes
+ammo_javelins
+ammo_longbow
+ammo_markmusket
+ammo_musketoon
+ammo_shot
+booty_it
+flying_axe
+func_pillageable
+game_zone_pirscore
+game_zone_territory
+game_zone_vikscore
+info_player_knight
+info_player_pirate
+info_player_viking
+info_playerstart_red
+info_pvk
+item_chainmail
+item_food
+item_leather
+item_platemail
+item_treasurechest
+javelin
+marker_flag
+monster_parrot
+monster_powderkeg
+respawn_chest
+treasure_chest
+weapon_axes
+weapon_bigaxe
+weapon_cutlass
+weapon_dagger
+weapon_flail
+weapon_flintlock
+weapon_javelin
+weapon_longbow
+weapon_mace
+weapon_markmusket
+weapon_musketoon
+weapon_parrot
+weapon_powderkeg
+weapon_treasure
+weapon_twosword
+weapon_viksword

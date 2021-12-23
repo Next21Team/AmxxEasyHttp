@@ -1,0 +1,38 @@
+// vim: set ft=cpp :
+
+// Swarm
+//    http://swarm.edgegaming.com/
+
+// Swarm (?? version)
+ammo_adrenaline
+ammo_needle
+ammo_swarmprimary
+ammo_swarmsecondary
+ammo_swarm_xen_secondary
+garg_hull
+grapple_hook
+item_swarm_flag
+monster_c4
+swarm_garg_stomp
+swarm_spawnpt_acontroller
+swarm_spawnpt_agarg
+swarm_spawnpt_aheadcrab
+swarm_spawnpt_aslave
+swarm_spawnpt_atripod
+swarm_spawnpt_hassassin
+swarm_spawnpt_hcommander
+swarm_spawnpt_hengineer
+swarm_spawnpt_hgrunt
+swarm_spawnpt_hscientist
+swarm_spawnpt_human
+swarm_team_alien
+swarm_team_human
+trigger_regen
+weapon_adrenaline
+weapon_eballblaster
+weapon_islavezap
+weapon_needle
+weapon_pipebomb
+weapon_sonicgrenade
+weapon_swarm_gargflame
+// (end swarm)

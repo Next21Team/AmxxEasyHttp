@@ -1,0 +1,83 @@
+// vim: set ft=cpp :
+
+// Counter-Strike (Beta 6.2a)
+armoury_entity
+ammo_338magnum
+ammo_357sig
+ammo_45acp
+ammo_50ae
+ammo_556nato
+ammo_57mm
+ammo_762nato
+ammo_9mm
+ammo_556natobox
+ammo_flashbang
+debris
+env_bombglow
+func_bomb_target
+func_buyzone
+func_escapezone
+func_hostage_rescue
+func_vip_safetyzone
+hostage_entity
+info_bomb_target
+info_hostage_rescue
+info_vip_start
+item_assaultsuit
+item_kevlar
+item_thighpack
+weapon_ak47
+weapon_awp
+weapon_aug
+weapon_c4
+weapon_deagle
+weapon_flashbang
+weapon_g3sg1
+weapon_glock18
+weapon_hegrenade
+weapon_knife
+weapon_m249
+weapon_m3
+weapon_m4a1
+weapon_mac10
+weapon_mp5navy
+weapon_p228
+weapon_p90
+weapon_scout
+weapon_sg552
+weapon_shield
+weapon_tmp
+weapon_usp
+weapon_xm1014
+// (End cstrike 6.2a)
+
+// cstrike 6.5
+weapon_smokegrenade
+info_map_parameters
+
+// cstrike b7
+func_vehicle
+func_vehiclecontrols
+weapon_elite
+
+// cstrike 1.0
+func_grencatch
+func_weaponcheck
+weapon_fiveseven
+weapon_sg550
+
+// cstrike 1.3 (maybe earlier)
+weapon_ump45
+
+// Version 1.6
+// From: Alfred Reynolds <Alfred@valvesoftware.com>
+// Date: Thu, 16 Jan 2003 12:32:41 -0800
+//
+weapon_famas
+weapon_galil
+weapon_shieldgun
+
+// From: "judge2k91" <judge2k91@ifrance.com>
+// Date: Wed, 15 Oct 2003 23:09:54 +0200
+env_rain
+env_snow

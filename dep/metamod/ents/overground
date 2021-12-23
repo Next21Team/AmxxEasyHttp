@@ -1,0 +1,56 @@
+// vim: set ft=cpp :
+
+// Over Ground
+//    http://og.portailmods.com/
+
+// Version Beta 1.0
+//
+// From: "Corentin" <corentincj@wanadoo.fr>
+// Date: Wed, 3 Sep 2003 18:41:42 +0200
+//
+ammo_deploygun
+ammo_explogun
+ammo_lgrenades
+ammo_machinegun
+ammo_pistolet
+ammo_sniper
+ctf_flag_follow_blue
+ctf_flag_follow_red
+env_fog
+env_mp3
+env_music
+env_particles
+env_push
+env_timer
+env_vgui
+func_tbutton
+item_ammo
+item_armor
+item_ctf_flag
+item_dbldamage
+item_health
+item_infjetpack
+item_invincibility
+item_invisibility
+item_random
+item_regeneration
+item_teleport
+item_vengeance
+lflamme_fire
+trigger_assault
+trigger_changevalue
+trigger_course
+trigger_ctf
+trigger_execcommand
+trigger_jetpack
+trigger_particles
+trigger_sound
+trigger_war
+weapon_dblpistolet
+weapon_deploygun
+weapon_explogun
+weapon_lflamme
+weapon_lgrenades
+weapon_machinegun
+weapon_pistolet
+weapon_sniper

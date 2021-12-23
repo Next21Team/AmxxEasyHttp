@@ -1,0 +1,36 @@
+// vim: set ft=cpp :
+
+// Adrenalinegamer
+//    http://www.bullit-ag.com/
+//    http://www.planethalflife.com/agmod/
+
+// Versions 3.2, 4.1
+//
+// From: "[pmers]BulliT" <bullit@pmers.net>
+// Date: Thu, 26 Jul 2001 13:13:46 +0200
+//
+// "Entities used is the same as regular HLDM standard SDK."
+
+// Version 6.0
+//
+// From: <bullit@pmers.net>
+// Date: Thu, 19 Sep 2002 18:02:37 +0200
+carried_flag_team1
+carried_flag_team2
+ctf_blueflag
+ctf_bluespawn
+ctf_redflag
+ctf_redspawn
+info_hmctfdetect
+info_player_team1
+info_player_team2
+item_flag_team1
+item_flag_team2
+
+// Version 6.5
+//
+// Game directory changed to 'ag'
+// Version 3.x is now sought for in game directory 'ag3'.
+//
+//From: Matthew Cheale <say_ten@multiplay.co.uk>
+//Date: Tue, 20 Jul 2004 16:49:28 +0100

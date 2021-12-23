@@ -1,0 +1,101 @@
+// vim: set ft=cpp :
+
+// Tour of Duty
+//    http://www.tourofdutymod.com/
+
+// Version 0.6.7
+//
+// From: "Pat Magnan" <pat@sluggo.org>
+// Date: Mon, 20 May 2002 17:31:09 -0500
+ammo_crate
+env_animsprite
+flag_capture_point
+flag_follow
+flag_world
+info_alias
+info_bomb_target
+info_boobytrap
+info_escape_target
+info_group
+info_landmine
+law_rocket
+monster_bomb
+monster_sitting_villager
+monster_villager
+monster_villager_dead
+multi_alias
+rpg7_rocket
+tod_control_point
+tod_roundend_trigger
+trigger_changealias
+weapon_ak47
+weapon_bayonet
+weapon_binos
+weapon_bomb
+weapon_colt
+weapon_dragunov
+weapon_kbar
+weapon_law
+weapon_m16
+weapon_m21
+weapon_m60
+weapon_m79
+weapon_mat49
+weapon_medkit
+weapon_nva_grenade
+weapon_rpd
+weapon_rpg7
+weapon_tokarev
+weapon_us_grenade
+
+// Version 0.8.0 update
+//
+// From: Pat Magnan <pat@sluggo.org>
+// Date: Sun, 23 Jun 2002 23:24:35 -0500
+env_model
+info_firstround_spawn
+info_rescue_monster
+info_roundx_spawn
+monster_dog
+monster_goat
+monster_kid
+monster_pig
+monster_pilot
+monster_prisoner
+monster_snake
+monster_troop
+tod_notripmine_area
+tod_roundstart_trigger
+tod_roundwon_trigger
+weapon_grease
+weapon_m14
+weapon_mortar
+weapon_mosin
+weapon_radio
+weapon_sks
+
+// Version 0.9.0
+//
+// From: Pat Magnan <pat@sluggo.org>
+// Date: Mon, 08 Jul 2002 14:10:12 -0400
+env_fog
+trigger_lightstyle
+light_glow
+
+// Version 1.1 Beta
+//
+// From: Pat Magnan <pat@sluggo.org>
+// Date: Fri, 15 Nov 2002 06:49:46 -0500
+info_minefield
+info_nomines
+info_player_nva_reenforcement
+info_player_usmc_reenforcement
+info_rescue_point
+monster_assassin_target
+monster_buffalo
+monster_chicken
+monster_cow
+monster_helicopter
+monster_monkey
+tod_control_area
+weapon_claymore

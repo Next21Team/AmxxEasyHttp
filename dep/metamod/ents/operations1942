@@ -1,0 +1,57 @@
+// vim: set ft=cpp :
+
+// Operations 1942
+//   http://www.no1studios.com/1942/
+//
+// Game directory: ops1942
+// Win32 DLL name: spirit.dll
+// Linux DSO name: spirit_i386.so
+//
+
+// Version 2.0
+//
+// From: "Pierre-Marie Baty" <pm@bots-united.com>
+// Date: Tue, 5 Oct 2004 14:22:57 +0200
+//
+calc_position
+calc_ratio
+calc_subvelocity
+calc_velocity_path
+calc_velocity_polar
+env_beamtrail
+env_decal
+env_dlight
+env_elight
+env_footsteps
+env_particle
+env_quakefx
+env_shockwave
+env_sky
+func_searchlight
+func_shine
+hud_sprite
+info_compile_parameters
+info_movewith
+info_texlights
+inout_register
+lightfader
+locus_alias
+locus_beam
+locus_variable
+monster_bullsquid
+monster_generic_dead
+monster_target
+motion_manager
+motion_thread
+player_freeze
+scripted_tanksequence
+scripted_trainsequence
+trigger_bounce
+trigger_changecvar
+trigger_command
+trigger_hevcharge
+trigger_inout
+trigger_motion
+trigger_onsight
+trigger_rottest
+watcher_count

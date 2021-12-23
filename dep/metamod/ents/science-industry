@@ -1,0 +1,73 @@
+// vim: set ft=cpp :
+
+// Science & Industry
+//    http://www.planethalflife.com/si/
+//
+// Game directory: si
+// Linux DSO name: si_i386.so
+// Win32 DLL name: si.dll
+//
+ammo_mindrayclip
+ammo_vomitclip
+info_administrator
+info_scientist
+info_scientist_dead
+info_scientist_start
+info_transistor
+weapon_mindray
+weapon_radio
+weapon_transistor
+weapon_vomit
+
+// Science & Industry
+//
+// Version 0.97
+// Additional entities, as guessed from symbol list of linux .so ...
+//    (willday, Thu May 24 00:16:24 EDT 2001)
+info_zone
+weapon_fev
+weapon_flamegrenade
+
+// Actual list provided by SI lead programmer:
+//
+// From: "Chris Glein" <papasnewbag@planethalflife.com>
+// Date: Wed, 23 May 2001 20:40:49 -0700
+ammo_rocketpistol
+ammo_snUZI
+ammo_tommygun
+carry_resource
+carry_scientist
+func_tech_breakable
+grapple_hook
+info_sidetect
+item_resource
+weapon_briefcase
+weapon_cloak
+weapon_colt
+weapon_experimental
+weapon_fleshgrenade
+weapon_generic
+weapon_grapple
+weapon_rocketpistol
+weapon_snUZI
+weapon_tommygun
+
+// From: "Sylvain Gravejat" <sylvain.gravejat@bigfoot.com>
+// Date: Sat, 24 Jul 2004 01:53:38 +0200
+//
+// Version 1.0
+//
+emp_cannister
+emp_pulse
+env_model
+fev_cloud
+fev_vial
+rocketpistol_rocket
+trigger_deliveryzone
+weapon_empcannon
+weapon_resource
+
+// From: "Caleb 'Ghoul' Delnay" <ghoul@nocensmundus.net>
+// Date: Wed, 8 Dec 2004 19:46:01 -0500 (EST)
+//
+timed_grenade

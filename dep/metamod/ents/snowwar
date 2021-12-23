@@ -1,0 +1,40 @@
+// vim: set ft=cpp :
+
+// Snow-War
+//    http://snowwar.hlgaming.com
+//
+// Game directory: snow
+// Win32 DLL name: snow.dll
+// Linux DSO name: snow_i386.so
+
+// Version 1.0
+//
+// From: <rhobot@gamershomepage.com>
+// Date: Sat, 29 Dec 2001 12:04:43 -0500
+//
+ctf_flag
+ctf_flagzone
+grapple_hook
+info_player_blue
+info_player_observer
+info_player_red
+power_ballbag
+power_coco
+power_gloves
+power_shield
+power_shoes
+snowball
+trip_beam
+weapon_snowball
+
+// Version 2.0
+//
+// From: Teemu Polvi <teemu.polvi@dnainternet.net>
+// Date: Sun, 19 Dec 2004 16:58:35 +0200
+//
+env_fog
+env_snow
+kotm_crown
+kotm_hill
+power_bag
+power_pogo

@@ -1,0 +1,67 @@
+// vim: set ft=cpp :
+
+// Rocket Crowbar 2
+//    http://www.rocketcrowbar.com/
+//
+// From: "Mr. Satan" <mrsatan@comcast.net>
+// Date: Fri, 9 Jan 2004 14:53:41 -0500
+//
+// Version: 1
+// Game directory: rc2
+// Win32 DLL name: rc2.dll
+// Linux DSO name: NONE
+//
+
+antifric_timer
+antifriction_grenade
+ball_lightning
+blaster_bolt
+bouncy_bolt
+bouncy_tripmine
+chain_hurter
+conc_charge
+control_forklift
+crowbar_rocket
+crowbarang
+explode_bolt
+freeze_grenade
+freeze_timer
+gauss_becon
+glock_gib
+glock_stickygib
+gravity_grenade
+impailer
+implode_timer
+info_player_coop
+lcs_spawner
+maintainer_ent
+mini_grunt
+nuclear_missile
+phase_pulse
+punch_tripmine
+race_controller
+race_path
+rm_rocket
+roach_charge
+rocket_mine
+scientist_mine
+shotgun_crate
+shotgun_forklift
+shotgun_hev
+shotgun_sci
+shrink_timer
+shrinker_project
+sm_project
+snark_cam
+snark_project
+sphere_mine
+suck_grenade
+suck_mine
+target_tripmine
+tcontroller_cball
+tcontroller_tball
+timedevent
+transphasic_gib
+ultima_grenade
+virtual_hull
+xbow_teather

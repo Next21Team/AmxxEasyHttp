@@ -1,0 +1,58 @@
+// vim: set ft=cpp :
+
+// Digital Paintball
+//    http://www.digitalpaintball.net/
+//
+// Gamedir: dpb
+// Win32  : pb.dll
+// Linux  : pb.i386.so
+
+// Version 1.0
+//
+// From: <jonah@digitalpaintball.net>
+// Date: Sun, 22 Sep 2002 02:18:18 -0400 (EDT)
+cflag
+func_goalpoint
+info_paintball
+info_playerstart_blue
+info_playerstart_red
+item_flag_blue
+item_flag_center
+item_flag_red
+paintball
+trigger_teampush
+weapon_angel
+weapon_bush
+weapon_cocker
+weapon_excal
+weapon_gren
+weapon_m98
+weapon_mag
+weapon_pgp
+weapon_phantom
+weapon_pt
+weapon_shocker
+weapon_sl68
+weapon_spyder
+
+// Version 2.1
+//
+// Date: Wed, 07 Apr 2004 02:00:32 -0500 (EST)
+// From: David Anderson <bailopan@amxmodx.org>
+
+weapon_emag
+weapon_impulse
+weapon_matrix
+weapon_orracle
+weapon_timmy
+
+// Version 2.2
+//
+// Linux DSO name changed from pg_i686.so to pb.i386.so
+// 
+// Date: Jun 15, 2005 2:24 PM
+// From: From: Ken Jimenez <goldeneagle68@_at_gmail.com>
+weapon_a5
+weapon_blazer
+weapon_dm4
+weapon_omen

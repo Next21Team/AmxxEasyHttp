@@ -1,0 +1,37 @@
+// vim: set ft=cpp :
+
+// Deathmatch Classic
+//    from Valve ?
+
+// From: Erik Johnson <erik@valvesoftware.com>
+// Date: Thu, 7 Jun 2001 10:08:53 -0700
+//
+// "DMC is a tribute to Quake 1 deathmatch. It looks similar, and plays
+// "pretty much identical."
+
+// Version 1
+item_armor1
+item_armor2
+item_armor3
+item_armorInv
+item_artifact_envirosuit
+item_artifact_invisibility
+item_artifact_invulnerability
+item_artifact_super_damage
+item_backpack
+item_cells
+item_rockets
+item_shells
+item_spikes
+item_weapon
+quake_nail
+quake_rocket
+teledeath
+trigger_env_hurt
+weapon_grenadelauncher
+weapon_lightning
+weapon_nailgun
+weapon_quakegun
+weapon_rocketlauncher
+weapon_supernailgun
+weapon_supershotgun

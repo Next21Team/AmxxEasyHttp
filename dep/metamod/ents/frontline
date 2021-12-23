@@ -1,0 +1,91 @@
+// vim: set ft=cpp :
+
+// Frontline (initial version?)
+ammo_beretta
+capture_point
+ammo_mp5a2
+ammo_mp5sd
+gren_smoke
+weapon_spas12
+ammo_spas12
+my_monster
+weapon_ump45
+ammo_ump45
+info_frontline
+weapon_clip_generic
+
+// Frontline 0.46
+weapon_hk21
+ammo_hk21
+weapon_mk23
+ammo_mk23
+weapon_msg90
+ammo_msg90
+
+// Frontline 0.49
+weapon_ak5
+ammo_ak5
+
+// Frontline (more from 1.0) ("yes, my bad with this")
+trip_beam
+weapon_mp5a2
+weapon_mp5sd
+info_player_attacker
+info_player_defender
+info_player_observer
+
+// Front Line Force 1.2a
+//    http://www.frontlineforce.com/
+//    http://www.flfmod.com/
+//
+// From: Rat <halflife@rat.org>
+// Date: Wed, 18 Apr 2001 01:41:56 -0700
+//
+// "I got adminmod to work with the new weapons FLF 1.2 by adding this"
+weapon_sako
+weapon_rs202m2
+ammo_sako
+ammo_rs202m2
+
+// From Botman's news page for FLF 1.2a:
+//    http://www.planethalflife.com/botman/index.shtml
+target_win
+weather_genie
+weather_litnode
+
+// Additional entities for 1.2a, from list forwarded by Florian.
+ammo_famas
+ammo_m4
+ammo_mac10
+secondary_point
+weapon_beretta
+weapon_famas
+weapon_flashbang
+weapon_hegrenade
+weapon_knife
+weapon_m4
+weapon_mac10
+
+// Additional entities from source-grep, posted on AM forums:
+//    SandHawk
+//    29-05 02:46am
+//    http://www.cfgn.net/vbulletin/showthread.php?threadid=10427#post157571
+//
+// From: "SandHawk" <valerev@home.com>
+// Date: Wed, 30 May 2001 13:02:52 +1000
+//
+// "I have a complete list of ents for frontline force, just got it from
+// david, one of the programmers."
+item_capkey
+weapon_m86
+weapon_smokegrenade
+
+// Version 1.3
+// No additional entities needed.
+
+// Version 1.3a
+// Additional entities, as guessed from symbol list of linux .so ...
+//    (willday, Thu Aug  2 02:48:05 EDT 2001)
+ammo_ak105
+getGlobalStunLevel
+player_flame

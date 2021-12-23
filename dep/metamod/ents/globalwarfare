@@ -1,0 +1,138 @@
+// vim: set ft=cpp :
+
+// Global Warfare
+//    http://www.Globalwarfare.net/
+//    http://www.globalwarfare.org/
+//    http://www.planethalflife.com/globalwarfare/
+//    http://dynamic.gamespy.com/~globalwarfare/
+
+// Version Beta 1.0
+// Entities as guessed from symbol list of linux .so ...
+//    (willday, Thu Jun  7 18:02:33 EDT 2001)
+
+ammo_berettaclip
+ammo_m2
+ammo_nato
+ammo_natoclip
+func_airstrike_area
+func_capture_area
+func_land_transport
+func_landtransport
+game_endbattle
+info_airstrike_node
+info_gwGeneral_spawn
+info_gwbriefing_spawn
+info_gwinmap_spawn
+info_gwplayer_spawn
+info_gwwaiting_spawn
+info_transport_node
+item_briefcase
+item_papers
+item_parachute
+item_silvercase
+mastertoggle
+monster_a10
+monster_c4
+monster_gps
+monster_lrocket
+monster_m2
+monster_mine
+monster_prop_apache
+monster_scorpion
+monster_srocket
+transport_apc
+transport_blackhawk
+trigger_capturetimer
+trigger_captureupdate
+weapon_ak
+weapon_beretta
+weapon_binoculars
+weapon_c4
+weapon_dragunov
+weapon_famas
+weapon_g36
+weapon_grenade
+weapon_knife
+weapon_laser
+weapon_law
+weapon_m16
+weapon_m2
+weapon_medkit
+weapon_mine
+weapon_pdw
+weapon_psg
+weapon_sa80
+weapon_spas
+weapon_stinger
+
+// Version Beta 1.0 Official
+//
+// Additional entities from list provided by dev team.
+//
+// From: "Alex Peterson" <wallyhawks@hotmail.com>
+// Date: Sun, 10 Jun 2001 17:18:51 -0400
+//
+// From: "Rob G." <sikesomewhere@home.com>
+// Date: Sun, 10 Jun 2001 17:25:48 -0400
+
+follower_basic
+monster_parachute
+
+// Version 1.1, 1.2
+//
+// Additional entities from list provided by dev team.
+//
+// From: "Alex Peterson" <wallyhawks@hotmail.com>
+// Date: Sun, 07 Oct 2001 23:27:58 -0400
+
+ammo_40glclip
+game_clock
+weapon_1911
+weapon_40gl
+weapon_m40a1
+weapon_m60
+weapon_m96
+weapon_p99
+weapon_pkm
+weapon_sigpro
+weapon_wa2000
+
+// Version Beta 2.0
+//
+// From: "Mike hotaling" <mike_hotaling@hotmail.com>
+// Date: Tue, 26 Nov 2002 17:37:17 +0000
+//
+ammo_1911clip
+ammo_ak47clip
+ammo_ak74clip
+ammo_ar10clip
+ammo_dragunovclip
+ammo_famasclip
+ammo_g36clip
+ammo_hk33clip
+ammo_m16a2clip
+ammo_m40a1clip
+ammo_m60clip
+ammo_mf2clip
+ammo_mp5pdwclip
+ammo_p99clip
+ammo_pkmclip
+ammo_psg1clip
+ammo_sa80clip
+ammo_sig245clip
+ammo_spasclip
+ammo_uziclip
+func_clouds
+func_protect
+trip_beam
+weapon_ak47
+weapon_ak74
+weapon_ar10
+weapon_gps
+weapon_hk33
+weapon_m16a2
+weapon_mf2
+weapon_mp5pdw
+weapon_psg1
+weapon_sig245
+weapon_uzi

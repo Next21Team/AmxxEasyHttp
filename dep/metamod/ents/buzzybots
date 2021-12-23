@@ -1,0 +1,25 @@
+// vim: set ft=cpp :
+
+// BuzzyBots
+//    http://www.buzzybots.dk/
+
+// Version 2.3
+//
+// From: "kenny" <junktext_@hotmail.com>
+// Date: Sat, 9 Nov 2002 02:31:15 -0700
+
+func_base
+info_chip
+info_player_blue
+info_player_observer
+info_player_red
+monster_bbturret
+npc_skrunk
+object_beacon
+object_follow
+object_superchip
+weapon_bomber
+weapon_guardian
+weapon_runner
+weapon_spy
+weapon_trooper

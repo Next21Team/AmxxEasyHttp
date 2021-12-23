@@ -1,0 +1,57 @@
+// vim: set ft=cpp :
+
+// The Specialists
+//    http://www.specialistsmod.net/
+
+// Version Beta 1.0
+//
+// From: "Guy Meoded" <guy_fifa@hotmail.com>
+// Date: Fri, 15 Nov 2002 16:23:38 +0200
+//
+// From: Morfeo [mailto:morfeo@halflifeitalia.com]
+// Sent: Wednesday, February 12, 2003 2:02 AM
+//
+TSAmmoPack
+TSWorldGun
+TS_PowerUp
+TS_bomb
+knife
+m61_grenade
+weapon_tsgun
+
+// Version Beta 2.0
+//
+// From: "Chan Kongs-sang" <cks@daspace.de>
+// Date: Fri, 11 Jul 2003 13:48:04 +0100
+//
+deadcorpse
+ts_trigger
+ts_slowmotion
+ts_slowmotionpoint
+ts_dmhill
+ts_model
+ts_mapglobals
+ts_objective_manager
+ts_objective_ptr
+ts_wingiver
+ts_hack
+ts_groundweapon
+ts_vipescape
+ts_teamescape
+
+// Additional for Beta 2.0
+//
+// From: Alexander Else <aels757@cse.unsw.EDU.AU>
+// Date: Thu, 31 Jul 2003 20:03:05 +1000 (EST)
+//
+ts_bomb
+ts_powerup
+vipescape
+
+
+// Version Beta 2.1
+//
+// From: Jorge Rodriguez <vino@vinoisnotouzo.ath.cx>
+// Date: Fri, 30 Apr 2004 05:24:20 -0500
+//
+shrapnel

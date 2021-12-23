@@ -1,0 +1,49 @@
+// vim: set ft=cpp :
+
+// VampireSlayer
+//    http://www.planethalflife.com/vampire/
+//
+// From: "Mark Gornall" <routetwo@planethalflife.com>
+// Date: Sat, 28 Apr 2001 11:57:28 +0100
+// 
+// Game directory: vs
+// Win32 DLL: mp.dll
+// Linux DSO: vsi386.so
+
+
+// Version 1.1
+info_player_vampire
+info_player_slayer
+weapon_claw
+
+// Version 2.0
+weapon_vsclaw
+weapon_vscolt
+vscrossbow_bolt
+weapon_vscrossbow
+weapon_vsdbshotgun
+weapon_vsmp5
+weapon_vsshotgun
+weapon_vsstake
+
+// Version "Chapter V"
+//
+// From: "Mark Gornall" <routetwo@planethalflife.com>
+// Date: Thu, 6 Feb 2003 12:35:25 -0000
+//
+func_breakpoints
+info_draw_slayerswin
+info_draw_vampireswin
+item_flag_slayer
+item_flag_vampire
+weapon_vscue
+weapon_vsthunderfive
+weapon_vswinchester
+
+// Version "Chapter VI"
+//
+// From: "Mark Gornall" <routetwo@planethalflife.com>
+// Date: Thu, 10 Jun 2004 20:11:27 +0100
+//
+info_dm 
+weapon_vsbike

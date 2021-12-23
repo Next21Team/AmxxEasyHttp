@@ -1,0 +1,64 @@
+// vim: set ft=cpp :
+
+// The Terrorist Revenge
+// http://www.terroristrevenge.net/
+//
+// Game directory: trevenge
+// Win32 DLL name: trevenge.dll
+// Linux DSO name: trevenge.so
+//
+
+// Version 0.2.1
+//
+// From: OC13 <oc13@ifrance.com>
+// Date: Sun, 16 Nov 2003 16:53:20 +0100
+//
+
+ammo_0mm45
+ammo_0mm50b
+ammo_5mm56
+ammo_5mm7
+ammo_7mm62
+ammo_9mm
+ammo_berrett82clip
+ammo_fnp90clip
+ammo_m16clip
+ammo_m4clip
+ammo_psg1clip
+ammo_synthol
+env_model
+hltr_assaut_boutton
+hltr_hostage
+hltr_object
+hltr_object_tombe
+hltr_objectcapture
+hltr_objectif
+hltr_objectif_num
+hltr_passant
+hltr_spectator_start
+hltr_turret
+hltr_waypoint
+info_flash
+info_lacrymo
+item_irnvg
+item_mask
+item_nvg
+weapon_barrett82
+weapon_ber92fs
+weapon_couteau
+weapon_cz75
+weapon_desert
+weapon_fnp90
+weapon_g36
+weapon_glock18
+weapon_hk33
+weapon_lacrymo
+weapon_m16a2
+weapon_m3
+weapon_m4a1
+weapon_mac10
+weapon_psg1
+weapon_seringue
+weapon_smokegrenade
+weapon_spas12
+weapon_ump45

@@ -1,0 +1,50 @@
+// vim: set ft=cpp :
+
+// The Trenches
+//    http://www.thetrenches.net/
+//
+// Game directory: tt
+// Win32 DLL name: tt.dll
+// Linux DSO name: tt_i386.so
+
+// Version Beta 1.0
+//
+// From: BAILOPAN
+// Date: Mon, 11 Oct 2004 22:46:50 -0500
+//
+ammo_CEnfield
+ammo_GMauserG98
+env_weather
+func_trenchcap1
+func_trenchcap2
+func_trenchcap3
+func_trenchcap4
+info_tt_gameplay
+particle_weatherfx
+push_point1
+push_point2
+push_point3
+push_point4
+push_point5
+trenches_allied_start
+trenches_axis_start
+trenches_central_start
+weapon_BritGrenMelee
+weapon_BritGrenNade
+weapon_CEnfield
+weapon_CEnfieldMelee
+weapon_CEnfieldNade
+weapon_GMauserG98
+weapon_GMauserG98Melee
+weapon_GMauserG98Nade
+weapon_GermGrenMelee
+weapon_GermGrenNade
+
+//
+// From: "Damaged Soul" <Protonic@cfl.rr.com>         
+// Date: Mon, 18 Oct 2004 04:30:06 -0400
+//
+env_fog
+env_model
+env_particle
+info_player_observer

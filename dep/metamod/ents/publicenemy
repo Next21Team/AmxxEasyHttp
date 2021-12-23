@@ -1,0 +1,61 @@
+// vim: set ft=cpp :
+
+// Public Enemy
+//    http://www.public-enemy.org
+//
+// From: "D. Hofer" <dhofer@besonet.ch>
+// Date: Wed, 09 Apr 2003 14:28:58 +0200
+//
+// Version Beta 1.0
+
+item_nvg
+mapobject_asiancar
+mapobject_bluecar
+mapobject_copcar
+mapobject_npc_bum
+mapobject_npc_bum1
+mapobject_npc_bum2
+mapobject_npc_bum3
+mapobject_npc_crow
+mapobject_npc_slavebot
+mapobject_redcar
+mapobject_zeppelin
+pe_escapezone
+pe_light
+pe_light_ref
+pe_object_case
+pe_object_htool
+pe_objectclip
+pe_radar_mark
+pe_rain
+pe_spawn_corps
+pe_spawn_syndicate
+pe_terminal
+trigger_coldbreath
+weapon_ak47
+weapon_aug
+weapon_benelli
+weapon_beretta
+weapon_beretta_a
+weapon_case
+weapon_deagle
+weapon_glock_auto
+weapon_glock_auto_a
+weapon_hegrenade
+weapon_knife
+weapon_m16
+weapon_microuzi
+weapon_microuzi_a
+weapon_minigun
+weapon_mp5sd
+weapon_orbital
+weapon_p225
+weapon_p226
+weapon_p226mp
+weapon_seburo
+weapon_sig550
+weapon_spas12
+weapon_stoner
+weapon_tavor
+weapon_usp
+weapon_uspmp

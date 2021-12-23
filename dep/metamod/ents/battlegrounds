@@ -1,0 +1,72 @@
+// vim: set ft=cpp :
+
+// The Battle Grounds
+//    http://www.bgmod.com/
+
+// Version 0.6
+//
+// From: "Ben Banfield" <b3nnyboy@lineone.net>
+// Date: Sun, 10 Feb 2002 18:06:36 -0000
+//
+FlyingTomaHawk
+ctb_point_one
+ctb_point_two
+info_player_observer
+info_player_team1
+info_player_team2
+info_teamplaydetect
+weapon_bandage
+weapon_knife
+weapon_musket
+weapon_pistol
+weapon_rifle
+weapon_saber
+weapon_tomahawk
+
+// Version Demo 1.0
+//
+// From: "Ben Banfield" <b3nnyboy@lineone.net>
+// Date: Fri, 8 Nov 2002 19:27:17 -0000
+//
+// Also note dllnames changed:
+// 	hl_i386.so -> bg_i386.so
+// 	hl.dll -> bg.dll
+//
+func_ctb
+func_point
+func_possesion
+info_american_line
+info_bg_detect
+info_british_line
+info_ctb_controller
+info_player_american
+info_player_british
+point_win
+weapon_BrownBess
+weapon_Charleville
+weapon_Knife
+weapon_Pennsylvania
+weapon_PistolA
+weapon_PistolB
+weapon_Revolutionnaire
+weapon_Sabre
+
+// Version 1.2
+//
+// From: Ben Banfield <ben@bgmod.com>
+// Date: Tue, 08 Jul 2003 20:36:34 +0100
+//
+func_capturepoint
+env_flag
+info_reset
+func_ammoprovider
+func_ammostripper
+
+// Version 1.2.1
+//
+// From: Ben Banfield <ben@bgmod.com>
+// Date: Fri, 31 Oct 2003 22:51:25 +0000
+//
+env_particleemitter
+game_team_score
+info_spawn_container

@@ -1,0 +1,59 @@
+// vim: set ft=cpp :
+
+// Existence
+//    http://www.whatisexistence.com/
+
+// Version Beta 1.3
+//
+// List provided by Alfred.
+
+AngleIMatrix
+AngleMatrix
+ammo_awm
+ammo_dualberettas
+ammo_dualscorpion
+ammo_mp5a4
+ammo_null
+ammo_stoner
+ammo_stonerscope
+ammo_stonersilencer
+ammo_uspclip
+ammo_vulcan
+ammo_xm4
+ammo_xm4slug
+drop_bomb
+func_jail_breakable
+func_jail_button
+func_jail_door
+func_jail_door_rotating
+func_jail_pushable
+info_button_phonebooth
+info_civ_start
+info_jwhite_capture
+info_jwhite_escape
+info_jwhite_rescue
+info_swat_start
+item_c4
+item_highjump
+item_newspaper
+item_speedburst
+item_upgradevest
+momentary_jail_door
+monster_civilian
+monster_civilian_dead
+monster_sitting_civilian
+player_glasses
+spy_camera
+weapon_awm
+weapon_cellphone
+weapon_dualberettas
+weapon_dualscorpion
+weapon_expgrenade
+weapon_mp5a4
+weapon_null
+weapon_spycam
+weapon_stoner
+weapon_stonerscope
+weapon_stonersilencer
+weapon_vulcan
+weapon_xm4

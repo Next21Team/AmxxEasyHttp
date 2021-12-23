@@ -1,0 +1,21 @@
+// vim: set ft=cpp :
+
+// Underworld Bloodline
+//    http://www.entertheunderworld.com/
+
+// Version 2.0
+//
+// From: p0_b0y@pb-puters.com (p0_b0y)
+// Date: Mon, 20 Oct 2003 16:48:53 -0400 (EDT)
+//
+uw_player_vamp
+uw_player_lycan
+uw_player_view
+ammo_m4
+weapon_star
+weapon_spider
+weapon_lightning
+weapon_vulcan
+ammo_lightning
+uw_monster_michael
+uw_monster_hybrid

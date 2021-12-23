@@ -1,0 +1,84 @@
+// vim: set ft=cpp :
+
+// Team Fortress Classic (version 1)
+building_dispenser
+building_sentrygun
+building_sentrygun_base
+detpack
+func_nobuild
+ghost
+info_player_teamspawn
+info_tfdetect
+info_tfgoal
+info_tfgoal_timer
+item_armor1
+item_armor2
+item_armor3
+item_artifact_envirosuit
+item_artifact_invisibility
+item_artifact_invulnerability
+item_artifact_super_damage
+item_cells
+item_health
+item_rockets
+item_shells
+item_spikes
+item_tfgoal
+i_p_t
+i_t_g
+i_t_t
+teledeath
+tf_ammo_rpgclip
+tf_flame
+tf_flamethrower_burst
+tf_gl_grenade
+tf_ic_rocket
+tf_nailgun_nail
+tf_rpg_rocket
+tf_weapon_ac
+tf_weapon_autorifle
+tf_weapon_axe
+tf_weapon_caltrop
+tf_weapon_caltropgrenade
+tf_weapon_concussiongrenade
+tf_weapon_empgrenade
+tf_weapon_flamethrower
+tf_weapon_gasgrenade
+tf_weapon_genericprimedgrenade
+tf_weapon_gl
+tf_weapon_ic
+tf_weapon_knife
+tf_weapon_medikit
+tf_weapon_mirvbomblet
+tf_weapon_mirvgrenade
+tf_weapon_nailgrenade
+tf_weapon_napalmgrenade
+tf_weapon_ng
+tf_weapon_normalgrenade
+tf_weapon_pl
+tf_weapon_railgun
+tf_weapon_rpg
+tf_weapon_shotgun
+tf_weapon_sniperrifle
+tf_weapon_spanner
+tf_weapon_superng
+tf_weapon_supershotgun
+tf_weapon_tranq
+timer
+// (End TFC v1)
+
+// New tfc stuff
+CTF_Map
+
+// New tfc 1.1.0.4 stuff
+info_areadef
+info_tf_teamcheck
+info_tf_teamset
+func_nogrenades
+
+// HL 1.1.1.1 (CS 1.6)
+//
+// From: Alfred Reynolds <Alfred@valvesoftware.com>
+// Date: Thu, 16 Jan 2003 12:32:41 -0800
+//
+building_teleporter

@@ -1,0 +1,15 @@
+// vim: set ft=cpp :
+
+// Common entity names found in multiple mods (cs, firearms, frontline, action, etc).
+// Really need to be moved back into the respective mod list.
+weapon_ak47
+ammo_ak47
+weapon_aug
+ammo_aug
+weapon_frag
+weapon_knife
+weapon_flashbang
+ammo_flashbang
+weapon_ump45
+
+game_playerdie

@@ -1,0 +1,53 @@
+// vim: set ft=cpp :
+
+// Outlawsmod
+//    http://www.planethalflife.com/outlawsmod/
+
+// Version Beta 1.5
+//
+// From: "TonToE" <tontoe@planethalflife.com>
+// Date: Sun, 10 Nov 2002 10:04:20 -0600
+
+ammo_dyno
+ammo_gatlinbox
+ammo_knives
+ammo_rifleshot
+ammo_sbarrelshot
+bowie_bolt
+env_rain
+flag_follow
+item_acme
+item_badge
+item_canteen
+item_chicken
+item_docbag
+item_dyno
+item_dyno1
+item_elixir
+item_knife
+item_lgboiler
+item_medboiler
+item_scope
+item_smboiler
+object_follow
+ol_bell
+ol_bluecapture
+ol_blueflag
+ol_bottle
+ol_ctf_blueteam
+ol_ctf_redteam
+ol_furniture
+ol_lantern
+ol_redcapture
+ol_redflag
+ol_spitoon
+redflag_follow
+trigger_fall
+weapon_double
+weapon_dynomite
+weapon_fist
+weapon_gatlin
+weapon_rifle
+weapon_sawgun
+weapon_sbarrel
+weapon_sixshooter

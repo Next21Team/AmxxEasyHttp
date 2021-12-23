@@ -1,0 +1,77 @@
+// vim: set ft=cpp :
+
+// Action Half-Life (version 08/23/99k)
+ammo_hkmp5
+ammo_pistol
+ammo_shells
+ammo_sniper
+item_bandolier
+item_flashlight
+item_laser
+item_silencer
+item_stealth
+item_vest
+sams_shower
+weapon_akimbob
+weapon_anaconda
+weapon_beretta
+weapon_frag
+weapon_handcannon
+weapon_hkmp5
+weapon_ithaca
+weapon_knife
+weapon_sniper
+
+// Action Half-Life
+//    http://ahl.action-web.net/
+
+
+// Version Beta4
+// Additional entities, as guessed from symbol list of linux .so ...
+//    (willday, Thu May 24 00:16:24 EDT 2001)
+ammo_44
+ammo_50cal
+ammo_766mm
+ammo_anaconda
+ammo_beretta
+ammo_colt
+ammo_de50
+ammo_m4
+ammo_m4clip
+ammo_msg90
+ammo_rifleclip
+ammo_rocket
+ammo_saa
+dove_flock
+dove_flyer
+follow_ent
+game_item
+game_player_die
+game_player_message
+game_roundend
+info_player_deadstart
+item_briefcase
+item_holster
+item_nightvision
+player_corpse
+thrown_knife
+trigger_coop
+trigger_deathmatch
+trigger_rndbased
+trigger_sponly
+weapon_50cal
+weapon_akimcolt
+weapon_akimsaa
+weapon_colt
+weapon_de50
+weapon_fists
+weapon_m4
+weapon_msg90
+weapon_pistol
+weapon_rifle
+weapon_saa
+
+// Additional entity from list forwarded from a dev team member.
+//
+// Date: Thu, 14 Jun 2001 23:09:46 +0200
+info_team

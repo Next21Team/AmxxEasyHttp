@@ -1,0 +1,49 @@
+// vim: set ft=cpp :
+
+// Wasteland
+ammo_caseless
+ammo_Deagle
+ammo_fnfal
+dc_info_objective
+dc_info_objectposition
+dc_object
+dc_trigger_objectcapture
+dc_trigger_reset
+dc_trigger_team
+info_team_ronin
+info_team_scavenger
+info_team_usmc
+laser_aimer
+weapon_boltrifle
+weapon_deserteagle
+weapon_fnfal
+weapon_g11
+weapon_G11
+weapon_jackhammer
+weapon_katana
+weapon_molotov
+weapon_rifle
+weapon_sawedoff
+weapon_sledge
+weapon_spear
+spear_bolt
+
+// Wasteland beta 2
+RONINTeamScore
+SCAVENGERTeamScore
+USMCTeamScore
+
+
+// Wasteland Half-Life
+//    http://thewastes.net/
+//    http://wastelandhalflife.com/
+
+
+// Version beta2
+// Additional entities, as guessed from symbol list of linux .so ...
+//    (willday, Thu Jun  7 16:56:36 EDT 2001)
+weapon_bat
+weapon_colt
+weapon_deagle
+weapon_handcannon
+weapon_mp5k
