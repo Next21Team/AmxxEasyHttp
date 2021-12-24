@@ -49,7 +49,8 @@ size_t thread::hardware_concurrency() noexcept {
 void thread::set_name(std::string_view name) noexcept {
     const std::wstring utf16_name(name.begin(),
                                   name.end());  // concurrencpp strings are always ASCII (english only)
-    ::SetThreadDescription(::GetCurrentThread(), utf16_name.data());
+    // SetThreadDescription available only on win 10+
+    //::SetThreadDescription(::GetCurrentThread(), utf16_name.data());
 }
 
 #elif defined(CRCPP_UNIX_OS)
