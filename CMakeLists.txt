@@ -9,8 +9,6 @@ set(BUILD_SHARED_LIBS OFF)
 
 # cpr options
 set(ENABLE_THREADED_RESOLVER OFF)
-set(USE_OPENSSL OFF)
-set(CMAKE_USE_SCHANNEL ON)
 set(BUILD_CPR_TESTS OFF)
 set(USE_SYSTEM_GTEST OFF)
 
@@ -37,6 +35,10 @@ add_library(AmxxEasyHttp SHARED
         src/easy_http/EasyHttpOptionsBuilder.h
         src/module.cpp)
 
+#-----------
+# properties
+#-----------
+
 if (MSVC AND CMAKE_BUILD_TYPE MATCHES Release)
     # Tell linker to include symbol data & generate map file
     set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -48,12 +50,11 @@ if (MSVC AND CMAKE_BUILD_TYPE MATCHES Release)
             COMPILE_PDB_OUTPUT_DIR ${CMAKE_BINARY_DIR})
 endif()
 
+#-----------
+# definitions
+#-----------
+
 target_compile_definitions(${PROJECT_NAME} PUBLIC
-        _WINDOWS
-        _WIN32
-        _WIN32_WINNT=0x0600
-        WIN32
-        WINVER=0x0600
         NOMINMAX
         HAVE_STDINT_H
         NO_MSVC8_AUTO_COMPAT)
@@ -64,10 +65,27 @@ else()
     target_compile_definitions(${PROJECT_NAME} PUBLIC NDEBUG)
 endif()
 
+if (WIN32)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC
+        _WINDOWS
+        _WIN32
+        _WIN32_WINNT=0x0600
+        WIN32
+        WINVER=0x0600)
+endif()
+
+#-----------
+# libraries
+#-----------
+
 target_link_libraries(${PROJECT_NAME}
         cpr::cpr
         CURL::libcurl
         concurrencpp::concurrencpp)
+
+#-----------
+# post process
+#-----------
 
 if (WIN32 AND DEFINED ENV{COPY_TO_PATH})
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
