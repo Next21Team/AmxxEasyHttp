@@ -2,7 +2,6 @@
 #include "easy_http/EasyHttp.h"
 #include <unordered_map>
 #include <algorithm>
-#include <ranges>
 
 #include "sdk/amxxmodule.h"
 
@@ -479,9 +478,9 @@ RequestId SendRequest(AMX* amx, cell* params, RequestMethod method)
         g_Options->at(options_id).GetOptions();
 
     auto url = cpr::Url(url_str, url_str_len);
-    auto on_complete = std::make_shared<std::function<void(cpr::Response)>>([amx, request_id](const cpr::Response &response) {
+    auto on_complete = [amx, request_id](const cpr::Response &response) {
         InvokeResponseCallback(amx, request_id, response);
-    });
+    };
 
     g_Requests->emplace(request_id, RequestData {g_EasyHttp->SendRequest(method, url, options, on_complete), callback_id});
     g_Options->erase(options_id);
@@ -601,8 +600,8 @@ void ReInitialize()
 {
     if (g_Requests)
     {
-        for (auto &request: *g_Requests | std::views::values)
-            request.request_control->canceled.store(true);
+        for (auto &request_kv: *g_Requests)
+            request_kv.second.request_control->canceled.store(true);
     }
 
     g_CurrentOptions = 0;
@@ -614,8 +613,8 @@ void ReInitialize()
 
 void UnInitialize()
 {
-    for (auto& request : *g_Requests | std::views::values)
-        request.request_control->canceled.store(true);
+    for (auto& request_kv : *g_Requests)
+        request_kv.second.request_control->canceled.store(true);
 
     g_Options.reset();
     g_Requests.reset();

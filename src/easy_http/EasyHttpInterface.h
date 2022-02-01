@@ -48,7 +48,7 @@ namespace ezhttp
     public:
         virtual ~EasyHttpInterface() = default;
 
-        virtual std::shared_ptr<RequestControl> SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, std::shared_ptr<RequestCallback> on_complete) = 0;
+        virtual std::shared_ptr<RequestControl> SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const RequestCallback& on_complete) = 0;
         virtual void RunFrame() = 0;
     };
 }

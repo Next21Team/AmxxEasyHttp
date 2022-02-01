@@ -1,21 +1,26 @@
 #include "EasyHttp.h"
 
+#include <utility>
+
 using namespace ezhttp;
-using namespace concurrencpp;
 using namespace std::chrono_literals;
 
-EasyHttp::EasyHttp()
-{
-    request_executor_ = runtime_.make_executor<thread_pool_executor>("easy_http_request", 10, 30s);
-    update_executor_ = runtime_.make_manual_executor();
-}
+EasyHttp::EasyHttp() :
+    request_scheduler_(10)
+{ }
 
-std::shared_ptr<RequestControl> EasyHttp::SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, std::shared_ptr<RequestCallback> on_complete)
+std::shared_ptr<RequestControl> EasyHttp::SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const RequestCallback& on_complete)
 {
     auto request_control = std::make_shared<RequestControl>();
 
-    update_executor_->submit([this, method, request_control, url, options, on_complete]() {
-        return SendRequestCoroutine(request_control, method, url, on_complete, options);
+    async::spawn(request_scheduler_, [request_control, method, url, options]()
+    {
+        return SendRequestCpr(request_control, method, url, options);
+    })
+    .then(update_scheduler_, [request_control, on_complete](cpr::Response response)
+    {
+        if (!request_control->canceled)
+            on_complete(std::move(response));
     });
 
     return request_control;
@@ -23,22 +28,11 @@ std::shared_ptr<RequestControl> EasyHttp::SendRequest(RequestMethod method, cons
 
 void EasyHttp::RunFrame()
 {
-    update_executor_->loop(10);
-}
-
-result<void> EasyHttp::SendRequestCoroutine(std::shared_ptr<RequestControl> request_control, RequestMethod method, cpr::Url url, std::shared_ptr<RequestCallback> on_complete,
-                                            RequestOptions options)
-{
-    cpr::Response response = co_await request_executor_->submit([request_control, method, url, options]() {
-        return SendRequestCpr(request_control, method, url, options);
-    });
-
-    if (request_control->canceled)
-        co_return;
-
-    co_await resume_on(update_executor_);
-
-    (*on_complete)(response);
+    for (int i = 0; i < 10; i++)
+    {
+        if (!update_scheduler_.try_run_one_task())
+            break;
+    }
 }
 
 cpr::Response EasyHttp::SendRequestCpr(const std::shared_ptr<RequestControl>& request_control, RequestMethod method, cpr::Url url, RequestOptions options)
