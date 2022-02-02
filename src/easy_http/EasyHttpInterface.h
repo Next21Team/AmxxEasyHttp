@@ -3,6 +3,7 @@
 #include "cpr/cpr.h"
 #include <functional>
 #include <utility>
+#include <optional>
 
 namespace ezhttp
 {
