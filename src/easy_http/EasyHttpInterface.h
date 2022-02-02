@@ -2,7 +2,6 @@
 
 #include "cpr/cpr.h"
 #include <functional>
-#include <ranges>
 #include <utility>
 
 namespace ezhttp

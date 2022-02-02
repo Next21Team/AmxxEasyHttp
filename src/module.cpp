@@ -1,4 +1,4 @@
-#include "easy_http//EasyHttpOptionsBuilder.h"
+#include "easy_http/EasyHttpOptionsBuilder.h"
 #include "easy_http/EasyHttp.h"
 #include <unordered_map>
 #include <algorithm>
