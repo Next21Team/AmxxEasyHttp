@@ -24,6 +24,6 @@ namespace ezhttp
         void SetProxyAuth(const std::string& user, const std::string& password);
         void SetAuth(const std::string& user, const std::string& password);
 
-        RequestOptions& GetOptions() { return options_; }
+        [[nodiscard]] RequestOptions& GetOptions() { return options_; }
     };
 }

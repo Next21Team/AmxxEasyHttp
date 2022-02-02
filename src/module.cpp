@@ -475,7 +475,7 @@ RequestId SendRequest(AMX* amx, cell* params, RequestMethod method)
 
     RequestOptions options;
     if (options_id != 0)
-        g_Options->at(options_id).GetOptions();
+        options = g_Options->at(options_id).GetOptions();
 
     auto url = cpr::Url(url_str, url_str_len);
     auto on_complete = [amx, request_id](const cpr::Response &response) {
