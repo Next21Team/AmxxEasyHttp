@@ -3,17 +3,23 @@
 #include "EasyHttpInterface.h"
 #include "EasyHttpOptionsBuilder.h"
 #include <async++.h>
-#include <unordered_map>
+#include <vector>
 
 namespace ezhttp
 {
     class EasyHttp : public EasyHttpInterface
     {
-        async::threadpool_scheduler request_scheduler_;
-        async::fifo_scheduler update_scheduler_;
+        const int kMaxTasksExecPerFrame = 10;
+        const int kMaxThreads = 10;
+
+        std::unique_ptr<async::fifo_scheduler> update_scheduler_;
+        std::unique_ptr<async::threadpool_scheduler> request_scheduler_;
+
+        std::vector<async::task<void>> tasks_;
 
     public:
         explicit EasyHttp();
+        ~EasyHttp() override;
 
         std::shared_ptr<RequestControl> SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const RequestCallback& on_complete) override;
         void RunFrame() override;

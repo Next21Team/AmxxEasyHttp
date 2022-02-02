@@ -1,37 +1,59 @@
 #include "EasyHttp.h"
-
 #include <utility>
 
 using namespace ezhttp;
 using namespace std::chrono_literals;
 
-EasyHttp::EasyHttp() :
-    request_scheduler_(10)
-{ }
+EasyHttp::EasyHttp()
+{
+    update_scheduler_ = std::make_unique<async::fifo_scheduler>();
+    request_scheduler_ = std::make_unique<async::threadpool_scheduler>(kMaxThreads);
+}
 
 std::shared_ptr<RequestControl> EasyHttp::SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const RequestCallback& on_complete)
 {
     auto request_control = std::make_shared<RequestControl>();
 
-    async::spawn(request_scheduler_, [request_control, method, url, options]()
+    auto task = async::spawn(*request_scheduler_, [request_control, method, url, options]()
     {
         return SendRequestCpr(request_control, method, url, options);
     })
-    .then(update_scheduler_, [request_control, on_complete](cpr::Response response)
+    .then(*update_scheduler_, [request_control, on_complete](cpr::Response response)
     {
         if (!request_control->canceled)
             on_complete(std::move(response));
     });
 
+    tasks_.emplace_back(std::move(task));
+
     return request_control;
+}
+
+EasyHttp::~EasyHttp()
+{
+    while (!async::when_all(tasks_).ready())
+        EasyHttp::RunFrame();
+
+    // !! make shure that request_scheduler_ destroys always before update_scheduler_
+    // to avoid continuation in destroyed update_scheduler_
+    request_scheduler_.reset();
+    update_scheduler_.reset();
 }
 
 void EasyHttp::RunFrame()
 {
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < kMaxTasksExecPerFrame; i++)
     {
-        if (!update_scheduler_.try_run_one_task())
+        if (!update_scheduler_->try_run_one_task())
             break;
+    }
+
+    for (auto it = tasks_.begin(); it != tasks_.end(); )
+    {
+        if (!it->valid() || it->ready())
+            it = tasks_.erase(it);
+        else
+            ++it;
     }
 }
 
