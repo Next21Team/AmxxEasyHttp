@@ -4,6 +4,7 @@
 #include "EasyHttpOptionsBuilder.h"
 #include <async++.h>
 #include <vector>
+#include <optional>
 
 namespace ezhttp
 {
