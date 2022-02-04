@@ -598,6 +598,9 @@ AMX_NATIVE_INFO g_Natives[] =
 
 void ReInitialize()
 {
+    std::string ca_cert_path(GET_GAME_INFO(PLID, GINFO_GAMEDIR));
+    ca_cert_path.append("/addons/amxmodx/data/amxx_easy_http_cacert.pem");
+
     if (g_Requests)
     {
         for (auto &request_kv: *g_Requests)
@@ -608,7 +611,7 @@ void ReInitialize()
     g_CurrentRequest = 0;
     g_Options = std::make_unique<std::unordered_map<OptionsId, EasyHttpOptionsBuilder>>();
     g_Requests = std::make_unique<std::unordered_map<RequestId, RequestData>>();
-    g_EasyHttp = std::make_unique<EasyHttp>();
+    g_EasyHttp = std::make_unique<EasyHttp>(ca_cert_path);
 }
 
 void UnInitialize()

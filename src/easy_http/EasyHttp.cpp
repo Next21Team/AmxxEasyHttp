@@ -1,10 +1,13 @@
 #include "EasyHttp.h"
+#include <amxxmodule.h>
+#include <meta_api.h>
 #include <utility>
 
 using namespace ezhttp;
 using namespace std::chrono_literals;
 
-EasyHttp::EasyHttp()
+EasyHttp::EasyHttp(std::string ca_cert_path) :
+    ca_cert_path_(std::move(ca_cert_path))
 {
     update_scheduler_ = std::make_unique<async::fifo_scheduler>();
     request_scheduler_ = std::make_unique<async::threadpool_scheduler>(kMaxThreads);
@@ -14,7 +17,7 @@ std::shared_ptr<RequestControl> EasyHttp::SendRequest(RequestMethod method, cons
 {
     auto request_control = std::make_shared<RequestControl>();
 
-    auto task = async::spawn(*request_scheduler_, [request_control, method, url, options]()
+    auto task = async::spawn(*request_scheduler_, [this, request_control, method, url, options]()
     {
         return SendRequestCpr(request_control, method, url, options);
     })
@@ -62,6 +65,12 @@ cpr::Response EasyHttp::SendRequestCpr(const std::shared_ptr<RequestControl>& re
     cpr::Session session;
 
     session.SetUrl(url);
+
+#ifdef LINUX
+    cpr::SslOptions ssl_opt;
+    ssl_opt.ca_info = ca_cert_path_;
+    session.SetSslOptions(ssl_opt);
+#endif
 
     session.SetProgressCallback(cpr::ProgressCallback(
         [request_control](cpr::cpr_off_t downloadTotal, cpr::cpr_off_t downloadNow, cpr::cpr_off_t uploadTotal, cpr::cpr_off_t uploadNow, intptr_t userdata) {

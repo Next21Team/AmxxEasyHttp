@@ -4,40 +4,53 @@ project(AmxxEasyHttp)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 set(CMAKE_CXX_STANDARD 20)
 
-# common options
-set(BUILD_SHARED_LIBS OFF)
+set(AMXX_EASY_HTTP_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
-# cpr options
-set(ENABLE_THREADED_RESOLVER OFF)
-set(BUILD_CPR_TESTS OFF)
-set(USE_SYSTEM_GTEST OFF)
+# Add "cmake" to module path
+set(CMAKE_MODULE_PATH
+    ${AMXX_EASY_HTTP_ROOT}/cmake
+    ${CMAKE_MODULE_PATH}
+)
 
 if (UNIX)
-    set_property(GLOBAL PROPERTY COMPILE_FLAGS "-m32" PROPERTY LINK_FLAGS "-m32")
+    set(CMAKE_C_FLAGS -m32)
+    set(CMAKE_CXX_FLAGS -m32)
 endif()
+
+# common options
+set(BUILD_SHARED_LIBS OFF)
+set(USE_SYSTEM_GTEST OFF)
+
+# cpr options
+set(CPR_FORCE_USE_SYSTEM_CURL ON) # system curl will be overridden by our embedded curl module
+set(CPR_USE_SYSTEM_GTEST OFF)
+set(BUILD_CPR_TESTS OFF)
+set(CPR_ENABLE_SSL ON)
 
 add_subdirectory(dep/cpr)
 add_subdirectory(dep/asyncplusplus)
 
-include_directories(dep/cpr/include
-        dep/asyncplusplus/include
-        dep/halflife/common
-        dep/halflife/dlls
-        dep/halflife/engine
-        dep/halflife/public
-        dep/metamod
+add_library(${PROJECT_NAME} SHARED
+    src/sdk/amxxmodule.cpp
+    src/sdk/amxxmodule.h
+    src/sdk/moduleconfig.h
+    src/easy_http/EasyHttpInterface.h
+    src/easy_http/EasyHttp.cpp
+    src/easy_http/EasyHttp.h
+    src/easy_http/EasyHttpOptionsBuilder.cpp
+    src/easy_http/EasyHttpOptionsBuilder.h
+    src/module.cpp
 )
 
-add_library(AmxxEasyHttp SHARED
-        src/sdk/amxxmodule.cpp
-        src/sdk/amxxmodule.h
-        src/sdk/moduleconfig.h
-        src/easy_http/EasyHttpInterface.h
-        src/easy_http/EasyHttp.cpp
-        src/easy_http/EasyHttp.h
-        src/easy_http/EasyHttpOptionsBuilder.cpp
-        src/easy_http/EasyHttpOptionsBuilder.h
-        src/module.cpp
+target_include_directories(${PROJECT_NAME} PUBLIC
+    dep/cpr/include
+    dep/asyncplusplus/include
+    dep/halflife/common
+    dep/halflife/dlls
+    dep/halflife/engine
+    dep/halflife/public
+    dep/metamod
+    src/sdk
 )
 
 #-----------
@@ -62,19 +75,23 @@ endif()
 #-----------
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC
-        LIBASYNC_STATIC
-        NOMINMAX
-        HAVE_STDINT_H
-        NO_MSVC8_AUTO_COMPAT
+    LIBASYNC_STATIC
+    NOMINMAX
+    HAVE_STDINT_H
+    NO_MSVC8_AUTO_COMPAT
 )
 
 if (WIN32)
     target_compile_definitions(${PROJECT_NAME} PUBLIC
-            _WINDOWS
-            _WIN32
-            _WIN32_WINNT=0x0600
-            WIN32
-            WINVER=0x0600
+        _WINDOWS
+        _WIN32
+        _WIN32_WINNT=0x0600
+        WIN32
+        WINVER=0x0600
+    )
+else()
+    target_compile_definitions(${PROJECT_NAME} PUBLIC
+        LINUX
     )
 endif()
 
@@ -88,22 +105,32 @@ endif()
 # libraries
 #-----------
 
-target_link_libraries(${PROJECT_NAME} Async++
+target_link_libraries(${PROJECT_NAME}
+    Async++
     cpr::cpr
     CURL::libcurl
 )
 
 if (UNIX)
-    target_link_libraries(${PROJECT_NAME} -latomic -static-libstdc++)
+    target_link_libraries(${PROJECT_NAME}
+        OPENSSL::libssl    #todo all curl dependencies list move to variable
+        OPENSSL::libcrypto
+        ZLIB::zlib
+        CARES::libcares
+        -latomic
+        -lpthread
+        -static-libstdc++
+        -static-libgcc
+    )
 endif()
 
 #-----------
 # post process
 #-----------
 
-if (WIN32 AND DEFINED ENV{COPY_TO_PATH})
+if (DEFINED ENV{${PROJECT_NAME}_COPY_TO_PATH})
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> $ENV{COPY_TO_PATH}
-            COMMENT "Copying '${PROJECT_NAME}' library to '$ENV{COPY_TO_PATH}'"
+            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> $ENV{${PROJECT_NAME}_COPY_TO_PATH}
+            COMMENT "Copying '${PROJECT_NAME}' library to '$ENV{${PROJECT_NAME}_COPY_TO_PATH}'"
     )
 endif()
