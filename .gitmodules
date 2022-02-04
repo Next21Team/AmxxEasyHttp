@@ -1,3 +1,6 @@
 [submodule "dep/asyncplusplus"]
 	path = dep/asyncplusplus
 	url = https://github.com/Amanieu/asyncplusplus.git
+[submodule "dep/cpr"]
+	path = dep/cpr
+	url = https://github.com/Polarhigh/cpr.git
