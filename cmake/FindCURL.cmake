@@ -18,9 +18,11 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(CURL REQUIRED_VARS CURL_LIBRARY CURL_LIBRARY_DEBUG CURL_INCLUDE_DIR)
 
 include(CMakeFindDependencyMacro)
-find_dependency(cares)
-find_dependency(OpenSSL)
-find_dependency(zlib)
+find_dependency(ZLIB)
+if (UNIX)
+    find_dependency(cares)
+    find_dependency(OpenSSL)
+endif()
 
 set(_supported_components HTTP HTTPS SSL FTP FTPS)
 foreach(_comp ${curl_FIND_COMPONENTS})
@@ -40,11 +42,11 @@ set_target_properties(CURL::libcurl PROPERTIES
 
     IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "C;RC"
     IMPORTED_LOCATION_RELEASE "${CURL_LIBRARY}"
-    INTERFACE_LINK_LIBRARIES_RELEASE "cares openssl zlib"
+    INTERFACE_LINK_LIBRARIES_RELEASE "$<$<PLATFORM_ID:Linux>:cares openssl> ZLIB"
 
     IMPORTED_LINK_INTERFACE_LANGUAGES_DEBUG "C;RC"
     IMPORTED_LOCATION_DEBUG "${CURL_LIBRARY_DEBUG}"
-    INTERFACE_LINK_LIBRARIES_DEBUG "cares openssl zlib"
+    INTERFACE_LINK_LIBRARIES_DEBUG "$<$<PLATFORM_ID:Linux>:cares openssl> ZLIB"
 )
 
 #unset(CURL_LIBRARY CACHE)

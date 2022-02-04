@@ -111,11 +111,19 @@ target_link_libraries(${PROJECT_NAME}
     CURL::libcurl
 )
 
-if (UNIX)
+if (WIN32)
+    target_link_libraries(${PROJECT_NAME}
+        Ws2_32.lib
+        Crypt32.lib
+        Wldap32.lib
+        Normaliz.lib
+        ZLIB::ZLIB
+    )
+else()
     target_link_libraries(${PROJECT_NAME}
         OPENSSL::libssl    #todo all curl dependencies list move to variable
         OPENSSL::libcrypto
-        ZLIB::zlib
+        ZLIB::ZLIB
         CARES::libcares
         -latomic
         -lpthread
