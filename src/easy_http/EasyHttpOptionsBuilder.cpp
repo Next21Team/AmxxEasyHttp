@@ -56,7 +56,7 @@ void EasyHttpOptionsBuilder::SetProxy(const std::string &proxy_url)
 
 void EasyHttpOptionsBuilder::SetProxyAuth(const std::string &user, const std::string &password)
 {
-    options_.proxy_auth = { user, password };
+    options_.proxy_auth = {user, password};
 }
 
 void EasyHttpOptionsBuilder::SetAuth(const std::string &user, const std::string &password)

@@ -123,7 +123,6 @@ cell AMX_NATIVE_CALL ezhttp_option_set_timeout(AMX* amx, cell* params)
         return 0;
 
     g_Options->at(options_id).SetTimeout(timeout_ms);
-
     return 0;
 }
 
@@ -193,7 +192,6 @@ cell AMX_NATIVE_CALL ezhttp_cancel_request(AMX* amx, cell* params)
     response.error.code = cpr::ErrorCode::REQUEST_CANCELLED;
 
     InvokeResponseCallback(amx, request_id, response);
-
     return 0;
 }
 
@@ -599,44 +597,43 @@ void SetStringOption(AMX* amx, cell* params, TMethod method)
 
 AMX_NATIVE_INFO g_Natives[] =
 {
-    { "ezhttp_create_options",           ezhttp_create_options },
-    { "ezhttp_destroy_options",          ezhttp_destroy_options },
-    { "ezhttp_option_set_user_agent",    ezhttp_option_set_user_agent },
+    { "ezhttp_create_options",              ezhttp_create_options },
+    { "ezhttp_destroy_options",             ezhttp_destroy_options },
+    { "ezhttp_option_set_user_agent",       ezhttp_option_set_user_agent },
     { "ezhttp_option_add_url_parameter",    ezhttp_option_add_url_parameter },
     { "ezhttp_option_add_form_payload",     ezhttp_option_add_form_payload },
     { "ezhttp_option_set_body",             ezhttp_option_set_body },
     { "ezhttp_option_set_header",           ezhttp_option_set_header },
     { "ezhttp_option_set_cookie",           ezhttp_option_set_cookie },
     { "ezhttp_option_set_timeout",          ezhttp_option_set_timeout },
-    { "ezhttp_option_set_proxy",      ezhttp_option_set_proxy },
-    { "ezhttp_option_set_proxy_auth", ezhttp_option_set_proxy_auth },
-    { "ezhttp_option_set_auth",    ezhttp_option_set_auth },
-
-    { "ezhttp_get",                ezhttp_get },
-    { "ezhttp_post",               ezhttp_post },
-    { "ezhttp_is_request_exists",    ezhttp_is_request_exists },
-    { "ezhttp_cancel_request",       ezhttp_cancel_request },
-    { "ezhttp_request_progress",     ezhttp_request_progress },
-
-    { "ezhttp_get_http_code",        ezhttp_get_http_code },
-    { "ezhttp_get_data",             ezhttp_get_data },
-    { "ezhttp_get_url",              ezhttp_get_url },
-    { "ezhttp_save_data_to_file",    ezhttp_save_data_to_file },
-    { "ezhttp_save_data_to_file2",   ezhttp_save_data_to_file2 },
-    { "ezhttp_get_headers_count",    ezhttp_get_headers_count },
-    { "ezhttp_get_headers",          ezhttp_get_headers },
-    { "ezhttp_iterate_headers",      ezhttp_iterate_headers },
-    { "ezhttp_get_elapsed",          ezhttp_get_elapsed },
-    { "ezhttp_get_cookies_count",    ezhttp_get_cookies_count },
-    { "ezhttp_get_cookies",          ezhttp_get_cookies },
-    { "ezhttp_iterate_cookies",      ezhttp_iterate_cookies },
-    { "ezhttp_get_error_code",       ezhttp_get_error_code },
-    { "ezhttp_get_error_message",    ezhttp_get_error_message },
-    { "ezhttp_get_redirect_count",   ezhttp_get_redirect_count },
-    { "ezhttp_get_uploaded_bytes",   ezhttp_get_uploaded_bytes },
-    { "ezhttp_get_downloaded_bytes", ezhttp_get_downloaded_bytes },
-
+    { "ezhttp_option_set_proxy",            ezhttp_option_set_proxy },
+    { "ezhttp_option_set_proxy_auth",       ezhttp_option_set_proxy_auth },
+    { "ezhttp_option_set_auth",             ezhttp_option_set_auth },
     { "ezhttp_option_set_user_data",        ezhttp_option_set_user_data },
+
+    { "ezhttp_get",                         ezhttp_get },
+    { "ezhttp_post",                        ezhttp_post },
+    { "ezhttp_is_request_exists",           ezhttp_is_request_exists },
+    { "ezhttp_cancel_request",              ezhttp_cancel_request },
+    { "ezhttp_request_progress",            ezhttp_request_progress },
+
+    { "ezhttp_get_http_code",               ezhttp_get_http_code },
+    { "ezhttp_get_data",                    ezhttp_get_data },
+    { "ezhttp_get_url",                     ezhttp_get_url },
+    { "ezhttp_save_data_to_file",           ezhttp_save_data_to_file },
+    { "ezhttp_save_data_to_file2",          ezhttp_save_data_to_file2 },
+    { "ezhttp_get_headers_count",           ezhttp_get_headers_count },
+    { "ezhttp_get_headers",                 ezhttp_get_headers },
+    { "ezhttp_iterate_headers",             ezhttp_iterate_headers },
+    { "ezhttp_get_elapsed",                 ezhttp_get_elapsed },
+    { "ezhttp_get_cookies_count",           ezhttp_get_cookies_count },
+    { "ezhttp_get_cookies",                 ezhttp_get_cookies },
+    { "ezhttp_iterate_cookies",             ezhttp_iterate_cookies },
+    { "ezhttp_get_error_code",              ezhttp_get_error_code },
+    { "ezhttp_get_error_message",           ezhttp_get_error_message },
+    { "ezhttp_get_redirect_count",          ezhttp_get_redirect_count },
+    { "ezhttp_get_uploaded_bytes",          ezhttp_get_uploaded_bytes },
+    { "ezhttp_get_downloaded_bytes",        ezhttp_get_downloaded_bytes },
     { "ezhttp_get_user_data",               ezhttp_get_user_data },
 
     { nullptr,                              nullptr },
