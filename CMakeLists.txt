@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.18)
 project(AmxxEasyHttp)
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 
 set(AMXX_EASY_HTTP_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 

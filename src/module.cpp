@@ -150,7 +150,7 @@ cell AMX_NATIVE_CALL ezhttp_is_request_exists(AMX* amx, cell* params)
 {
     RequestId request_id = params[1];
 
-    return g_Requests->contains(request_id);
+    return g_Requests->count(request_id) == 1;
 }
 
 cell AMX_NATIVE_CALL ezhttp_cancel_request(AMX* amx, cell* params)
@@ -295,7 +295,7 @@ cell AMX_NATIVE_CALL ezhttp_get_headers(AMX* amx, cell* params)
     const cpr::Response& response = g_Requests->at(request_id).response;
 
     const std::string header_key(key, key_len);
-    if (response.header.contains(header_key))
+    if (response.header.count(header_key) == 1)
     {
         const std::string& header_value = response.header.at(header_key);
 
@@ -490,7 +490,7 @@ RequestId SendRequest(AMX* amx, cell* params, RequestMethod method)
 
 bool ValidateOptionsId(AMX* amx, OptionsId options_id)
 {
-    if (!g_Options->contains(options_id))
+    if (g_Options->count(options_id) == 0)
     {
         MF_LogError(amx, AMX_ERR_NATIVE, "Options id %d not exists", options_id);
         return false;
@@ -501,7 +501,7 @@ bool ValidateOptionsId(AMX* amx, OptionsId options_id)
 
 bool ValidateRequestId(AMX* amx, RequestId request_id)
 {
-    if (!g_Requests->contains(request_id))
+    if (g_Requests->count(request_id) == 0)
     {
         MF_LogError(amx, AMX_ERR_NATIVE, "Request id %d not exists", request_id);
         return false;
