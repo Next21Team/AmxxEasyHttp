@@ -20,6 +20,9 @@ endif()
 # common options
 set(BUILD_SHARED_LIBS OFF)
 set(USE_SYSTEM_GTEST OFF)
+if (UNIX)
+    set(CMAKE_THREAD_PREFER_PTHREAD ON)
+endif()
 
 # cpr options
 set(CPR_FORCE_USE_SYSTEM_CURL ON) # system curl will be overridden by our embedded curl module
@@ -27,6 +30,7 @@ set(CPR_USE_SYSTEM_GTEST OFF)
 set(BUILD_CPR_TESTS OFF)
 set(CPR_ENABLE_SSL ON)
 
+find_package(Threads REQUIRED)
 add_subdirectory(dep/cpr)
 add_subdirectory(dep/asyncplusplus)
 
@@ -106,6 +110,7 @@ endif()
 #-----------
 
 target_link_libraries(${PROJECT_NAME}
+    Threads::Threads
     Async++
     cpr::cpr
     CURL::libcurl
@@ -126,7 +131,6 @@ else()
         ZLIB::ZLIB
         CARES::libcares
         -latomic
-        -lpthread
         -static-libstdc++
         -static-libgcc
     )
