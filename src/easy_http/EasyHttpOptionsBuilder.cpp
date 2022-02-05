@@ -63,3 +63,8 @@ void EasyHttpOptionsBuilder::SetAuth(const std::string &user, const std::string 
 {
     options_.auth = {user, password};
 }
+
+void EasyHttpOptionsBuilder::SetUserData(const std::vector<cell>& user_data)
+{
+    options_.user_data = user_data;
+}

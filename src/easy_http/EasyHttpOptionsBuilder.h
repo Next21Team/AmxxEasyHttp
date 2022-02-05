@@ -2,6 +2,7 @@
 
 #include "EasyHttpInterface.h"
 #include "cpr/cpr.h"
+#include <amxxmodule.h>
 #include <optional>
 #include <utility>
 #include <string>
@@ -23,6 +24,7 @@ namespace ezhttp
         void SetProxy(const std::string& proxy_url);
         void SetProxyAuth(const std::string& user, const std::string& password);
         void SetAuth(const std::string& user, const std::string& password);
+        void SetUserData(const std::vector<cell>& user_data);
 
         [[nodiscard]] RequestOptions& GetOptions() { return options_; }
     };

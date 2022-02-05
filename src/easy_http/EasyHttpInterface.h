@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cpr/cpr.h"
+#include <amxxmodule.h>
 #include <functional>
 #include <utility>
 #include <optional>
@@ -27,6 +28,7 @@ namespace ezhttp
         std::optional<std::string> proxy_url;
         std::optional<std::pair<std::string, std::string>> proxy_auth;
         std::optional<cpr::Authentication> auth;
+        std::optional<std::vector<cell>> user_data;
     };
 
     struct RequestControl

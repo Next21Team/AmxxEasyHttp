@@ -2,6 +2,7 @@
 #include "easy_http/EasyHttp.h"
 #include <unordered_map>
 #include <algorithm>
+#include <utility>
 
 #include "sdk/amxxmodule.h"
 
@@ -22,8 +23,16 @@ struct RequestData
 {
     std::shared_ptr<RequestControl> request_control;
     int callback_id;
+    std::optional<std::vector<cell>> user_data;
 
     cpr::Response response;
+
+    RequestData() = delete;
+    RequestData(std::shared_ptr<RequestControl> request_control, int callback_id, std::optional<std::vector<cell>> user_data) :
+        request_control(std::move(request_control)),
+        callback_id(callback_id),
+        user_data(std::move(user_data))
+    { }
 };
 
 using OptionsId = int32_t;
@@ -133,6 +142,23 @@ cell AMX_NATIVE_CALL ezhttp_option_set_proxy_auth(AMX* amx, cell* params)
 cell AMX_NATIVE_CALL ezhttp_option_set_auth(AMX* amx, cell* params)
 {
     SetKeyValueOption(amx, params, &EasyHttpOptionsBuilder::SetAuth);
+    return 0;
+}
+
+cell AMX_NATIVE_CALL ezhttp_option_set_user_data(AMX* amx, cell* params)
+{
+    OptionsId options_id = params[1];
+    cell* data_addr = MF_GetAmxAddr(amx, params[2]);
+    int data_len = params[3];
+
+    if (!ValidateOptionsId(amx, options_id))
+        return 0;
+
+    std::vector<cell> user_data;
+    user_data.resize(data_len);
+    MF_CopyAmxMemory(user_data.data(), data_addr, data_len);
+
+    g_Options->at(options_id).SetUserData(user_data);
     return 0;
 }
 
@@ -442,6 +468,23 @@ cell AMX_NATIVE_CALL ezhttp_get_downloaded_bytes(AMX* amx, cell* params)
     return response.downloaded_bytes;
 }
 
+cell AMX_NATIVE_CALL ezhttp_get_user_data(AMX* amx, cell* params)
+{
+    RequestId request_id = params[1];
+    cell* data_addr = MF_GetAmxAddr(amx, params[2]);
+
+    if (!ValidateRequestId(amx, request_id))
+        return 0;
+
+    const std::optional<std::vector<cell>>& user_data = g_Requests->at(request_id).user_data;
+    if (!user_data)
+        return 0;
+
+    MF_CopyAmxMemory(data_addr, user_data.value().data(), user_data.value().size());
+
+    return 0;
+}
+
 RequestId SendRequest(AMX* amx, cell* params, RequestMethod method)
 {
     RequestId request_id = ++g_CurrentRequest;
@@ -482,7 +525,7 @@ RequestId SendRequest(AMX* amx, cell* params, RequestMethod method)
         InvokeResponseCallback(amx, request_id, response);
     };
 
-    g_Requests->emplace(request_id, RequestData {g_EasyHttp->SendRequest(method, url, options, on_complete), callback_id});
+    g_Requests->emplace(request_id, RequestData {g_EasyHttp->SendRequest(method, url, options, on_complete), callback_id, options.user_data});
     g_Options->erase(options_id);
 
     return request_id;
@@ -593,7 +636,10 @@ AMX_NATIVE_INFO g_Natives[] =
     { "ezhttp_get_uploaded_bytes",   ezhttp_get_uploaded_bytes },
     { "ezhttp_get_downloaded_bytes", ezhttp_get_downloaded_bytes },
 
-    { nullptr,                       nullptr },
+    { "ezhttp_option_set_user_data",        ezhttp_option_set_user_data },
+    { "ezhttp_get_user_data",               ezhttp_get_user_data },
+
+    { nullptr,                              nullptr },
 };
 
 void ReInitialize()
