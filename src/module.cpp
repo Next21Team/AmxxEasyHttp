@@ -497,10 +497,10 @@ RequestId SendRequest(AMX* amx, cell* params, RequestMethod method)
     int url_str_len;
     char* url_str = MF_GetAmxString(amx, params[1], 0, &url_str_len);
 
-    OptionsId options_id = params[2];
-
     int callback_len;
-    char* callback = MF_GetAmxString(amx, params[3], 1, &callback_len);
+    char* callback = MF_GetAmxString(amx, params[2], 1, &callback_len);
+
+    OptionsId options_id = params[3];
 
     if (options_id != 0 && !ValidateOptionsId(amx, options_id))
         return 0;
