@@ -4,18 +4,8 @@
 #include <algorithm>
 #include <utility>
 
-#include "sdk/amxxmodule.h"
-
-// undef metamods fabulous shit
-#undef snprintf
-#undef vsnprintf
-#undef sleep
-#undef strcasecmp
-#undef strncasecmp
-#undef open
-#undef read
-#undef write
-#undef close
+#include <amxxmodule.h>
+#include <undef_metamod.h>
 
 using namespace ezhttp;
 
@@ -42,7 +32,8 @@ bool ValidateOptionsId(AMX* amx, OptionsId options_id);
 bool ValidateRequestId(AMX* amx, RequestId request_id);
 template <class TMethod> void SetKeyValueOption(AMX* amx, cell* params, TMethod method);
 template <class TMethod> void SetStringOption(AMX* amx, cell* params, TMethod method);
-RequestId SendRequest(AMX* amx, cell* params, RequestMethod method);
+std::string ConstructFtpUrl(const std::string& user, const std::string& password, const std::string& host, const std::string& remote_file);
+RequestId SendRequest(AMX* amx, RequestMethod method, const RequestOptions& options, const std::string& url, const std::string& callback);
 void InvokeResponseCallback(AMX* amx, RequestId request_id, const cpr::Response &response);
 
 
@@ -163,12 +154,42 @@ cell AMX_NATIVE_CALL ezhttp_option_set_user_data(AMX* amx, cell* params)
 
 cell AMX_NATIVE_CALL ezhttp_get(AMX* amx, cell* params)
 {
-    return SendRequest(amx, params, RequestMethod::Get);
+    int url_len;
+    char* url = MF_GetAmxString(amx, params[1], 0, &url_len);
+
+    int callback_len;
+    char* callback = MF_GetAmxString(amx, params[2], 1, &callback_len);
+
+    OptionsId options_id = params[3];
+
+    RequestOptions options;
+    if (options_id != 0)
+    {
+        options = g_Options->at(options_id).GetOptions();
+        g_Options->erase(options_id);
+    }
+
+    return SendRequest(amx, RequestMethod::HttpGet,  options, std::string(url, url_len), std::string(callback, callback_len));
 }
 
 cell AMX_NATIVE_CALL ezhttp_post(AMX* amx, cell* params)
 {
-    return SendRequest(amx, params, RequestMethod::Post);
+    int url_len;
+    char* url = MF_GetAmxString(amx, params[1], 0, &url_len);
+
+    int callback_len;
+    char* callback = MF_GetAmxString(amx, params[2], 1, &callback_len);
+
+    OptionsId options_id = params[3];
+
+    RequestOptions options;
+    if (options_id != 0)
+    {
+        options = g_Options->at(options_id).GetOptions();
+        g_Options->erase(options_id);
+    }
+
+    return SendRequest(amx, RequestMethod::HttpPost,  options, std::string(url, url_len), std::string(callback, callback_len));
 }
 
 cell AMX_NATIVE_CALL ezhttp_is_request_exists(AMX* amx, cell* params)
@@ -483,8 +504,122 @@ cell AMX_NATIVE_CALL ezhttp_get_user_data(AMX* amx, cell* params)
     return 0;
 }
 
-RequestId SendRequest(AMX* amx, cell* params, RequestMethod method)
+cell AMX_NATIVE_CALL ezhttp_ftp_upload(AMX* amx, cell* params)
 {
+    int len;
+    std::string user(MF_GetAmxString(amx, params[1], 0, &len));
+    std::string password (MF_GetAmxString(amx, params[2], 0, &len));
+    std::string host = MF_GetAmxString(amx, params[3], 0, &len);
+    std::string remote_file = MF_GetAmxString(amx, params[4], 0, &len);
+    int local_file_len;
+    char* local_file = MF_GetAmxString(amx, params[5], 1, &local_file_len);
+    std::string callback = MF_GetAmxString(amx, params[6], 0, &len);
+    bool secure = params[7];
+
+    std::string url = ConstructFtpUrl(user, password, host, remote_file);
+
+    RequestOptions options;
+    options.file_path.emplace(local_file, local_file_len);
+    options.require_secure = secure;
+
+    SendRequest(amx, RequestMethod::FtpUpload, options, url, callback);
+
+    return 0;
+}
+
+cell AMX_NATIVE_CALL ezhttp_ftp_upload2(AMX* amx, cell* params)
+{
+    int url_str_len;
+    char* url_str = MF_GetAmxString(amx, params[1], 0, &url_str_len);
+
+    int local_file_len;
+    char* local_file = MF_GetAmxString(amx, params[2], 1, &local_file_len);
+
+    int callback_len;
+    char* callback = MF_GetAmxString(amx, params[3], 2, &callback_len);
+
+    bool secure = params[4];
+
+    RequestOptions options;
+    options.file_path.emplace(local_file, local_file_len);
+    options.require_secure = secure;
+
+    SendRequest(amx, RequestMethod::FtpUpload, options, std::string(url_str, url_str_len), std::string(callback, callback_len));
+
+    return 0;
+}
+
+cell AMX_NATIVE_CALL ezhttp_ftp_download(AMX* amx, cell* params)
+{
+    int len;
+    std::string user(MF_GetAmxString(amx, params[1], 0, &len));
+    std::string password (MF_GetAmxString(amx, params[2], 0, &len));
+    std::string host = MF_GetAmxString(amx, params[3], 0, &len);
+    std::string remote_file = MF_GetAmxString(amx, params[4], 0, &len);
+    int local_file_len;
+    char* local_file = MF_GetAmxString(amx, params[5], 1, &local_file_len);
+    std::string callback = MF_GetAmxString(amx, params[6], 0, &len);
+    bool secure = params[7];
+
+    std::string url = ConstructFtpUrl(user, password, host, remote_file);
+
+    RequestOptions options;
+    options.file_path.emplace(local_file, local_file_len);
+    options.require_secure = secure;
+
+    SendRequest(amx, RequestMethod::FtpDownload, options, url, callback);
+
+    return 0;
+}
+
+cell AMX_NATIVE_CALL ezhttp_ftp_download2(AMX* amx, cell* params)
+{
+    int url_str_len;
+    char* url_str = MF_GetAmxString(amx, params[1], 0, &url_str_len);
+
+    int local_file_len;
+    char* local_file = MF_GetAmxString(amx, params[2], 1, &local_file_len);
+
+    int callback_len;
+    char* callback = MF_GetAmxString(amx, params[3], 2, &callback_len);
+
+    bool secure = params[4];
+
+    RequestOptions options;
+    options.file_path.emplace(local_file, local_file_len);
+    options.require_secure = secure;
+
+    SendRequest(amx, RequestMethod::FtpDownload, options, std::string(url_str, url_str_len), std::string(callback, callback_len));
+
+    return 0;
+}
+
+std::string ConstructFtpUrl(const std::string& user, const std::string& password, const std::string& host, const std::string& remote_file)
+{
+    std::ostringstream url;
+    url << "ftp://" << user << ":" << password << "@" << host;
+
+    if (remote_file.empty() || remote_file[0] != '/')
+        url << "/";
+
+    url << remote_file;
+
+    return url.str();
+}
+
+RequestId SendRequest(AMX* amx, RequestMethod method, const RequestOptions& options, const std::string& url, const std::string& callback)
+{
+    int callback_id = -1;
+    if (!callback.empty())
+    {
+        callback_id = MF_RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_DONE);
+        if (callback_id == -1)
+        {
+            MF_LogError(amx, AMX_ERR_NATIVE, "Callback function \"%s\" is not exists", callback.c_str());
+            return 0;
+        }
+    }
+
     RequestId request_id = ++g_CurrentRequest;
     if (request_id == std::numeric_limits<int32_t>::max())
     {
@@ -492,39 +627,11 @@ RequestId SendRequest(AMX* amx, cell* params, RequestMethod method)
         return 0;
     }
 
-    int url_str_len;
-    char* url_str = MF_GetAmxString(amx, params[1], 0, &url_str_len);
-
-    int callback_len;
-    char* callback = MF_GetAmxString(amx, params[2], 1, &callback_len);
-
-    OptionsId options_id = params[3];
-
-    if (options_id != 0 && !ValidateOptionsId(amx, options_id))
-        return 0;
-
-    int callback_id = -1;
-    if (callback_len > 0)
-    {
-        callback_id = MF_RegisterSPForwardByName(amx, callback, FP_CELL, FP_DONE);
-        if (callback_id == -1)
-        {
-            MF_LogError(amx, AMX_ERR_NATIVE, "Callback function \"%s\" not exists", callback);
-            return 0;
-        }
-    }
-
-    RequestOptions options;
-    if (options_id != 0)
-        options = g_Options->at(options_id).GetOptions();
-
-    auto url = cpr::Url(url_str, url_str_len);
     auto on_complete = [amx, request_id](const cpr::Response &response) {
         InvokeResponseCallback(amx, request_id, response);
     };
 
-    g_Requests->emplace(request_id, RequestData {g_EasyHttp->SendRequest(method, url, options, on_complete), callback_id, options.user_data});
-    g_Options->erase(options_id);
+    g_Requests->emplace(request_id, RequestData {g_EasyHttp->SendRequest(method, cpr::Url(url), options, on_complete), callback_id, options.user_data});
 
     return request_id;
 }
@@ -635,6 +742,11 @@ AMX_NATIVE_INFO g_Natives[] =
     { "ezhttp_get_uploaded_bytes",          ezhttp_get_uploaded_bytes },
     { "ezhttp_get_downloaded_bytes",        ezhttp_get_downloaded_bytes },
     { "ezhttp_get_user_data",               ezhttp_get_user_data },
+
+    { "ezhttp_ftp_upload",                  ezhttp_ftp_upload },
+    { "ezhttp_ftp_upload2",                 ezhttp_ftp_upload2 },
+    { "ezhttp_ftp_download",                ezhttp_ftp_download },
+    { "ezhttp_ftp_download2",               ezhttp_ftp_download2 },
 
     { nullptr,                              nullptr },
 };

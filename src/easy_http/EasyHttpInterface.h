@@ -12,8 +12,10 @@ namespace ezhttp
 
     enum class RequestMethod
     {
-        Get,
-        Post
+        HttpGet,
+        HttpPost,
+        FtpUpload,
+        FtpDownload
     };
 
     struct RequestOptions
@@ -29,6 +31,8 @@ namespace ezhttp
         std::optional<std::pair<std::string, std::string>> proxy_auth;
         std::optional<cpr::Authentication> auth;
         std::optional<std::vector<cell>> user_data;
+        bool require_secure = false;
+        std::optional<std::string> file_path; // for ftp and multipart/form-data in future
     };
 
     struct RequestControl

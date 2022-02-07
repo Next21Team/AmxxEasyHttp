@@ -28,6 +28,10 @@ namespace ezhttp
         void RunFrame() override;
 
     private:
-        cpr::Response SendRequestCpr(const std::shared_ptr<RequestControl>& request_control, RequestMethod method, cpr::Url url, RequestOptions options);
+        cpr::Session CreateSession(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url);
+        cpr::Response SendRequest(const std::shared_ptr<RequestControl>& request_control, RequestMethod method, const cpr::Url& url, const RequestOptions& options);
+        cpr::Response SendHttpRequest(const std::shared_ptr<RequestControl>& request_control, RequestMethod method, const cpr::Url& url, const RequestOptions& options);
+        cpr::Response FtpUpload(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options);
+        cpr::Response FtpDownload(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options);
     };
 }

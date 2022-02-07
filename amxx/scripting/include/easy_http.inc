@@ -13,25 +13,25 @@
 #endif
 
 enum EzHttpErrorCode {
-    OK = 0,
-    CONNECTION_FAILURE,
-    EMPTY_RESPONSE,
-    HOST_RESOLUTION_FAILURE,
-    INTERNAL_ERROR,
-    INVALID_URL_FORMAT,
-    NETWORK_RECEIVE_ERROR,
-    NETWORK_SEND_FAILURE,
-    OPERATION_TIMEDOUT,
-    PROXY_RESOLUTION_FAILURE,
-    SSL_CONNECT_ERROR,
-    SSL_LOCAL_CERTIFICATE_ERROR,
-    SSL_REMOTE_CERTIFICATE_ERROR,
-    SSL_CACERT_ERROR,
-    GENERIC_SSL_ERROR,
-    UNSUPPORTED_PROTOCOL,
-    REQUEST_CANCELLED,
-    TOO_MANY_REDIRECTS,
-    UNKNOWN_ERROR = 1000,
+    EZH_OK = 0,
+    EZH_CONNECTION_FAILURE,
+    EZH_EMPTY_RESPONSE,
+    EZH_HOST_RESOLUTION_FAILURE,
+    EZH_INTERNAL_ERROR,
+    EZH_INVALID_URL_FORMAT,
+    EZH_NETWORK_RECEIVE_ERROR,
+    EZH_NETWORK_SEND_FAILURE,
+    EZH_OPERATION_TIMEDOUT,
+    EZH_PROXY_RESOLUTION_FAILURE,
+    EZH_SSL_CONNECT_ERROR,
+    EZH_SSL_LOCAL_CERTIFICATE_ERROR,
+    EZH_SSL_REMOTE_CERTIFICATE_ERROR,
+    EZH_SSL_CACERT_ERROR,
+    EZH_GENERIC_SSL_ERROR,
+    EZH_UNSUPPORTED_PROTOCOL,
+    EZH_REQUEST_CANCELLED,
+    EZH_TOO_MANY_REDIRECTS,
+    EZH_UNKNOWN_ERROR = 1000,
 };
 
 enum EzHttpProgress
@@ -40,6 +40,12 @@ enum EzHttpProgress
     EZH_DownloadTotal,
     EZH_UploadNow,
     EZH_UploadTotal
+};
+
+enum EzHttpFtpSecurity
+{
+    EZH_UNSECURE = 0,
+    EZH_SECURE_EXPLICIT
 };
 
 // options natives
@@ -80,3 +86,10 @@ native ezhttp_get_redirect_count(EzHttpRequest:request_id);
 native ezhttp_get_uploaded_bytes(EzHttpRequest:request_id);
 native ezhttp_get_downloaded_bytes(EzHttpRequest:request_id);
 native ezhttp_get_user_data(EzHttpRequest:request_id, data[]);
+
+
+native EzHttpRequest:ezhttp_ftp_upload(const user[], const password[], const host[], const remote_file[], const local_file[], const on_complete[], EzHttpFtpSecurity:security = EZH_UNSECURE);
+native EzHttpRequest:ezhttp_ftp_upload2(const uri[], const local_file[], const on_complete[], EzHttpFtpSecurity:security = EZH_UNSECURE);
+
+native EzHttpRequest:ezhttp_ftp_download(const user[], const password[], const host[], const remote_file[], const local_file[], const on_complete[], EzHttpFtpSecurity:security = EZH_UNSECURE);
+native EzHttpRequest:ezhttp_ftp_download2(const uri[], const local_file[], const on_complete[], EzHttpFtpSecurity:security = EZH_UNSECURE);

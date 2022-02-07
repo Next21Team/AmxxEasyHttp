@@ -38,6 +38,7 @@ add_library(${PROJECT_NAME} SHARED
     src/sdk/amxxmodule.cpp
     src/sdk/amxxmodule.h
     src/sdk/moduleconfig.h
+    src/undef_metamod.h
     src/easy_http/EasyHttpInterface.h
     src/easy_http/EasyHttp.cpp
     src/easy_http/EasyHttp.h
@@ -55,6 +56,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     dep/halflife/public
     dep/metamod
     src/sdk
+    src
 )
 
 #-----------
