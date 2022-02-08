@@ -21,6 +21,7 @@ namespace ezhttp
         void SetHeader(const std::string& key, const std::string& value);
         void SetCookie(const std::string& key, const std::string& value);
         void SetTimeout(int32_t timeout_ms);
+        void SetConnectTimeout(int32_t timeout_ms);
         void SetProxy(const std::string& proxy_url);
         void SetProxyAuth(const std::string& user, const std::string& password);
         void SetAuth(const std::string& user, const std::string& password);

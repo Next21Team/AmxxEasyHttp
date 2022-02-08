@@ -61,7 +61,7 @@ void EasyHttp::RunFrame()
     }
 }
 
-cpr::Session EasyHttp::CreateSession(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url)
+cpr::Session EasyHttp::CreateSessionWithCommonOptions(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options)
 {
     cpr::Session session;
 
@@ -79,6 +79,12 @@ cpr::Session EasyHttp::CreateSession(const std::shared_ptr<RequestControl>& requ
             return !request_control->canceled;
         }));
 
+    if (options.timeout)
+        session.SetTimeout(*options.timeout);
+
+    if (options.connect_timeout)
+        session.SetConnectTimeout(*options.connect_timeout);
+
     return session;
 }
 
@@ -86,21 +92,22 @@ cpr::Response EasyHttp::SendRequest(const std::shared_ptr<RequestControl>& reque
 {
     switch (method)
     {
-        case RequestMethod::HttpGet:
-        case RequestMethod::HttpPost:
-            return SendHttpRequest(request_control, method, url, options);
-
         case RequestMethod::FtpUpload:
             return FtpUpload(request_control, url, options);
 
         case RequestMethod::FtpDownload:
             return FtpDownload(request_control, url, options);
+
+        case RequestMethod::HttpGet:
+        case RequestMethod::HttpPost:
+        default:
+            return SendHttpRequest(request_control, method, url, options);
     }
 }
 
 cpr::Response EasyHttp::SendHttpRequest(const std::shared_ptr<RequestControl>& request_control, RequestMethod method, const cpr::Url& url, const RequestOptions& options)
 {
-    cpr::Session session = CreateSession(request_control, url);
+    cpr::Session session = CreateSessionWithCommonOptions(request_control, url, options);
 
     if (options.user_agent)
         session.SetUserAgent(*options.user_agent);
@@ -119,9 +126,6 @@ cpr::Response EasyHttp::SendHttpRequest(const std::shared_ptr<RequestControl>& r
 
     if (options.cookies)
         session.SetCookies(*options.cookies);
-
-    if (options.timeout)
-        session.SetTimeout(*options.timeout);
 
     if (options.proxy_url)
     {
@@ -149,7 +153,7 @@ cpr::Response EasyHttp::SendHttpRequest(const std::shared_ptr<RequestControl>& r
 
 cpr::Response EasyHttp::FtpUpload(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options)
 {
-    cpr::Session session = CreateSession(request_control, url);
+    cpr::Session session = CreateSessionWithCommonOptions(request_control, url, options);
 
     if (!options.file_path)
         return session.Complete(CURLE_READ_ERROR);
@@ -201,7 +205,7 @@ cpr::Response EasyHttp::FtpUpload(const std::shared_ptr<RequestControl>& request
 
 cpr::Response EasyHttp::FtpDownload(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options)
 {
-    cpr::Session session = CreateSession(request_control, url);
+    cpr::Session session = CreateSessionWithCommonOptions(request_control, url, options);
 
     if (!options.file_path)
         return session.Complete(CURLE_READ_ERROR);

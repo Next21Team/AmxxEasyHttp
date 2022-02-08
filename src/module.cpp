@@ -117,6 +117,18 @@ cell AMX_NATIVE_CALL ezhttp_option_set_timeout(AMX* amx, cell* params)
     return 0;
 }
 
+cell AMX_NATIVE_CALL ezhttp_option_set_connect_timeout(AMX* amx, cell* params)
+{
+    OptionsId options_id = params[1];
+    cell timeout_ms = params[2];
+
+    if (!ValidateOptionsId(amx, options_id))
+        return 0;
+
+    g_Options->at(options_id).SetConnectTimeout(timeout_ms);
+    return 0;
+}
+
 cell AMX_NATIVE_CALL ezhttp_option_set_proxy(AMX* amx, cell* params)
 {
     SetStringOption(amx, params, &EasyHttpOptionsBuilder::SetProxy);
@@ -713,6 +725,7 @@ AMX_NATIVE_INFO g_Natives[] =
     { "ezhttp_option_set_header",           ezhttp_option_set_header },
     { "ezhttp_option_set_cookie",           ezhttp_option_set_cookie },
     { "ezhttp_option_set_timeout",          ezhttp_option_set_timeout },
+    { "ezhttp_option_set_connect_timeout",  ezhttp_option_set_connect_timeout },
     { "ezhttp_option_set_proxy",            ezhttp_option_set_proxy },
     { "ezhttp_option_set_proxy_auth",       ezhttp_option_set_proxy_auth },
     { "ezhttp_option_set_auth",             ezhttp_option_set_auth },

@@ -56,7 +56,8 @@ native ezhttp_option_add_form_payload(EzHttpOptions:options_id, const key[], con
 native ezhttp_option_set_body(EzHttpOptions:options_id, const body[]);
 native ezhttp_option_set_header(EzHttpOptions:options_id, const key[], const value[]);
 native ezhttp_option_set_cookie(EzHttpOptions:options_id, const key[], const value[]);
-native ezhttp_option_set_timeout(EzHttpOptions:options_id, timeout_ms);
+native ezhttp_option_set_timeout(EzHttpOptions:options_id, timeout_ms); // максимальное время выполнения передачи
+native ezhttp_option_set_connect_timeout(EzHttpOptions:options_id, timeout_ms);
 native ezhttp_option_set_proxy(EzHttpOptions:options_id, const proxy_url[]);
 native ezhttp_option_set_proxy_auth(EzHttpOptions:options_id, const user[], const password[]);
 native ezhttp_option_set_auth(EzHttpOptions:options_id, const user[], const password[]);

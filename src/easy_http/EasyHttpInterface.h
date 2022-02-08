@@ -27,6 +27,7 @@ namespace ezhttp
         std::optional<cpr::Header> header;
         std::optional<cpr::Cookies> cookies;
         std::optional<cpr::Timeout> timeout;
+        std::optional<cpr::ConnectTimeout> connect_timeout;
         std::optional<std::string> proxy_url;
         std::optional<std::pair<std::string, std::string>> proxy_auth;
         std::optional<cpr::Authentication> auth;

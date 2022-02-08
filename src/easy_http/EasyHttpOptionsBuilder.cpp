@@ -49,6 +49,11 @@ void EasyHttpOptionsBuilder::SetTimeout(int32_t timeout_ms)
     options_.timeout = cpr::Timeout{timeout_ms};
 }
 
+void EasyHttpOptionsBuilder::SetConnectTimeout(int32_t timeout_ms)
+{
+    options_.connect_timeout = cpr::ConnectTimeout{timeout_ms};
+}
+
 void EasyHttpOptionsBuilder::SetProxy(const std::string &proxy_url)
 {
     options_.proxy_url = proxy_url;
