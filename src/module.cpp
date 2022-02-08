@@ -33,6 +33,7 @@ bool ValidateRequestId(AMX* amx, RequestId request_id);
 template <class TMethod> void SetKeyValueOption(AMX* amx, cell* params, TMethod method);
 template <class TMethod> void SetStringOption(AMX* amx, cell* params, TMethod method);
 std::string ConstructFtpUrl(const std::string& user, const std::string& password, const std::string& host, const std::string& remote_file);
+RequestOptions PopOptions(OptionsId options_id);
 RequestId SendRequest(AMX* amx, RequestMethod method, const RequestOptions& options, const std::string& url, const std::string& callback);
 void InvokeResponseCallback(AMX* amx, RequestId request_id, const cpr::Response &response);
 
@@ -174,12 +175,7 @@ cell AMX_NATIVE_CALL ezhttp_get(AMX* amx, cell* params)
 
     OptionsId options_id = params[3];
 
-    RequestOptions options;
-    if (options_id != 0)
-    {
-        options = g_Options->at(options_id).GetOptions();
-        g_Options->erase(options_id);
-    }
+    RequestOptions options = PopOptions(options_id);
 
     return SendRequest(amx, RequestMethod::HttpGet,  options, std::string(url, url_len), std::string(callback, callback_len));
 }
@@ -194,12 +190,7 @@ cell AMX_NATIVE_CALL ezhttp_post(AMX* amx, cell* params)
 
     OptionsId options_id = params[3];
 
-    RequestOptions options;
-    if (options_id != 0)
-    {
-        options = g_Options->at(options_id).GetOptions();
-        g_Options->erase(options_id);
-    }
+    RequestOptions options = PopOptions(options_id);
 
     return SendRequest(amx, RequestMethod::HttpPost,  options, std::string(url, url_len), std::string(callback, callback_len));
 }
@@ -527,10 +518,11 @@ cell AMX_NATIVE_CALL ezhttp_ftp_upload(AMX* amx, cell* params)
     char* local_file = MF_GetAmxString(amx, params[5], 1, &local_file_len);
     std::string callback = MF_GetAmxString(amx, params[6], 0, &len);
     bool secure = params[7];
+    OptionsId options_id = params[8];
 
     std::string url = ConstructFtpUrl(user, password, host, remote_file);
 
-    RequestOptions options;
+    RequestOptions options = PopOptions(options_id);
     options.file_path.emplace(local_file, local_file_len);
     options.require_secure = secure;
 
@@ -551,8 +543,9 @@ cell AMX_NATIVE_CALL ezhttp_ftp_upload2(AMX* amx, cell* params)
     char* callback = MF_GetAmxString(amx, params[3], 2, &callback_len);
 
     bool secure = params[4];
+    OptionsId options_id = params[5];
 
-    RequestOptions options;
+    RequestOptions options = PopOptions(options_id);
     options.file_path.emplace(local_file, local_file_len);
     options.require_secure = secure;
 
@@ -572,10 +565,11 @@ cell AMX_NATIVE_CALL ezhttp_ftp_download(AMX* amx, cell* params)
     char* local_file = MF_GetAmxString(amx, params[5], 1, &local_file_len);
     std::string callback = MF_GetAmxString(amx, params[6], 0, &len);
     bool secure = params[7];
+    OptionsId options_id = params[8];
 
     std::string url = ConstructFtpUrl(user, password, host, remote_file);
 
-    RequestOptions options;
+    RequestOptions options = PopOptions(options_id);
     options.file_path.emplace(local_file, local_file_len);
     options.require_secure = secure;
 
@@ -596,8 +590,9 @@ cell AMX_NATIVE_CALL ezhttp_ftp_download2(AMX* amx, cell* params)
     char* callback = MF_GetAmxString(amx, params[3], 2, &callback_len);
 
     bool secure = params[4];
+    OptionsId options_id = params[5];
 
-    RequestOptions options;
+    RequestOptions options = PopOptions(options_id);
     options.file_path.emplace(local_file, local_file_len);
     options.require_secure = secure;
 
@@ -617,6 +612,18 @@ std::string ConstructFtpUrl(const std::string& user, const std::string& password
     url << remote_file;
 
     return url.str();
+}
+
+RequestOptions PopOptions(OptionsId options_id)
+{
+    RequestOptions options;
+    if (options_id != 0)
+    {
+        options = g_Options->at(options_id).GetOptions();
+        g_Options->erase(options_id);
+    }
+
+    return options;
 }
 
 RequestId SendRequest(AMX* amx, RequestMethod method, const RequestOptions& options, const std::string& url, const std::string& callback)

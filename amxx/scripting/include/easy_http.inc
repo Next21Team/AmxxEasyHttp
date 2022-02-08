@@ -89,8 +89,8 @@ native ezhttp_get_downloaded_bytes(EzHttpRequest:request_id);
 native ezhttp_get_user_data(EzHttpRequest:request_id, data[]);
 
 
-native EzHttpRequest:ezhttp_ftp_upload(const user[], const password[], const host[], const remote_file[], const local_file[], const on_complete[], EzHttpFtpSecurity:security = EZH_UNSECURE);
-native EzHttpRequest:ezhttp_ftp_upload2(const uri[], const local_file[], const on_complete[], EzHttpFtpSecurity:security = EZH_UNSECURE);
+native EzHttpRequest:ezhttp_ftp_upload(const user[], const password[], const host[], const remote_file[], const local_file[], const on_complete[], EzHttpFtpSecurity:security = EZH_UNSECURE, EzHttpOptions:options_id = EzHttpOptions:0);
+native EzHttpRequest:ezhttp_ftp_upload2(const uri[], const local_file[], const on_complete[], EzHttpFtpSecurity:security = EZH_UNSECURE, EzHttpOptions:options_id = EzHttpOptions:0);
 
-native EzHttpRequest:ezhttp_ftp_download(const user[], const password[], const host[], const remote_file[], const local_file[], const on_complete[], EzHttpFtpSecurity:security = EZH_UNSECURE);
-native EzHttpRequest:ezhttp_ftp_download2(const uri[], const local_file[], const on_complete[], EzHttpFtpSecurity:security = EZH_UNSECURE);
+native EzHttpRequest:ezhttp_ftp_download(const user[], const password[], const host[], const remote_file[], const local_file[], const on_complete[], EzHttpFtpSecurity:security = EZH_UNSECURE, EzHttpOptions:options_id = EzHttpOptions:0);
+native EzHttpRequest:ezhttp_ftp_download2(const uri[], const local_file[], const on_complete[], EzHttpFtpSecurity:security = EZH_UNSECURE, EzHttpOptions:options_id = EzHttpOptions:0);
