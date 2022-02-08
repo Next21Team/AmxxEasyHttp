@@ -38,13 +38,15 @@ add_library(${PROJECT_NAME} SHARED
     src/sdk/amxxmodule.cpp
     src/sdk/amxxmodule.h
     src/sdk/moduleconfig.h
-    src/undef_metamod.h
     src/easy_http/EasyHttpInterface.h
     src/easy_http/EasyHttp.cpp
     src/easy_http/EasyHttp.h
     src/easy_http/EasyHttpOptionsBuilder.cpp
     src/easy_http/EasyHttpOptionsBuilder.h
+    src/utils.h
+    src/utils.cpp
     src/module.cpp
+    src/undef_metamod.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC

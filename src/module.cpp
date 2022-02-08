@@ -1,5 +1,6 @@
 #include "easy_http/EasyHttpOptionsBuilder.h"
 #include "easy_http/EasyHttp.h"
+#include "utils.h"
 #include <unordered_map>
 #include <algorithm>
 #include <utility>
@@ -32,7 +33,6 @@ bool ValidateOptionsId(AMX* amx, OptionsId options_id);
 bool ValidateRequestId(AMX* amx, RequestId request_id);
 template <class TMethod> void SetKeyValueOption(AMX* amx, cell* params, TMethod method);
 template <class TMethod> void SetStringOption(AMX* amx, cell* params, TMethod method);
-std::string ConstructFtpUrl(const std::string& user, const std::string& password, const std::string& host, const std::string& remote_file);
 RequestOptions PopOptions(OptionsId options_id);
 RequestId SendRequest(AMX* amx, RequestMethod method, const RequestOptions& options, const std::string& url, const std::string& callback);
 void InvokeResponseCallback(AMX* amx, RequestId request_id, const cpr::Response &response);
@@ -599,19 +599,6 @@ cell AMX_NATIVE_CALL ezhttp_ftp_download2(AMX* amx, cell* params)
     SendRequest(amx, RequestMethod::FtpDownload, options, std::string(url_str, url_str_len), std::string(callback, callback_len));
 
     return 0;
-}
-
-std::string ConstructFtpUrl(const std::string& user, const std::string& password, const std::string& host, const std::string& remote_file)
-{
-    std::ostringstream url;
-    url << "ftp://" << user << ":" << password << "@" << host;
-
-    if (remote_file.empty() || remote_file[0] != '/')
-        url << "/";
-
-    url << remote_file;
-
-    return url.str();
 }
 
 RequestOptions PopOptions(OptionsId options_id)
