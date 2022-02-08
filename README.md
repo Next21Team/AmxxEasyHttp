@@ -18,7 +18,7 @@ public http_post()
     ezhttp_option_set_header(options_id, "Content-Type", "text/plain")
     ezhttp_option_set_body(options_id, "Hello!")
 
-    ezhttp_post("https://httpbin.org/post", "http_complete")
+    ezhttp_post("https://httpbin.org/post", "http_complete", options_id)
 }
 
 public http_complete(EzHttpRequest:request_id)
