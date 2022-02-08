@@ -196,11 +196,7 @@ cpr::Response EasyHttp::FtpUpload(const std::shared_ptr<RequestControl>& request
 
     file.close();
 
-    cpr::Response resp = session.Complete(curl_code);
-    if (resp.error.code == cpr::ErrorCode::REQUEST_CANCELLED)
-        std::filesystem::remove(*options.file_path);
-
-    return resp;
+    return session.Complete(curl_code);
 }
 
 cpr::Response EasyHttp::FtpDownload(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options)
