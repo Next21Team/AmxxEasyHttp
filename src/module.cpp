@@ -523,7 +523,7 @@ cell AMX_NATIVE_CALL ezhttp_ftp_upload(AMX* amx, cell* params)
     std::string url = ConstructFtpUrl(user, password, host, remote_file);
 
     RequestOptions options = PopOptions(options_id);
-    options.file_path.emplace(local_file, local_file_len);
+    options.file_path.emplace(MF_BuildPathname("%s", local_file));
     options.require_secure = secure;
 
     SendRequest(amx, RequestMethod::FtpUpload, options, url, callback);
@@ -546,7 +546,7 @@ cell AMX_NATIVE_CALL ezhttp_ftp_upload2(AMX* amx, cell* params)
     OptionsId options_id = params[5];
 
     RequestOptions options = PopOptions(options_id);
-    options.file_path.emplace(local_file, local_file_len);
+    options.file_path.emplace(MF_BuildPathname("%s", local_file));
     options.require_secure = secure;
 
     SendRequest(amx, RequestMethod::FtpUpload, options, std::string(url_str, url_str_len), std::string(callback, callback_len));
@@ -570,7 +570,7 @@ cell AMX_NATIVE_CALL ezhttp_ftp_download(AMX* amx, cell* params)
     std::string url = ConstructFtpUrl(user, password, host, remote_file);
 
     RequestOptions options = PopOptions(options_id);
-    options.file_path.emplace(local_file, local_file_len);
+    options.file_path.emplace(MF_BuildPathname("%s", local_file));
     options.require_secure = secure;
 
     SendRequest(amx, RequestMethod::FtpDownload, options, url, callback);
@@ -593,7 +593,7 @@ cell AMX_NATIVE_CALL ezhttp_ftp_download2(AMX* amx, cell* params)
     OptionsId options_id = params[5];
 
     RequestOptions options = PopOptions(options_id);
-    options.file_path.emplace(local_file, local_file_len);
+    options.file_path.emplace(MF_BuildPathname("%s", local_file));
     options.require_secure = secure;
 
     SendRequest(amx, RequestMethod::FtpDownload, options, std::string(url_str, url_str_len), std::string(callback, callback_len));
@@ -773,8 +773,7 @@ AMX_NATIVE_INFO g_Natives[] =
 
 void ReInitialize()
 {
-    std::string ca_cert_path(GET_GAME_INFO(PLID, GINFO_GAMEDIR));
-    ca_cert_path.append("/addons/amxmodx/data/amxx_easy_http_cacert.pem");
+    std::string ca_cert_path = MF_BuildPathname("addons/amxmodx/data/amxx_easy_http_cacert.pem");
 
     if (g_Requests)
     {
