@@ -138,6 +138,10 @@ else()
         -static-libstdc++
         -static-libgcc
     )
+
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/AmxxEasyHttp.version
+        LINK_FLAGS "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/AmxxEasyHttp.version")
 endif()
 
 #-----------

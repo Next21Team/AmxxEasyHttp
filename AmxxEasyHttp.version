@@ -1,0 +1,23 @@
+AMXXEASYHTTP_1.0 {
+    global:
+        GetEntityAPI2;
+        GetEntityAPI2_Post;
+        GetEngineFunctions;
+        GetEngineFunctions_Post;
+        GetNewDLLFunctions;
+        GetNewDLLFunctions_Post;
+        Meta_Query;
+        Meta_Attach;
+        Meta_Detach;
+        GiveFnptrsToDll;
+        AMXX_Query;
+        AMXX_CheckGame;
+        AMXX_Attach;
+        AMXX_Detach;
+        AMXX_PluginsLoaded;
+        AMXX_PluginsUnloaded;
+        AMXX_PluginsUnloading;
+
+    local:
+        *;
+};
