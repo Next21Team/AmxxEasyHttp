@@ -65,17 +65,25 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 # properties
 #-----------
 
-if (MSVC AND CMAKE_BUILD_TYPE MATCHES Release)
-    # Tell linker to include symbol data & generate map file
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-            LINK_FLAGS "/INCREMENTAL:NO /DEBUG /OPT:REF /OPT:ICF /MAP:${CMAKE_BINARY_DIR}/${PROJECT_NAME}.map"
-    )
+#TODO for gcc: disable rtti, set O2, enable whole program optimization
 
-    # Set file name & location
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-            COMPILE_PDB_NAME ${PROJECT_NAME}
-            COMPILE_PDB_OUTPUT_DIR ${CMAKE_BINARY_DIR}
-    )
+if (MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE /GR-)
+
+    if (CMAKE_BUILD_TYPE MATCHES Release)
+        target_compile_options(${PROJECT_NAME} PRIVATE /Zi /O2 /GL)
+
+        # Tell linker to include symbol data & generate map file
+        set_target_properties(${PROJECT_NAME} PROPERTIES
+                LINK_FLAGS "/LTCG  /INCREMENTAL:NO /DEBUG /OPT:REF /OPT:ICF /MAP:${CMAKE_BINARY_DIR}/${PROJECT_NAME}.map"
+        )
+
+        # Set file name & location
+        set_target_properties(${PROJECT_NAME} PROPERTIES
+                COMPILE_PDB_NAME ${PROJECT_NAME}
+                COMPILE_PDB_OUTPUT_DIR ${CMAKE_BINARY_DIR}
+        )
+    endif()
 endif()
 
 #-----------
