@@ -1,14 +1,13 @@
 #pragma once
 
 #include "cpr/cpr.h"
-#include <amxxmodule.h>
 #include <functional>
 #include <utility>
 #include <optional>
 
 namespace ezhttp
 {
-    using RequestCallback = std::function<void(cpr::Response)>;
+    using ResponseCallback = std::function<void(cpr::Response)>;
 
     enum class RequestMethod
     {
@@ -31,7 +30,6 @@ namespace ezhttp
         std::optional<std::string> proxy_url;
         std::optional<std::pair<std::string, std::string>> proxy_auth;
         std::optional<cpr::Authentication> auth;
-        std::optional<std::vector<cell>> user_data;
         bool require_secure = false;
         std::optional<std::string> file_path; // for ftp and multipart/form-data in future
     };
@@ -46,6 +44,8 @@ namespace ezhttp
             int32_t upload_now;
         };
 
+        bool completed{};
+        bool forgotten{};
         std::atomic_bool canceled{};
         std::atomic<Progress> progress{};
     };
@@ -55,7 +55,14 @@ namespace ezhttp
     public:
         virtual ~EasyHttpInterface() = default;
 
-        virtual std::shared_ptr<RequestControl> SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const RequestCallback& on_complete) = 0;
+        virtual std::shared_ptr<RequestControl> SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const ResponseCallback& on_complete) = 0;
         virtual void RunFrame() = 0;
+        virtual int GetActiveRequestCount() = 0;
+
+        // No callback functions will be called for all current requests
+        virtual void ForgetAllRequests() = 0;
+
+        // All requests will be interrupted as soon as possible
+        virtual void CancelAllRequests() = 0;
     };
 }

@@ -1,20 +1,18 @@
 #include "EasyHttp.h"
-#include <amxxmodule.h>
-#include <undef_metamod.h>
 #include <utility>
 #include <filesystem>
 
 using namespace ezhttp;
 using namespace std::chrono_literals;
 
-EasyHttp::EasyHttp(std::string ca_cert_path) :
+EasyHttp::EasyHttp(std::string ca_cert_path, int threads) :
     ca_cert_path_(std::move(ca_cert_path))
 {
     update_scheduler_ = std::make_unique<async::fifo_scheduler>();
-    request_scheduler_ = std::make_unique<async::threadpool_scheduler>(kMaxThreads);
+    request_scheduler_ = std::make_shared<async::threadpool_scheduler>(threads);
 }
 
-std::shared_ptr<RequestControl> EasyHttp::SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const RequestCallback& on_complete)
+std::shared_ptr<RequestControl> EasyHttp::SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const ResponseCallback& on_complete)
 {
     auto request_control = std::make_shared<RequestControl>();
 
@@ -24,10 +22,14 @@ std::shared_ptr<RequestControl> EasyHttp::SendRequest(RequestMethod method, cons
     })
     .then(*update_scheduler_, [request_control, on_complete](cpr::Response response)
     {
+        request_control->completed = true;
+
+        if (!request_control->forgotten)
             on_complete(std::move(response));
     });
 
     tasks_.emplace_back(std::move(task));
+    requests_.emplace_back(request_control);
 
     return request_control;
 }
@@ -51,6 +53,7 @@ void EasyHttp::RunFrame()
             break;
     }
 
+    // erase completed tasks
     for (auto it = tasks_.begin(); it != tasks_.end(); )
     {
         if (!it->valid() || it->ready())
@@ -58,6 +61,27 @@ void EasyHttp::RunFrame()
         else
             ++it;
     }
+
+    // erase completed requests
+    for (auto it = requests_.begin(); it != requests_.end(); )
+    {
+        if ((*it)->completed)
+            it = requests_.erase(it);
+        else
+            ++it;
+    }
+}
+
+void EasyHttp::ForgetAllRequests()
+{
+    for (auto& request : requests_)
+        request->forgotten = true;
+}
+
+void EasyHttp::CancelAllRequests()
+{
+    for (auto& request : requests_)
+        request->canceled.store(true);
 }
 
 cpr::Session EasyHttp::CreateSessionWithCommonOptions(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options)
@@ -191,11 +215,21 @@ cpr::Response EasyHttp::FtpUpload(const std::shared_ptr<RequestControl>& request
         curl_easy_setopt(curl, CURLOPT_USE_SSL, CURLUSESSL_ALL);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     }
-    CURLcode curl_code = curl_easy_perform(curl);
+    CURLcode curl_result = curl_easy_perform(curl);
 
     file.close();
 
-    return session.Complete(curl_code);
+    cpr::Response resp = session.Complete(curl_result);
+    if (request_control->canceled)
+    {
+        long response_code;
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+
+        resp.error.code = cpr::ErrorCode::REQUEST_CANCELLED;
+        resp.error.message = "Ftp uploading canceled. Code " + std::to_string(response_code);
+    }
+
+    return resp;
 }
 
 cpr::Response EasyHttp::FtpDownload(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options)
@@ -222,13 +256,21 @@ cpr::Response EasyHttp::FtpDownload(const std::shared_ptr<RequestControl>& reque
         curl_easy_setopt(curl, CURLOPT_USE_SSL, CURLUSESSL_ALL);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     }
-    CURLcode curl_code = curl_easy_perform(curl);
+    CURLcode curl_result = curl_easy_perform(curl);
 
     file.close();
 
-    cpr::Response resp = session.Complete(curl_code);
-    if (resp.error.code == cpr::ErrorCode::REQUEST_CANCELLED)
+    cpr::Response resp = session.Complete(curl_result);
+    if (request_control->canceled)
+    {
         std::filesystem::remove(*options.file_path);
+
+        long response_code;
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+
+        resp.error.code = cpr::ErrorCode::REQUEST_CANCELLED;
+        resp.error.message = "Ftp downloading canceled. Code " + std::to_string(response_code);
+    }
 
     return resp;
 }

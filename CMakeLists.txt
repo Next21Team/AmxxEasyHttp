@@ -41,12 +41,16 @@ add_library(${PROJECT_NAME} SHARED
     src/easy_http/EasyHttpInterface.h
     src/easy_http/EasyHttp.cpp
     src/easy_http/EasyHttp.h
-    src/easy_http/EasyHttpOptionsBuilder.cpp
     src/easy_http/EasyHttpOptionsBuilder.h
-    src/utils.h
-    src/utils.cpp
+    src/utils/ContainerWithHandles.h
+    src/utils/ftp_utils.h
+    src/utils/ftp_utils.cpp
+    src/utils/string_utils.h
+    src/utils/string_utils.cpp
     src/module.cpp
     src/undef_metamod.h
+    src/EasyHttpModule.cpp
+    src/EasyHttpModule.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC

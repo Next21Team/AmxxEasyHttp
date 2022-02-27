@@ -22,7 +22,7 @@
 #define MODULE_LIBRARY "easy_http"
 #define MODULE_LIBCLASS "easy_http"
 // If you want the module not to be reloaded on mapchange, remove / comment out the next line
-#define MODULE_RELOAD_ON_MAPCHANGE
+// #define MODULE_RELOAD_ON_MAPCHANGE
 
 #ifdef __DATE__
 #define MODULE_DATE __DATE__
@@ -94,7 +94,7 @@
 // Meta attach
 //#define FN_META_ATTACH OnMetaAttach
 // Meta detach
-//#define FN_META_DETACH OnMetaDetach
+// #define FN_META_DETACH OnMetaDetach
 
 // (wd) are Will Day's notes
 // - GetEntityAPI2 functions
@@ -119,7 +119,7 @@
 // #define FN_ClientPutInServer			ClientPutInServer			/* pfnClientPutInServer()		(wd) Client is entering the game */
 // #define FN_ClientCommand				ClientCommand				/* pfnClientCommand()			(wd) Player has sent a command (typed or from a bind) */
 // #define FN_ClientUserInfoChanged		ClientUserInfoChanged		/* pfnClientUserInfoChanged()	(wd) Client has updated their setinfo structure */
- #define FN_ServerActivate			    ServerActivate				/* pfnServerActivate()			(wd) Server is starting a new map */
+// #define FN_ServerActivate			    ServerActivate				/* pfnServerActivate()			(wd) Server is starting a new map */
  #define FN_ServerDeactivate			ServerDeactivate			/* pfnServerDeactivate()		(wd) Server is leaving the map (shutdown or changelevel); SDK2 */
 // #define FN_PlayerPreThink			PlayerPreThink				/* pfnPlayerPreThink() */
 // #define FN_PlayerPostThink			PlayerPostThink				/* pfnPlayerPostThink() */
@@ -494,7 +494,7 @@
 // #define FN_GetPlayerAuthId_Post				GetPlayerAuthId_Post
 
 // #define FN_OnFreeEntPrivateData				OnFreeEntPrivateData				
-// #define FN_GameShutdown						GameShutdown
+ #define FN_GameShutdown						GameShutdown
 // #define FN_ShouldCollide						ShouldCollide
 
 // #define FN_OnFreeEntPrivateData_Post			OnFreeEntPrivateData_Post

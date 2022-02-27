@@ -1,15 +1,15 @@
 #if defined _easy_http_included
-    #endinput
+#endinput
 #endif
 #define _easy_http_included
 
 #if AMXX_VERSION_NUM >= 175
- #pragma reqlib easy_http
+#pragma reqlib easy_http
  #if !defined AMXMODX_NOAUTOLOAD
   #pragma loadlib easy_http
  #endif
 #else
- #pragma library easy_http
+#pragma library easy_http
 #endif
 
 enum EzHttpErrorCode {
@@ -48,12 +48,19 @@ enum EzHttpFtpSecurity
     EZH_SECURE_EXPLICIT
 };
 
+enum EzHttpPluginEndBehaviour
+{
+    EZH_CANCEL_REQUESTS = 0,
+    EZH_FORGET_REQUESTS,
+};
+
 // options natives
 native EzHttpOptions:ezhttp_create_options();
 native ezhttp_option_set_user_agent(EzHttpOptions:options_id, const user_agent[]);
 native ezhttp_option_add_url_parameter(EzHttpOptions:options_id, const key[], const value[]);
 native ezhttp_option_add_form_payload(EzHttpOptions:options_id, const key[], const value[]);
 native ezhttp_option_set_body(EzHttpOptions:options_id, const body[]);
+native ezhttp_option_append_body(EzHttpOptions:options_id, const body[]);
 native ezhttp_option_set_header(EzHttpOptions:options_id, const key[], const value[]);
 native ezhttp_option_set_cookie(EzHttpOptions:options_id, const key[], const value[]);
 native ezhttp_option_set_timeout(EzHttpOptions:options_id, timeout_ms); // максимальное время выполнения передачи
@@ -62,6 +69,8 @@ native ezhttp_option_set_proxy(EzHttpOptions:options_id, const proxy_url[]);
 native ezhttp_option_set_proxy_auth(EzHttpOptions:options_id, const user[], const password[]);
 native ezhttp_option_set_auth(EzHttpOptions:options_id, const user[], const password[]);
 native ezhttp_option_set_user_data(EzHttpOptions:options_id, const data[], len);
+native ezhttp_option_set_plugin_end_behaviour(EzHttpOptions:options_id, EzHttpPluginEndBehaviour:plugin_end_behaviour);
+native ezhttp_option_set_queue(EzHttpOptions:options_id, EzHttpQueue:end_map_behaviour);
 
 // request natives
 native EzHttpRequest:ezhttp_get(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0);
@@ -94,3 +103,6 @@ native EzHttpRequest:ezhttp_ftp_upload2(const uri[], const local_file[], const o
 
 native EzHttpRequest:ezhttp_ftp_download(const user[], const password[], const host[], const remote_file[], const local_file[], const on_complete[], EzHttpFtpSecurity:security = EZH_UNSECURE, EzHttpOptions:options_id = EzHttpOptions:0);
 native EzHttpRequest:ezhttp_ftp_download2(const uri[], const local_file[], const on_complete[], EzHttpFtpSecurity:security = EZH_UNSECURE, EzHttpOptions:options_id = EzHttpOptions:0);
+
+
+native EzHttpQueue:ezhttp_create_queue();
