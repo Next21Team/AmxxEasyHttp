@@ -24,7 +24,6 @@ std::shared_ptr<RequestControl> EasyHttp::SendRequest(RequestMethod method, cons
     })
     .then(*update_scheduler_, [request_control, on_complete](cpr::Response response)
     {
-        if (!request_control->canceled)
             on_complete(std::move(response));
     });
 
@@ -35,7 +34,7 @@ std::shared_ptr<RequestControl> EasyHttp::SendRequest(RequestMethod method, cons
 
 EasyHttp::~EasyHttp()
 {
-    while (!async::when_all(tasks_).ready())
+    while (!tasks_.empty())
         EasyHttp::RunFrame();
 
     // !! make shure that request_scheduler_ destroys always before update_scheduler_
