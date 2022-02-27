@@ -73,7 +73,7 @@ if (UNIX)
     target_compile_options(${PROJECT_NAME} PRIVATE -fno-rtti)
 
     if (CMAKE_BUILD_TYPE MATCHES Release)
-        target_compile_options(${PROJECT_NAME} PRIVATE -fuse-linker-plugin -O2)
+        target_compile_options(${PROJECT_NAME} PRIVATE -O2)
     endif()
 endif()
 
@@ -81,7 +81,7 @@ if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /GR-)
 
     if (CMAKE_BUILD_TYPE MATCHES Release)
-        target_compile_options(${PROJECT_NAME} PRIVATE /Zi /O2 /GL)
+        target_compile_options(${PROJECT_NAME} PRIVATE /Zi /O2)
 
         # Tell linker to include symbol data & generate map file
         set_target_properties(${PROJECT_NAME} PROPERTIES
