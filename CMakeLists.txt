@@ -69,7 +69,13 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 # properties
 #-----------
 
-#TODO for gcc: disable rtti, set O2, enable whole program optimization
+if (UNIX)
+    target_compile_options(${PROJECT_NAME} PRIVATE -fno-rtti)
+
+    if (CMAKE_BUILD_TYPE MATCHES Release)
+        target_compile_options(${PROJECT_NAME} PRIVATE -fuse-linker-plugin -O2)
+    endif()
+endif()
 
 if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /GR-)
