@@ -6,8 +6,6 @@ find_library(ZLIB_LIBRARY
         NAMES libz.a zlib_a.lib
         PATHS ${AMXX_EASY_HTTP_ROOT}/dep/zlib/lib NO_DEFAULT_PATH)
 
-message(${ZLIB_LIBRARY})
-
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(ZLIB REQUIRED_VARS ZLIB_LIBRARY)
 
