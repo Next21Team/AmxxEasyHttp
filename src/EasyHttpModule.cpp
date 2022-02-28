@@ -13,7 +13,7 @@ EasyHttpModule::EasyHttpModule(std::string ca_cert_path) :
 
 EasyHttpModule::~EasyHttpModule()
 {
-    ResetMainAndRemoveUsersQueue();
+    ResetMainAndRemoveUsersQueues();
 
     while (!forgotten_easy_http_.empty())
         RunCleanupFrameForForgottenEasyHttp();
@@ -27,7 +27,7 @@ void EasyHttpModule::RunFrame()
 
 void EasyHttpModule::ServerDeactivate()
 {
-    ResetMainAndRemoveUsersQueue();
+    ResetMainAndRemoveUsersQueues();
 }
 
 RequestId EasyHttpModule::SendRequest(RequestMethod method, const std::string& url, OptionsId options_id, const ModuleRequestCallback& callback)
@@ -74,7 +74,7 @@ bool EasyHttpModule::DeleteOptions(OptionsId handle)
 }
 
 
-void EasyHttpModule::ResetMainAndRemoveUsersQueue()
+void EasyHttpModule::ResetMainAndRemoveUsersQueues()
 {
     for (auto it = easy_http_pack_.begin(); it != easy_http_pack_.end(); )
     {
@@ -88,7 +88,7 @@ void EasyHttpModule::ResetMainAndRemoveUsersQueue()
             if (it->first == QueueId::Main)
                 terminating_ez = std::make_unique<ezhttp::EasyHttp>(ca_cert_path_, kMainQueueThreads);
             else
-                terminating_ez.reset();
+                terminating_ez = nullptr;
         }
 
         if (forgettable_ez)
@@ -99,7 +99,7 @@ void EasyHttpModule::ResetMainAndRemoveUsersQueue()
             if (it->first == QueueId::Main)
                 forgettable_ez = std::make_unique<ezhttp::EasyHttp>(ca_cert_path_, kMainQueueThreads);
             else
-                forgettable_ez.reset();
+                forgettable_ez = nullptr;
         }
 
         if (it->first != QueueId::Main)

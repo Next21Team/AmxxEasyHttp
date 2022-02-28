@@ -95,7 +95,7 @@ public:
     [[nodiscard]] inline bool IsQueueExists(QueueId handle) const { return easy_http_pack_.contains(handle); }
 
 private:
-    void ResetMainAndRemoveUsersQueue();
+    void ResetMainAndRemoveUsersQueues();
     void RunFrameEasyHttp();
     void RunCleanupFrameForForgottenEasyHttp();
     std::unique_ptr<ezhttp::EasyHttpInterface>& GetEasyHttp(QueueId queue_id, PluginEndBehaviour end_map_behaviour);

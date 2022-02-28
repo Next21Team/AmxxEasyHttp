@@ -206,9 +206,6 @@ cell AMX_NATIVE_CALL ezhttp_cancel_request(AMX* amx, cell* params)
     RequestData& request_data = g_EasyHttpModule->GetRequest(request_id);
     request_data.request_control->canceled.store(true);
 
-    cpr::Response response;
-    response.error.code = cpr::ErrorCode::REQUEST_CANCELLED;
-
     return 0;
 }
 

@@ -50,8 +50,8 @@ enum EzHttpFtpSecurity
 
 enum EzHttpPluginEndBehaviour
 {
-    EZH_CANCEL_REQUESTS = 0,
-    EZH_FORGET_REQUESTS,
+    EZH_CANCEL_REQUEST = 0,
+    EZH_FORGET_REQUEST,
 };
 
 // options natives
