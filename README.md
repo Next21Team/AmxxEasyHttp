@@ -72,6 +72,16 @@ public ftp_upload_complete(EzHttpRequest:request_id)
 * OpenSSL and WinSSL support for HTTPS requests
 * FTP/FTPES download and upload support
 
+## Advanced features
+
+### Behavior at the end of the map
+By default, when you change map, all requests are interrupted. The callback functions are called with error code EZH_REQUEST_CANCELLED.
+An alternative is to specify the option ```ezhttp_option_set_plugin_end_behaviour(options_id, EZH_FORGET_REQUEST)```, in which case the request will not be interrupted at the end of the map (but the callback will not be called).
+
+### Request queue
+The module uses up to 6 threads to execute requests, so there is no guarantee that requests will be executed in the order in which they were sent.
+If you need to execute requests sequentially, you can create a queue with ```new EzHttpQueue:queue_id = ezhttp_create_queue()``` and then set the ```ezhttp_option_set_queue(options_id, queue_id)``` option for all requests that need to be executed within that queue.
+
 ## Building
 
 Building AmxxEasyHttp requires CMake 3.18+ and GCC or MSVC compiler with C++17 support. Tested compilers are:
