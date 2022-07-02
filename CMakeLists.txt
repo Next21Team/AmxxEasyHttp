@@ -152,7 +152,6 @@ else()
         OPENSSL::libcrypto
         ZLIB::ZLIB
         CARES::libcares
-        -latomic
         -static-libstdc++
         -static-libgcc
     )

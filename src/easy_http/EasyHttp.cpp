@@ -81,7 +81,10 @@ void EasyHttp::ForgetAllRequests()
 void EasyHttp::CancelAllRequests()
 {
     for (auto& request : requests_)
-        request->canceled.store(true);
+    {
+        std::lock_guard<std::mutex> lock_guard(request->control_mutex);
+        request->canceled = true;
+    }
 }
 
 cpr::Session EasyHttp::CreateSessionWithCommonOptions(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options)
@@ -97,6 +100,8 @@ cpr::Session EasyHttp::CreateSessionWithCommonOptions(const std::shared_ptr<Requ
     session.SetUrl(url);
     session.SetProgressCallback(cpr::ProgressCallback(
         [request_control](cpr::cpr_off_t downloadTotal, cpr::cpr_off_t downloadNow, cpr::cpr_off_t uploadTotal, cpr::cpr_off_t uploadNow, intptr_t userdata) {
+            std::lock_guard<std::mutex> lock_guard(request_control->control_mutex);
+
             request_control->progress = RequestControl::Progress{ (int32_t)(downloadTotal), (int32_t)(downloadNow), (int32_t)(uploadTotal), (int32_t)(uploadNow) };
 
             return !request_control->canceled;

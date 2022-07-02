@@ -204,7 +204,9 @@ cell AMX_NATIVE_CALL ezhttp_cancel_request(AMX* amx, cell* params)
         return 0;
 
     RequestData& request_data = g_EasyHttpModule->GetRequest(request_id);
-    request_data.request_control->canceled.store(true);
+
+    std::lock_guard<std::mutex> lock_guard(request_data.request_control->control_mutex);
+    request_data.request_control->canceled = true;
 
     return 0;
 }
@@ -216,13 +218,14 @@ cell AMX_NATIVE_CALL ezhttp_request_progress(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    auto progress = g_EasyHttpModule->GetRequest(request_id).request_control->progress.load();
+    auto& request_control = g_EasyHttpModule->GetRequest(request_id).request_control;
+    std::lock_guard<std::mutex> lock_guard(request_control->control_mutex);
 
     cell* p = MF_GetAmxAddr(amx, params[2]);
-    p[0] = progress.download_now;
-    p[1] = progress.download_total;
-    p[2] = progress.upload_now;
-    p[3] = progress.upload_total;
+    p[0] = request_control->progress.download_now;
+    p[1] = request_control->progress.download_total;
+    p[2] = request_control->progress.upload_now;
+    p[3] = request_control->progress.upload_total;
 
     return 0;
 }

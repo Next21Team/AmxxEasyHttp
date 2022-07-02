@@ -36,6 +36,8 @@ namespace ezhttp
 
     struct RequestControl
     {
+        std::mutex control_mutex;
+
         struct Progress
         {
             int32_t download_total;
@@ -46,8 +48,8 @@ namespace ezhttp
 
         bool completed{};
         bool forgotten{};
-        std::atomic_bool canceled{};
-        std::atomic<Progress> progress{};
+        bool canceled{};
+        Progress progress{};
     };
 
     class EasyHttpInterface
