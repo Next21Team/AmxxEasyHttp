@@ -387,7 +387,8 @@ cell AMX_NATIVE_CALL ezhttp_get_cookies_count(AMX* amx, cell* params)
 
     const cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
 
-    return response.cookies.size();
+    size_t size = response.cookies.end() - response.cookies.begin();
+    return (cell)size;
 }
 
 cell AMX_NATIVE_CALL ezhttp_get_cookies(AMX* amx, cell* params)
@@ -403,9 +404,11 @@ cell AMX_NATIVE_CALL ezhttp_get_cookies(AMX* amx, cell* params)
     cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
 
     const std::string cookie_key(key, key_len);
-    if (response.cookies.contains(cookie_key))
+
+    auto it = std::find_if(response.cookies.begin(), response.cookies.end(), [&cookie_key](const auto& item) { return item.GetName() == cookie_key; });
+    if (it != response.cookies.end())
     {
-        const std::string& cookie_value = response.cookies[cookie_key];
+        const std::string& cookie_value = it->GetValue();
 
         MF_SetAmxString(amx, params[3], cookie_value.c_str(), value_max_len);
 

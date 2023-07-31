@@ -53,12 +53,16 @@ namespace ezhttp
             if (!options_.cookies)
                 options_.cookies = cpr::Cookies{};
 
-            (*options_.cookies)[key] = value;
+            auto it = std::find_if(options_.cookies->begin(), options_.cookies->end(), [&key](const auto& item) { return item.GetName() == key; });
+            if (it == options_.cookies->end())
+                options_.cookies->push_back(cpr::Cookie(key, value));
+
+            size_t index = it - options_.cookies->begin();
+            (*options_.cookies)[index] = cpr::Cookie(key, value);
         }
 
         inline void SetTimeout(int32_t timeout_ms) {
             options_.timeout = cpr::Timeout{timeout_ms};
-
         }
 
         inline void SetConnectTimeout(int32_t timeout_ms) {
@@ -74,7 +78,7 @@ namespace ezhttp
         }
 
         inline void SetAuth(const std::string& user, const std::string& password) {
-            options_.auth = {user, password};
+            options_.auth = cpr::Authentication(user, password, cpr::AuthMode::BASIC);
         }
 
         inline void SetSecure(bool secure) {

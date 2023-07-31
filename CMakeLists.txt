@@ -25,7 +25,8 @@ if (UNIX)
 endif()
 
 # cpr options
-set(CPR_FORCE_USE_SYSTEM_CURL ON) # system curl will be overridden by our embedded curl module
+#set(CPR_FORCE_USE_SYSTEM_CURL ON) # system curl will be overridden by our embedded curl module
+set(ENABLE_THREADED_RESOLVER OFF)
 set(CPR_USE_SYSTEM_GTEST OFF)
 set(BUILD_CPR_TESTS OFF)
 set(CPR_ENABLE_SSL ON)
@@ -138,20 +139,8 @@ target_link_libraries(${PROJECT_NAME}
     CURL::libcurl
 )
 
-if (WIN32)
+if (UNIX)
     target_link_libraries(${PROJECT_NAME}
-        Ws2_32.lib
-        Crypt32.lib
-        Wldap32.lib
-        Normaliz.lib
-        ZLIB::ZLIB
-    )
-else()
-    target_link_libraries(${PROJECT_NAME}
-        OPENSSL::libssl    #todo all curl dependencies list move to variable
-        OPENSSL::libcrypto
-        ZLIB::ZLIB
-        CARES::libcares
         -static-libstdc++
         -static-libgcc
     )
