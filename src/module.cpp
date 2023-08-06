@@ -84,6 +84,32 @@ cell AMX_NATIVE_CALL ezhttp_option_set_body(AMX* amx, cell* params)
     return 0;
 }
 
+// native bool:ezhttp_option_set_body_from_json(EzHttpOptions:options_id, EzJSON:json, bool:pretty = false);
+cell AMX_NATIVE_CALL ezhttp_option_set_body_from_json(AMX* amx, cell* params)
+{
+    auto options_id = (OptionsId)params[1];
+    auto json_handle = (JS_Handle)params[2];
+    auto pretty = (bool)params[3];
+
+    if (!ValidateOptionsId(amx, options_id))
+        return 0;
+
+    if (!g_JsonManager->IsValidHandle(json_handle))
+    {
+        MF_LogError(amx, AMX_ERR_NATIVE, "Invalid JSON handle! %d", json_handle);
+        return 0;
+    }
+
+    char* json_str = g_JsonManager->SerialToString(json_handle, pretty);
+    if (json_str == nullptr)
+        return 0;
+
+    g_EasyHttpModule->GetOptions(options_id).options_builder.SetBody(json_str);
+    g_JsonManager->FreeString(json_str);
+
+    return 1;
+}
+
 // native ezhttp_option_append_body(EzHttpOptions:options_id, const body[]);
 cell AMX_NATIVE_CALL ezhttp_option_append_body(AMX* amx, cell* params)
 {
@@ -296,6 +322,23 @@ cell AMX_NATIVE_CALL ezhttp_get_data(AMX* amx, cell* params)
     utils::SetAmxStringUTF8CharSafe(amx, params[2], response.text.c_str(), response.text.length(), max_len);
 
     return 0;
+}
+
+// native EzJSON:ezhttp_parse_json_response(EzHttpRequest:request_id, bool:with_comments = false);
+cell AMX_NATIVE_CALL ezhttp_parse_json_response(AMX* amx, cell* params)
+{
+    auto request_id = (RequestId)params[1];
+    bool with_comments = (bool)params[2];
+
+    if (!ValidateRequestId(amx, request_id))
+        return 0;
+
+    const cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+
+    JS_Handle json_handle;
+    bool result = g_JsonManager->Parse(response.text.c_str(), &json_handle, false, with_comments);
+
+    return result ? json_handle : -1;
 }
 
 cell AMX_NATIVE_CALL ezhttp_get_url(AMX* amx, cell* params)
@@ -685,23 +728,6 @@ cell AMX_NATIVE_CALL ezhttp_steam_to_steam64(AMX* amx, cell* params)
     return 1;
 }
 
-// native EzJSON:ezhttp_parse_json_response(EzHttpRequest:request_id, bool:with_comments = false);
-cell AMX_NATIVE_CALL ezhttp_parse_json_response(AMX* amx, cell* params)
-{
-    auto request_id = (RequestId)params[1];
-    bool with_comments = (bool)params[2];
-
-    if (!ValidateRequestId(amx, request_id))
-        return 0;
-
-    const cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
-
-    JS_Handle handle;
-    bool result = g_JsonManager->Parse(response.text.c_str(), &handle, false, with_comments);
-
-    return result ? handle : -1;
-}
-
 RequestId SendRequest(AMX* amx, RequestMethod method, OptionsId options_id, const std::string& url, const std::string& callback)
 {
     int callback_id = -1;
@@ -796,12 +822,14 @@ void SetStringOption(AMX* amx, cell* params, TMethod method)
 
 AMX_NATIVE_INFO g_Natives[] =
 {
+    // options
     { "ezhttp_create_options",              ezhttp_create_options },
     { "ezhttp_destroy_options",             ezhttp_destroy_options },
     { "ezhttp_option_set_user_agent",       ezhttp_option_set_user_agent },
     { "ezhttp_option_add_url_parameter",    ezhttp_option_add_url_parameter },
     { "ezhttp_option_add_form_payload",     ezhttp_option_add_form_payload },
     { "ezhttp_option_set_body",             ezhttp_option_set_body },
+    { "ezhttp_option_set_body_from_json",   ezhttp_option_set_body_from_json },
     { "ezhttp_option_append_body",          ezhttp_option_append_body },
     { "ezhttp_option_set_header",           ezhttp_option_set_header },
     { "ezhttp_option_set_cookie",           ezhttp_option_set_cookie },
@@ -814,14 +842,17 @@ AMX_NATIVE_INFO g_Natives[] =
     { "ezhttp_option_set_plugin_end_behaviour", ezhttp_option_set_plugin_end_behaviour },
     { "ezhttp_option_set_queue",            ezhttp_option_set_queue },
 
+    // requests
     { "ezhttp_get",                         ezhttp_get },
     { "ezhttp_post",                        ezhttp_post },
     { "ezhttp_is_request_exists",           ezhttp_is_request_exists },
     { "ezhttp_cancel_request",              ezhttp_cancel_request },
     { "ezhttp_request_progress",            ezhttp_request_progress },
 
+    // response
     { "ezhttp_get_http_code",               ezhttp_get_http_code },
     { "ezhttp_get_data",                    ezhttp_get_data },
+    { "ezhttp_parse_json_response",         ezhttp_parse_json_response },
     { "ezhttp_get_url",                     ezhttp_get_url },
     { "ezhttp_save_data_to_file",           ezhttp_save_data_to_file },
     { "ezhttp_save_data_to_file2",          ezhttp_save_data_to_file2 },
@@ -839,18 +870,17 @@ AMX_NATIVE_INFO g_Natives[] =
     { "ezhttp_get_downloaded_bytes",        ezhttp_get_downloaded_bytes },
     { "ezhttp_get_user_data",               ezhttp_get_user_data },
 
+    // ftp
     { "ezhttp_ftp_upload",                  ezhttp_ftp_upload },
     { "ezhttp_ftp_upload2",                 ezhttp_ftp_upload2 },
     { "ezhttp_ftp_download",                ezhttp_ftp_download },
     { "ezhttp_ftp_download2",               ezhttp_ftp_download2 },
 
+    // queue
     { "ezhttp_create_queue",                ezhttp_create_queue },
 
+    // special
     { "_ezhttp_steam_to_steam64",           ezhttp_steam_to_steam64 },
-
-    // json functions
-    { "ezhttp_parse_json_response",         ezhttp_parse_json_response },
-
     { nullptr,                              nullptr },
 };
 

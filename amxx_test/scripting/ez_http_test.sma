@@ -13,15 +13,16 @@
 
 
 TEST_LIST_ASYNC = {
-    { "test_get_parameters", "test parameters in get request" },
-    { "test_post_form", "test post form" },
-    { "test_post_body", "test post body plain/text" },
-    { "test_user_agent", "test user agent" },
-    { "test_headers", "test headers" },
-    { "test_cookies", "test cookies" },
-    { "test_auth", "test auth" },
-    { "test_save_to_file", "test save to file" },
-    { "test_fail_by_timeout", "test timeout" },
+    { "test_get_parameters",    "test parameters in get request" },
+    { "test_post_form",         "test post form" },
+    { "test_post_body",         "test post body plain/text" },
+    { "test_post_body_json",    "test post body json" },
+    { "test_user_agent",        "test user agent" },
+    { "test_headers",           "test headers" },
+    { "test_cookies",           "test cookies" },
+    { "test_auth",              "test auth" },
+    { "test_save_to_file",      "test save to file" },
+    { "test_fail_by_timeout",   "test timeout" },
     TEST_LIST_END
 };
 
@@ -169,6 +170,45 @@ public test_post_body_complete(EzHttpRequest:request_id)
 
     //
 
+    ezjson_free(json_root);
+
+    END_ASYNC_TEST()
+}
+
+START_ASYNC_TEST(test_post_body_json)
+{
+    new EzHttpOptions:opt = ezhttp_create_options();
+
+    new EzJSON:json_root = ezjson_init_object();
+    ezjson_object_set_string(json_root, "StringField", "TestValue");
+    ezjson_object_set_number(json_root, "NumberField", 21);
+
+    ezhttp_option_set_body_from_json(opt, json_root);
+    ezjson_free(json_root);
+    ezhttp_option_set_header(opt, "Content-Type", "application/json");
+
+    EZHTTP_OPTION_SET_TEST_DATA(opt)
+
+    ezhttp_post("https://httpbin.org/anything", "test_post_body_json_complete", opt);
+}
+
+public test_post_body_json_complete(EzHttpRequest:request_id)
+{
+    EZHTTP_OPTION_EXTRACT_TEST_DATA(request_id)
+
+    new EzJSON:json_root = ezhttp_parse_json_response(request_id);
+    new EzJSON:json_data = ezjson_object_get_value(json_root, "json");
+
+    // asserts
+    new tmp_data[256];
+
+    ezjson_object_get_string(json_data, "StringField", tmp_data, charsmax(tmp_data));
+    ASSERT_TRUE(equal(tmp_data, "TestValue"));
+
+    ASSERT_TRUE(ezjson_object_get_number(json_data, "NumberField") == 21);
+    //
+
+    ezjson_free(json_data);
     ezjson_free(json_root);
 
     END_ASYNC_TEST()

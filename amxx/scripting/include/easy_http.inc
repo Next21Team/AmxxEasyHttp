@@ -56,6 +56,21 @@ native ezhttp_option_set_user_agent(EzHttpOptions:options_id, const user_agent[]
 native ezhttp_option_add_url_parameter(EzHttpOptions:options_id, const key[], const value[]);
 native ezhttp_option_add_form_payload(EzHttpOptions:options_id, const key[], const value[]);
 native ezhttp_option_set_body(EzHttpOptions:options_id, const body[]);
+
+/**
+ * Copies serialized string to the requests body.
+ *
+ * @note                    Needs to be freed using json_free() native.
+ *
+ * @param options_id        options_id  
+ * @param json              EzJSON handle  
+ * @param pretty            True to format pretty JSON string, false to not
+ *
+ * @return                  True if serialization was successful, false otherwise
+ * @error                   If passed handle is not a valid value. If passed options_id is not exists.
+ */
+native bool:ezhttp_option_set_body_from_json(EzHttpOptions:options_id, EzJSON:json, bool:pretty = false);
+
 native ezhttp_option_append_body(EzHttpOptions:options_id, const body[]);
 native ezhttp_option_set_header(EzHttpOptions:options_id, const key[], const value[]);
 native ezhttp_option_set_cookie(EzHttpOptions:options_id, const key[], const value[]);
@@ -78,6 +93,19 @@ native ezhttp_request_progress(EzHttpRequest:request_id, progress[EzHttpProgress
 // response natives. You can use these only in response on_complete callback!
 native ezhttp_get_http_code(EzHttpRequest:request_id);
 native ezhttp_get_data(EzHttpRequest:request_id, buffer[], max_len);
+
+/**
+ * Parses http response body to JSON.
+ *
+ * @note                    Needs to be freed using json_free() native.
+ *
+ * @param request_id        request_id  
+ * @param with_comments     True if parsing JSON includes comments (it will ignore them), false otherwise
+ *
+ * @return                  EzJSON handle, EzInvalid_JSON if error occurred
+ */
+native EzJSON:ezhttp_parse_json_response(EzHttpRequest:request_id, bool:with_comments = false);
+
 native ezhttp_get_url(EzHttpRequest:request_id, buffer[], max_len);
 native ezhttp_save_data_to_file(EzHttpRequest:request_id, const file_path[]); // file_path must be relative to mod dir
 native ezhttp_save_data_to_file2(EzHttpRequest:request_id, file_handle); // file_handle must be opened via fopen with write permissions. Returns written bytes count
@@ -92,18 +120,6 @@ native ezhttp_get_redirect_count(EzHttpRequest:request_id);
 native ezhttp_get_uploaded_bytes(EzHttpRequest:request_id);
 native ezhttp_get_downloaded_bytes(EzHttpRequest:request_id);
 native ezhttp_get_user_data(EzHttpRequest:request_id, data[]);
-
-/**
- * Parses http response body to JSON.
- *
- * @note                    Needs to be freed using json_free() native.
- *
- * @param request_id        request_id
- * @param with_comments     True if parsing JSON includes comments (it will ignore them), false otherwise
- *
- * @return                  EzJSON handle, EzInvalid_JSON if error occurred
- */
-native EzJSON:ezhttp_parse_json_response(EzHttpRequest:request_id, bool:with_comments = false);
 
 native EzHttpRequest:ezhttp_ftp_upload(const user[], const password[], const host[], const remote_file[], const local_file[], const on_complete[], EzHttpFtpSecurity:security = EZH_UNSECURE, EzHttpOptions:options_id = EzHttpOptions:0);
 native EzHttpRequest:ezhttp_ftp_upload2(const uri[], const local_file[], const on_complete[], EzHttpFtpSecurity:security = EZH_UNSECURE, EzHttpOptions:options_id = EzHttpOptions:0);
