@@ -35,6 +35,7 @@ add_subdirectory(dep/cpr)
 add_subdirectory(dep/asyncplusplus)
 
 add_library(${PROJECT_NAME} SHARED
+    dep/parson/src/parson.cpp
     src/sdk/amxxmodule.cpp
     src/sdk/amxxmodule.h
     src/sdk/moduleconfig.h
@@ -47,13 +48,21 @@ add_library(${PROJECT_NAME} SHARED
     src/utils/ftp_utils.cpp
     src/utils/string_utils.h
     src/utils/string_utils.cpp
+    src/utils/amxx_utils.cpp
+    src/utils/amxx_utils.h
     src/module.cpp
     src/undef_metamod.h
     src/EasyHttpModule.cpp
     src/EasyHttpModule.h
+    src/json/IJsonMngr.h
+    src/json/JsonMngr.cpp
+    src/json/JsonMngr.h
+    src/json/JsonNatives.cpp
+    src/json/JsonNatives.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
+    dep/parson/include
     dep/cpr/include
     dep/asyncplusplus/include
     dep/halflife/common
