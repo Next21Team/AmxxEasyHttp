@@ -471,4 +471,7 @@ void JSONMngr::FreeAllHandles()
             _FreeHandle(i);
         }
     }
+
+    m_Handles.clear();
+    m_OldHandles.clear();
 }
