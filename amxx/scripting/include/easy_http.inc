@@ -60,7 +60,7 @@ native ezhttp_option_set_body(EzHttpOptions:options_id, const body[]);
 /**
  * Copies serialized string to the requests body.
  *
- * @note                    Needs to be freed using json_free() native.
+ * @note                    Needs to be freed using ezjson_free() native.
  *
  * @param options_id        options_id  
  * @param json              EzJSON handle  
