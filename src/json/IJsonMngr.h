@@ -12,6 +12,7 @@
 //
 
 #include <cstdint>
+#include <stddef.h>
 
 namespace AMXX
 {
