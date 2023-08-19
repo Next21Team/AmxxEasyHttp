@@ -71,6 +71,7 @@ public ftp_upload_complete(EzHttpRequest:request_id)
 * Proxy support
 * OpenSSL and WinSSL support for HTTPS requests
 * FTP/FTPES download and upload support
+* Built-in JSON support
 
 ## Advanced features
 
