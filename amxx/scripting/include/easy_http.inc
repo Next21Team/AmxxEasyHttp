@@ -97,7 +97,7 @@ native ezhttp_get_data(EzHttpRequest:request_id, buffer[], max_len);
 /**
  * Parses http response body to JSON.
  *
- * @note                    Needs to be freed using json_free() native.
+ * @note                    Needs to be freed using ezjson_free() native.
  *
  * @param request_id        request_id  
  * @param with_comments     True if parsing JSON includes comments (it will ignore them), false otherwise
@@ -169,7 +169,7 @@ enum EzJSON
 /**
  * Parses JSON string or a file that contains JSON.
  *
- * @note                    Needs to be freed using json_free() native.
+ * @note                    Needs to be freed using ezjson_free() native.
  *
  * @param string            String to parse
  * @param is_file           True to treat string param as filename, false otherwise
@@ -216,7 +216,7 @@ native bool:ezjson_validate(const EzJSON:schema, const EzJSON:value);
 /**
  * Gets value's parent handle.
  *
- * @note                  Parent's handle needs to be freed using json_free() native.
+ * @note                  Parent's handle needs to be freed using ezjson_free() native.
  *
  * @param value           EzJSON handle
  *
@@ -237,7 +237,7 @@ native EzJSONType:ezjson_get_type(const EzJSON:value);
 /**
  * Inits an empty object.
  *
- * @note                    Needs to be freed using json_free() native.
+ * @note                    Needs to be freed using ezjson_free() native.
  *
  * @return                  EzJSON handle, EzInvalid_JSON if error occurred
  */
@@ -246,7 +246,7 @@ native EzJSON:ezjson_init_object();
 /**
  * Inits an empty array.
  *
- * @note                    Needs to be freed using json_free() native.
+ * @note                    Needs to be freed using ezjson_free() native.
  *
  * @return                  EzJSON handle, EzInvalid_JSON if error occurred
  */
@@ -255,7 +255,7 @@ native EzJSON:ezjson_init_array();
 /**
  * Inits string data.
  *
- * @note                    Needs to be freed using json_free() native.
+ * @note                    Needs to be freed using ezjson_free() native.
  *
  * @param value             String that the handle will be initialized with
  *
@@ -266,7 +266,7 @@ native EzJSON:ezjson_init_string(const value[]);
 /**
  * Inits a number.
  *
- * @note                    Needs to be freed using json_free() native.
+ * @note                    Needs to be freed using ezjson_free() native.
  *
  * @param value             Integer number that the handle will be initialized with
  *
@@ -277,7 +277,7 @@ native EzJSON:ezjson_init_number(value);
 /**
  * Inits a real number.
  *
- * @note                    Needs to be freed using json_free() native.
+ * @note                    Needs to be freed using ezjson_free() native.
  *
  * @param value             Real number that the handle will be initialized with
  *
@@ -288,7 +288,7 @@ native EzJSON:ezjson_init_real(Float:value);
 /**
  * Inits a boolean value.
  *
- * @note                    Needs to be freed using json_free() native.
+ * @note                    Needs to be freed using ezjson_free() native.
  *
  * @param value             Boolean value that the handle will be initialized with
  *
@@ -299,7 +299,7 @@ native EzJSON:ezjson_init_bool(bool:value);
 /**
  * Inits a null.
  *
- * @note                    Needs to be freed using json_free() native.
+ * @note                    Needs to be freed using ezjson_free() native.
  *
  * @return                  EzJSON handle, EzInvalid_JSON if error occurred
  */
@@ -308,7 +308,7 @@ native EzJSON:ezjson_init_null();
 /**
  * Creates deep copy of passed value.
  *
- * @note                    Needs to be freed using json_free() native.
+ * @note                    Needs to be freed using ezjson_free() native.
  *
  * @param value             EzJSON handle to be copied
  *
@@ -372,7 +372,7 @@ native bool:ezjson_get_bool(const EzJSON:value);
 /**
  * Gets a value from the array.
  *
- * @note                    Needs to be freed using json_free() native.
+ * @note                    Needs to be freed using ezjson_free() native.
  *
  * @param array             Array handle
  * @param index             Position in the array (starting from 0)
@@ -600,7 +600,7 @@ native bool:ezjson_array_clear(EzJSON:array);
 /**
  * Gets a value from the object.
  *
- * @note                    Needs to be freed using json_free() native.
+ * @note                    Needs to be freed using ezjson_free() native.
  * @note                    If dot notation is used some values may be inaccessible
  *                          because valid names in JSON can contain dots.
  *
@@ -701,7 +701,7 @@ native ezjson_object_get_name(const EzJSON:object, index, buffer[], maxlen);
 /**
  * Gets a value at the specified position from the object.
  *
- * @note                    Needs to be freed using json_free() native.
+ * @note                    Needs to be freed using ezjson_free() native.
  *
  * @param object            Object handle
  * @param index             Position from which get key name
