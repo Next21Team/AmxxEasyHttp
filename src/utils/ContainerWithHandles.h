@@ -6,7 +6,7 @@
 namespace utils
 {
     // THandle must be convertable to int.
-    // TValue may any type.
+    // TValue may be any type.
     //
     // THandle starts with 1. Zero is never used.
     template<class THandle, class TValue>

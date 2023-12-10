@@ -62,7 +62,7 @@ using ModuleRequestCallback = std::function<void(RequestId request_id)>;
 
 class EasyHttpModule
 {
-    static const int kMainQueueThreads = 6;
+    const int kMainQueueThreads = 6;
 
     std::string ca_cert_path_;
 
