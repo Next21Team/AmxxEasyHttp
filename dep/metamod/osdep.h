@@ -206,26 +206,6 @@ mBOOL os_safe_call(REG_CMD_FN pfn);
 	#define PATH_MAX	_MAX_PATH
 #endif /* _WIN32 */
 
-
-// Various other windows routine differences.
-#if defined(__linux) || defined(__APPLE__)
-	#include <unistd.h>	// sleep
-	#ifndef O_BINARY
-    	#define O_BINARY 0
-	#endif	
-#elif defined(_WIN32)
-	#define snprintf	_snprintf
-	#define vsnprintf	_vsnprintf
-	#define sleep(x)	Sleep(x*1000)
-	#define strcasecmp	stricmp
-	#define strncasecmp	_strnicmp
-    #include <io.h>
-    #define open _open
-    #define read _read
-    #define write _write
-    #define close _close
-#endif /* _WIN32 */
-
 #ifdef __GNUC__
 	#include <unistd.h>	// getcwd
 #elif defined(_MSC_VER)

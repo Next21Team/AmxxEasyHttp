@@ -25,7 +25,6 @@ if (UNIX)
 endif()
 
 # cpr options
-#set(CPR_FORCE_USE_SYSTEM_CURL ON) # system curl will be overridden by our embedded curl module
 set(ENABLE_THREADED_RESOLVER OFF)
 set(CPR_USE_SYSTEM_GTEST OFF)
 set(BUILD_CPR_TESTS OFF)
@@ -52,7 +51,6 @@ add_library(${PROJECT_NAME} SHARED
     src/utils/amxx_utils.cpp
     src/utils/amxx_utils.h
     src/module.cpp
-    src/undef_metamod.h
     src/EasyHttpModule.cpp
     src/EasyHttpModule.h
     src/json/IJsonMngr.h
@@ -150,6 +148,8 @@ target_link_libraries(${PROJECT_NAME}
 
 if (UNIX)
     target_link_libraries(${PROJECT_NAME}
+        OpenSSL::SSL
+        OpenSSL::Crypto
         -static-libstdc++
         -static-libgcc
     )

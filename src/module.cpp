@@ -11,8 +11,6 @@
 #include "utils/string_utils.h"
 #include "utils/amxx_utils.h"
 
-#include <undef_metamod.h>
-
 using namespace ezhttp;
 
 bool ValidateOptionsId(AMX* amx, OptionsId options_id);
