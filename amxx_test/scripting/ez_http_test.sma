@@ -285,6 +285,7 @@ START_ASYNC_TEST(test_cookies)
 {
     new EzHttpOptions:opt = ezhttp_create_options();
     ezhttp_option_set_cookie(opt, "Mycookie1", "CookieVal1");
+    ezhttp_option_set_cookie(opt, "Mycookie2", "CookieVal20");
     ezhttp_option_set_cookie(opt, "Mycookie2", "CookieVal2");
 
     EZHTTP_OPTION_SET_TEST_DATA(opt)

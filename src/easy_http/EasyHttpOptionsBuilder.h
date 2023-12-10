@@ -55,10 +55,14 @@ namespace ezhttp
 
             auto it = std::find_if(options_.cookies->begin(), options_.cookies->end(), [&key](const auto& item) { return item.GetName() == key; });
             if (it == options_.cookies->end())
+            {
                 options_.cookies->push_back(cpr::Cookie(key, value));
-
-            size_t index = it - options_.cookies->begin();
-            (*options_.cookies)[index] = cpr::Cookie(key, value);
+            }
+            else
+            {
+                size_t index = it - options_.cookies->begin();
+                (*options_.cookies)[index] = cpr::Cookie(key, value);
+            }
         }
 
         inline void SetTimeout(int32_t timeout_ms) {
