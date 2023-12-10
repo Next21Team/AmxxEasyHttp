@@ -32,7 +32,7 @@ namespace ezhttp
         void CancelAllRequests() override;
 
     private:
-        cpr::Session CreateSessionWithCommonOptions(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options);
+        std::unique_ptr<cpr::Session> CreateSessionWithCommonOptions(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options);
         cpr::Response SendRequest(const std::shared_ptr<RequestControl>& request_control, RequestMethod method, const cpr::Url& url, const RequestOptions& options);
         cpr::Response SendHttpRequest(const std::shared_ptr<RequestControl>& request_control, RequestMethod method, const cpr::Url& url, const RequestOptions& options);
         cpr::Response FtpUpload(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options);
