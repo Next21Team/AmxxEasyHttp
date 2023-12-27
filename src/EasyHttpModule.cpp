@@ -36,7 +36,7 @@ RequestId EasyHttpModule::SendRequest(RequestMethod method, const std::string& u
         options_id = CreateOptions();
     OptionsData& options = GetOptions(options_id);
 
-    RequestId request_id = requests_.Add(RequestData{});
+    RequestId request_id = requests_.Add(RequestData());
     RequestData& request = GetRequest(request_id);
 
     QueueId queue_id = options.queue_id;
@@ -45,7 +45,7 @@ RequestId EasyHttpModule::SendRequest(RequestMethod method, const std::string& u
 
     auto& easy_http = GetEasyHttp(queue_id, options.plugin_end_behaviour);
 
-    ResponseCallback cb_proxy = [this, request_id, callback](const cpr::Response& response) {
+    ResponseCallback cb_proxy = [this, request_id, callback](const Response& response) {
         GetRequest(request_id).response = response;
         callback(request_id);
     };

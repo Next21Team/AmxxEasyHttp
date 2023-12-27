@@ -22,7 +22,7 @@ struct RequestData
     std::shared_ptr<ezhttp::RequestControl> request_control;
     // options_id is always valid as long as the RequestId associated with the object exists
     OptionsId options_id;
-    cpr::Response response;
+    ezhttp::Response response;
 };
 
 struct OptionsData

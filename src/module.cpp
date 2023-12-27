@@ -302,7 +302,7 @@ cell AMX_NATIVE_CALL ezhttp_get_http_code(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
 
     return response.status_code;
 }
@@ -315,7 +315,7 @@ cell AMX_NATIVE_CALL ezhttp_get_data(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id) || max_len == 0)
         return 0;
 
-    const cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
 
     utils::SetAmxStringUTF8CharSafe(amx, params[2], response.text.c_str(), response.text.length(), max_len);
 
@@ -331,7 +331,7 @@ cell AMX_NATIVE_CALL ezhttp_parse_json_response(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
 
     JS_Handle json_handle;
     bool result = g_JsonManager->Parse(response.text.c_str(), &json_handle, false, with_comments);
@@ -347,7 +347,7 @@ cell AMX_NATIVE_CALL ezhttp_get_url(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id) || max_len == 0)
         return 0;
 
-    const cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
 
     utils::SetAmxStringUTF8CharSafe(amx, params[2], response.url.c_str(), response.url.str().length(), max_len);
 
@@ -365,7 +365,7 @@ cell AMX_NATIVE_CALL ezhttp_save_data_to_file(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
 
     if (response.text.empty())
         return 0;
@@ -388,7 +388,7 @@ cell AMX_NATIVE_CALL ezhttp_save_data_to_file2(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
 
     return std::fwrite(response.text.data(), sizeof(char), response.text.length(), file_handle);
 }
@@ -400,7 +400,7 @@ cell AMX_NATIVE_CALL ezhttp_get_headers_count(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
 
     return response.header.size();
 }
@@ -415,7 +415,7 @@ cell AMX_NATIVE_CALL ezhttp_get_headers(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
 
     const std::string header_key(key, key_len);
     if (response.header.count(header_key) == 1)
@@ -455,7 +455,7 @@ cell AMX_NATIVE_CALL ezhttp_get_elapsed(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
 
     return amx_ftoc(response.elapsed);
 }
@@ -467,7 +467,7 @@ cell AMX_NATIVE_CALL ezhttp_get_cookies_count(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
 
     size_t size = response.cookies.end() - response.cookies.begin();
     return (cell)size;
@@ -483,7 +483,7 @@ cell AMX_NATIVE_CALL ezhttp_get_cookies(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    Response& response = g_EasyHttpModule->GetRequest(request_id).response;
 
     const std::string cookie_key(key, key_len);
 
@@ -512,7 +512,7 @@ cell AMX_NATIVE_CALL ezhttp_get_error_code(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
 
     return (cell)response.error.code;
 }
@@ -525,7 +525,7 @@ cell AMX_NATIVE_CALL ezhttp_get_error_message(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id) || max_len == 0)
         return 0;
 
-    const cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
 
     utils::SetAmxStringUTF8CharSafe(amx, params[2], response.error.message.c_str(), response.error.message.length(), max_len);
 
@@ -539,7 +539,7 @@ cell AMX_NATIVE_CALL ezhttp_get_redirect_count(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
 
     return response.redirect_count;
 }
@@ -551,7 +551,7 @@ cell AMX_NATIVE_CALL ezhttp_get_uploaded_bytes(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
 
     return response.uploaded_bytes;
 }
@@ -563,7 +563,7 @@ cell AMX_NATIVE_CALL ezhttp_get_downloaded_bytes(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const cpr::Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
 
     return response.downloaded_bytes;
 }
