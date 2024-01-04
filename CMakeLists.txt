@@ -154,6 +154,7 @@ if (UNIX)
         -static-libgcc
         OpenSSL::Crypto
         OpenSSL::SSL
+        CARES::libcares
     )
 
     set_target_properties(${PROJECT_NAME} PROPERTIES
