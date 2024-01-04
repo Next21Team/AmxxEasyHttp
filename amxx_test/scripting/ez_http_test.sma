@@ -23,6 +23,8 @@ TEST_LIST_ASYNC = {
     { "test_auth",              "test auth" },
     { "test_save_to_file",      "test save to file" },
     { "test_fail_by_timeout",   "test timeout" },
+    { "test_ftp_download",      "test ftp download" },
+    { "test_ftp_upload",        "test ftp upload" },
     TEST_LIST_END
 };
 
@@ -380,6 +382,51 @@ public test_auth_complete(EzHttpRequest:request_id)
     //
 
     ezjson_free(json_root);
+
+    END_ASYNC_TEST()
+}
+
+START_ASYNC_TEST(test_ftp_download)
+{
+    new EzHttpOptions:opt = ezhttp_create_options();
+
+    EZHTTP_OPTION_SET_TEST_DATA(opt)
+
+    ezhttp_ftp_download2("ftp://speedtest.tele2.net/5MB.zip", "ezhttp_test_ftp_download_5MB.zip", "test_ftp_download_complete", EZH_UNSECURE, opt);
+}
+
+public test_ftp_download_complete(EzHttpRequest:request_id)
+{
+    const expected_file_size = 5242880;
+
+    EZHTTP_OPTION_EXTRACT_TEST_DATA(request_id)
+
+    // asserts
+
+    ASSERT_INT_EQ(EzHttpErrorCode:EZH_OK, ezhttp_get_error_code(request_id));
+    new size = filesize("ezhttp_test_ftp_download_5MB.zip");
+    ASSERT_INT_EQ_MSG(expected_file_size, size, fmt("expected %d but was %d", expected_file_size, size));
+
+    delete_file("ezhttp_test_ftp_download_5MB.zip");
+    END_ASYNC_TEST()
+}
+
+START_ASYNC_TEST(test_ftp_upload)
+{
+    new EzHttpOptions:opt = ezhttp_create_options();
+
+    EZHTTP_OPTION_SET_TEST_DATA(opt)
+
+    ezhttp_ftp_upload2("ftp://speedtest.tele2.net/upload/cstrike.ico", "cstrike.ico", "test_ftp_upload_complete", EZH_UNSECURE, opt);
+}
+
+public test_ftp_upload_complete(EzHttpRequest:request_id)
+{
+    EZHTTP_OPTION_EXTRACT_TEST_DATA(request_id)
+
+    // asserts
+
+    ASSERT_INT_EQ(EzHttpErrorCode:EZH_OK, ezhttp_get_error_code(request_id));
 
     END_ASYNC_TEST()
 }
