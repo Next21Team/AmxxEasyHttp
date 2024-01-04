@@ -13,8 +13,8 @@ set(CMAKE_MODULE_PATH
 )
 
 if (UNIX)
-    set(CMAKE_C_FLAGS -m32)
-    set(CMAKE_CXX_FLAGS -m32)
+    set(CMAKE_C_FLAGS "-m32")
+    set(CMAKE_CXX_FLAGS "-m32 -Wno-error=attribute-warning")
 endif()
 
 # common options
@@ -25,10 +25,15 @@ if (UNIX)
 endif()
 
 # cpr options
-set(ENABLE_THREADED_RESOLVER OFF)
+set(CPR_USE_SYSTEM_CURL ON)
 set(CPR_USE_SYSTEM_GTEST OFF)
-set(BUILD_CPR_TESTS OFF)
+set(CPR_ENABLE_CURL_HTTP_ONLY OFF)
 set(CPR_ENABLE_SSL ON)
+if (UNIX)
+    set(CPR_FORCE_OPENSSL_BACKEND ON)
+elseif (WIN32)
+    set(CPR_FORCE_WINSSL_BACKEND ON)
+endif()
 
 find_package(Threads REQUIRED)
 add_subdirectory(dep/cpr)
@@ -124,15 +129,11 @@ if (WIN32)
         WINVER=0x0600
     )
 else()
-    target_compile_definitions(${PROJECT_NAME} PUBLIC
-        LINUX
-    )
+    target_compile_definitions(${PROJECT_NAME} PUBLIC LINUX)
 endif()
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
     target_compile_definitions(${PROJECT_NAME} PUBLIC _DEBUG SOURCE_DEBUG)
-else()
-    target_compile_definitions(${PROJECT_NAME} PUBLIC NDEBUG)
 endif()
 
 #-----------
@@ -144,28 +145,37 @@ target_link_libraries(${PROJECT_NAME}
     Async++
     cpr::cpr
     CURL::libcurl
+    ZLIB::ZLIB
 )
 
 if (UNIX)
     target_link_libraries(${PROJECT_NAME}
-        OpenSSL::SSL
-        OpenSSL::Crypto
         -static-libstdc++
         -static-libgcc
+        OpenSSL::Crypto
+        OpenSSL::SSL
     )
 
     set_target_properties(${PROJECT_NAME} PROPERTIES
         LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/AmxxEasyHttp.version
         LINK_FLAGS "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/AmxxEasyHttp.version")
-endif()
-
-#-----------
-# post process
-#-----------
-
-if (DEFINED ENV{${PROJECT_NAME}_COPY_TO_PATH})
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> $ENV{${PROJECT_NAME}_COPY_TO_PATH}
-            COMMENT "Copying '${PROJECT_NAME}' library to '$ENV{${PROJECT_NAME}_COPY_TO_PATH}'"
+elseif (WIN32)
+    target_link_libraries(${PROJECT_NAME}
+        Ws2_32.lib
+        Crypt32.lib
+        Wldap32.lib
+        Normaliz.lib
     )
 endif()
+
+# custom build targets
+add_custom_target(BUILD_ALL ALL)
+add_dependencies(BUILD_ALL ${PROJECT_NAME})
+
+add_custom_target(INSTALL_ALL
+        COMMENT "Copying '${PROJECT_NAME}' library to '$ENV{${PROJECT_NAME}_COPY_TO_PATH}'"
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> $ENV{${PROJECT_NAME}_COPY_TO_PATH})
+
+add_custom_target(BUILD_AND_INSTALL_ALL ALL)
+add_dependencies(BUILD_AND_INSTALL_ALL BUILD_ALL)
+add_dependencies(BUILD_AND_INSTALL_ALL INSTALL_ALL)
