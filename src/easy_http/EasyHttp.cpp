@@ -18,8 +18,12 @@ std::shared_ptr<RequestControl> EasyHttp::SendRequest(RequestMethod method, cons
 
     auto task = async::spawn(*request_scheduler_, [this, request_control, method, url, options]()
     {
-        cpr::Response cpr_response = SendRequest(request_control, method, url, options);
-        return Response(cpr_response);
+        Response ezhttp_response;
+        {
+            cpr::Response cpr_response = SendRequest(request_control, method, url, options);
+            ezhttp_response = Response(cpr_response);
+        }
+        return ezhttp_response;
     })
     .then(*update_scheduler_, [request_control, on_complete](Response response)
     {
