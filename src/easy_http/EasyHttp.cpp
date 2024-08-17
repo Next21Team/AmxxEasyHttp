@@ -127,8 +127,6 @@ cpr::Response EasyHttp::SendRequest(const std::shared_ptr<RequestControl>& reque
         case RequestMethod::FtpDownload:
             return FtpDownload(request_control, url, options);
 
-        case RequestMethod::HttpGet:
-        case RequestMethod::HttpPost:
         default:
             return SendHttpRequest(request_control, method, url, options);
     }
@@ -174,10 +172,22 @@ cpr::Response EasyHttp::SendHttpRequest(const std::shared_ptr<RequestControl>& r
     if (options.auth)
         session->SetAuth(*options.auth);
 
-    if (method == RequestMethod::HttpGet)
-        return session->Get();
+    switch (method)
+    {
+        case RequestMethod::HttpPost:
+            return session->Post();
 
-    return session->Post();
+        case RequestMethod::HttpPut:
+            return session->Put();
+
+        case RequestMethod::HttpPatch:
+            return session->Patch();
+
+        case RequestMethod::HttpDelete:
+            return session->Delete();
+    }
+
+    return session->Get();
 }
 
 cpr::Response EasyHttp::FtpUpload(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options)

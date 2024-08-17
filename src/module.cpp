@@ -251,6 +251,48 @@ cell AMX_NATIVE_CALL ezhttp_post(AMX* amx, cell* params)
     return (cell)SendRequest(amx, RequestMethod::HttpPost, options_id, std::string(url, url_len), std::string(callback, callback_len));
 }
 
+// native EzHttpRequest:ezhttp_put(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0);
+cell AMX_NATIVE_CALL ezhttp_put(AMX* amx, cell* params)
+{
+    int url_len;
+    char* url = MF_GetAmxString(amx, params[1], 0, &url_len);
+
+    int callback_len;
+    char* callback = MF_GetAmxString(amx, params[2], 1, &callback_len);
+
+    auto options_id = (OptionsId)params[3];
+
+    return (cell)SendRequest(amx, RequestMethod::HttpPut, options_id, std::string(url, url_len), std::string(callback, callback_len));
+}
+
+// native EzHttpRequest:ezhttp_patch(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0);
+cell AMX_NATIVE_CALL ezhttp_patch(AMX* amx, cell* params)
+{
+    int url_len;
+    char* url = MF_GetAmxString(amx, params[1], 0, &url_len);
+
+    int callback_len;
+    char* callback = MF_GetAmxString(amx, params[2], 1, &callback_len);
+
+    auto options_id = (OptionsId)params[3];
+
+    return (cell)SendRequest(amx, RequestMethod::HttpPatch, options_id, std::string(url, url_len), std::string(callback, callback_len));
+}
+
+// native EzHttpRequest:ezhttp_delete(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0);
+cell AMX_NATIVE_CALL ezhttp_delete(AMX* amx, cell* params)
+{
+    int url_len;
+    char* url = MF_GetAmxString(amx, params[1], 0, &url_len);
+
+    int callback_len;
+    char* callback = MF_GetAmxString(amx, params[2], 1, &callback_len);
+
+    auto options_id = (OptionsId)params[3];
+
+    return (cell)SendRequest(amx, RequestMethod::HttpDelete, options_id, std::string(url, url_len), std::string(callback, callback_len));
+}
+
 // native ezhttp_is_request_exists(EzHttpRequest:request_id);
 cell AMX_NATIVE_CALL ezhttp_is_request_exists(AMX* amx, cell* params)
 {
@@ -846,6 +888,9 @@ AMX_NATIVE_INFO g_Natives[] =
     // requests
     { "ezhttp_get",                         ezhttp_get },
     { "ezhttp_post",                        ezhttp_post },
+    { "ezhttp_put",                         ezhttp_put },
+    { "ezhttp_patch",                       ezhttp_patch },
+    { "ezhttp_delete",                      ezhttp_delete },
     { "ezhttp_is_request_exists",           ezhttp_is_request_exists },
     { "ezhttp_cancel_request",              ezhttp_cancel_request },
     { "ezhttp_request_progress",            ezhttp_request_progress },
