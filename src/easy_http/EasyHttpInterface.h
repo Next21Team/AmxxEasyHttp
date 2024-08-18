@@ -49,6 +49,9 @@ namespace ezhttp
     {
         HttpGet,
         HttpPost,
+        HttpPut,
+        HttpPatch,
+        HttpDelete,
         FtpUpload,
         FtpDownload
     };
