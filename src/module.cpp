@@ -2,7 +2,7 @@
 #include <utility>
 #include <fstream>
 
-#include <amxxmodule.h>
+#include <sdk/amxxmodule.h>
 
 #include "EasyHttpModule.h"
 #include "json/JsonMngr.h"

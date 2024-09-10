@@ -1,183 +1,122 @@
-cmake_minimum_required(VERSION 3.18)
-project(AmxxEasyHttp)
+cmake_minimum_required(VERSION 3.20)
+project(AmxxEasyHttp
+        VERSION        2.4.0
+        DESCRIPTION    "HTTP, HTTPS and FTP for AMXX plugins"
+        HOMEPAGE_URL   "https://github.com/Next21Team/AmxxEasyHttp"
+        LANGUAGES      CXX
+)
 
-set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+option(AMXX_EASY_HTTP_BUILD_TESTS "Set ON to build a tests (dll/so will not be built in this case)" OFF)
+option(AMXX_EASY_HTTP_USE_SYSTEM_GTEST "Set ON to use GTest installed on the system (otherwise GTest will be downloaded via FetchContent)" OFF)
 
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-set(CMAKE_CXX_STANDARD 17)
+###
+### Cmake setup
+###
+
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW) # Prevent option() from removing normal variables with the same name
+set(CMAKE_POLICY_DEFAULT_CMP0117 NEW) # Do not add /GR to standard compilation flags (prevents D9025 warning)
 
 set(AMXX_EASY_HTTP_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
-# Add "cmake" to module path
 set(CMAKE_MODULE_PATH
-    ${AMXX_EASY_HTTP_ROOT}/cmake
-    ${CMAKE_MODULE_PATH}
+        ${AMXX_EASY_HTTP_ROOT}/cmake
+        ${CMAKE_MODULE_PATH}
 )
 
-if (UNIX)
-    set(CMAKE_C_FLAGS "-m32")
-    set(CMAKE_CXX_FLAGS "-m32 -Wno-error=attribute-warning")
-endif()
+if (AMXX_EASY_HTTP_BUILD_TESTS)
+    set(AMXX_EASY_HTTP_BUILD_STATIC ON)
+else ()
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/bin/${CMAKE_BUILD_TYPE})
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+    set(CMAKE_PDB_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/pdb/${CMAKE_BUILD_TYPE})
+endif ()
 
-# common options
-set(BUILD_SHARED_LIBS OFF)
-set(USE_SYSTEM_GTEST OFF)
-if (UNIX)
-    set(CMAKE_THREAD_PREFER_PTHREAD ON)
-endif()
+set(BUILD_SHARED_LIBS OFF) # BUILD_SHARED_LIBS only affect external dependencies
 
-# cpr options
+###
+### Compilers setup
+###
+
+if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}. Only GCC and MSVC are supported")
+endif ()
+
+set(CMAKE_CXX_STANDARD 17)
+
+if (GNU)
+    add_compile_options(
+            -m32
+            -static-libstdc++    # Static linking of the GCC C++ runtime
+            -static-libgcc       # Static linking of the GCC library
+    )
+elseif (MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>") # Static linking of the MSVC's C++ runtime
+endif ()
+
+###
+### cpr setup
+###
+
 set(CPR_USE_SYSTEM_CURL ON)
-set(CPR_USE_SYSTEM_GTEST OFF)
-set(CPR_ENABLE_CURL_HTTP_ONLY OFF)
-set(CPR_ENABLE_SSL ON)
 if (UNIX)
     set(CPR_FORCE_OPENSSL_BACKEND ON)
 elseif (WIN32)
     set(CPR_FORCE_WINSSL_BACKEND ON)
-endif()
+endif ()
 
-find_package(Threads REQUIRED)
+###
+### Add dependencies and subprojects
+###
+
 add_subdirectory(dep/cpr)
 add_subdirectory(dep/asyncplusplus)
+add_subdirectory(dep/parson)
+add_subdirectory(src)
 
-add_library(${PROJECT_NAME} SHARED
-    dep/parson/src/parson.cpp
-    src/sdk/amxxmodule.cpp
-    src/sdk/amxxmodule.h
-    src/sdk/moduleconfig.h
-    src/easy_http/EasyHttpInterface.h
-    src/easy_http/EasyHttp.cpp
-    src/easy_http/EasyHttp.h
-    src/easy_http/EasyHttpOptionsBuilder.h
-    src/utils/ContainerWithHandles.h
-    src/utils/ftp_utils.h
-    src/utils/ftp_utils.cpp
-    src/utils/string_utils.h
-    src/utils/string_utils.cpp
-    src/utils/amxx_utils.cpp
-    src/utils/amxx_utils.h
-    src/module.cpp
-    src/EasyHttpModule.cpp
-    src/EasyHttpModule.h
-    src/json/IJsonMngr.h
-    src/json/JsonMngr.cpp
-    src/json/JsonMngr.h
-    src/json/JsonNatives.cpp
-    src/json/JsonNatives.h
-)
+###
+### GTest setup
+###
 
-target_include_directories(${PROJECT_NAME} PUBLIC
-    dep/parson/include
-    dep/cpr/include
-    dep/asyncplusplus/include
-    dep/halflife/common
-    dep/halflife/dlls
-    dep/halflife/engine
-    dep/halflife/public
-    dep/metamod
-    src/sdk
-    src
-)
+if (AMXX_EASY_HTTP_BUILD_TESTS)
+    if (AMXX_EASY_HTTP_USE_SYSTEM_GTEST)
+        find_package(GTest)
+    endif ()
+    if (NOT AMXX_EASY_HTTP_USE_SYSTEM_GTEST OR NOT GTEST_FOUND)
+        message(STATUS "Not using system gtest, using built-in googletest project instead.")
 
-#-----------
-# properties
-#-----------
+        FetchContent_Declare(GoogleTest
+                GIT_REPOSITORY         https://github.com/google/googletest.git
+                GIT_TAG                v1.15.2
+                USES_TERMINAL_DOWNLOAD TRUE)   # <---- This is needed only for Ninja to show download progress
+        FetchContent_MakeAvailable(googletest)
 
-if (UNIX)
-    target_compile_options(${PROJECT_NAME} PRIVATE -fno-rtti)
+        add_library(gtest_int INTERFACE)
+        target_link_libraries(gtest_int INTERFACE gtest)
+        target_include_directories(gtest_int INTERFACE ${googletest_SOURCE_DIR}/include)
 
-    if (CMAKE_BUILD_TYPE MATCHES Release)
-        target_compile_options(${PROJECT_NAME} PRIVATE -O2)
-    endif()
-endif()
+        add_library(GTest::GTest ALIAS gtest_int)
 
-if (MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /GR-)
+        # Group under the "tests/gtest" project folder in IDEs such as Visual Studio.
+        set_property(TARGET gtest PROPERTY FOLDER "tests/gtest")
+        set_property(TARGET gtest_main PROPERTY FOLDER "tests/gtest")
+    endif ()
 
-    if (CMAKE_BUILD_TYPE MATCHES Release)
-        target_compile_options(${PROJECT_NAME} PRIVATE /Zi /O2)
+    enable_testing()
+    add_subdirectory(tests)
+endif ()
 
-        # Tell linker to include symbol data & generate map file
-        set_target_properties(${PROJECT_NAME} PROPERTIES
-                LINK_FLAGS "/LTCG  /INCREMENTAL:NO /DEBUG /OPT:REF /OPT:ICF /MAP:${CMAKE_BINARY_DIR}/${PROJECT_NAME}.map"
-        )
+###
+### Add custom build targets
+###
 
-        # Set file name & location
-        set_target_properties(${PROJECT_NAME} PROPERTIES
-                COMPILE_PDB_NAME ${PROJECT_NAME}
-                COMPILE_PDB_OUTPUT_DIR ${CMAKE_BINARY_DIR}
-        )
-    endif()
-endif()
+set(MAIN_TARGET_NAME easy_http)
 
-#-----------
-# definitions
-#-----------
-
-target_compile_definitions(${PROJECT_NAME} PUBLIC
-    LIBASYNC_STATIC
-    NOMINMAX
-    HAVE_STDINT_H
-    NO_MSVC8_AUTO_COMPAT
-)
-
-if (WIN32)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC
-        _WINDOWS
-        _WIN32
-        _WIN32_WINNT=0x0600
-        WIN32
-        WINVER=0x0600
-    )
-else()
-    target_compile_definitions(${PROJECT_NAME} PUBLIC LINUX)
-endif()
-
-if (CMAKE_BUILD_TYPE MATCHES Debug)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC _DEBUG SOURCE_DEBUG)
-endif()
-
-#-----------
-# libraries
-#-----------
-
-target_link_libraries(${PROJECT_NAME}
-    Threads::Threads
-    Async++
-    cpr::cpr
-    CURL::libcurl
-    ZLIB::ZLIB
-)
-
-if (UNIX)
-    target_link_libraries(${PROJECT_NAME}
-        -static-libstdc++
-        -static-libgcc
-        OpenSSL::Crypto
-        OpenSSL::SSL
-        CARES::libcares
-    )
-
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-        LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/AmxxEasyHttp.version
-        LINK_FLAGS "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/AmxxEasyHttp.version")
-elseif (WIN32)
-    target_link_libraries(${PROJECT_NAME}
-        Ws2_32.lib
-        Crypt32.lib
-        Wldap32.lib
-        Normaliz.lib
-    )
-endif()
-
-# custom build targets
 add_custom_target(BUILD_ALL ALL)
-add_dependencies(BUILD_ALL ${PROJECT_NAME})
+add_dependencies(BUILD_ALL ${MAIN_TARGET_NAME})
 
 add_custom_target(INSTALL_ALL
-        COMMENT "Copying '${PROJECT_NAME}' library to '$ENV{${PROJECT_NAME}_COPY_TO_PATH}'"
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> $ENV{${PROJECT_NAME}_COPY_TO_PATH})
+        COMMENT "Copying '${MAIN_TARGET_NAME}' library to '$ENV{${MAIN_TARGET_NAME}_COPY_TO_PATH}'"
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${MAIN_TARGET_NAME}> $ENV{${MAIN_TARGET_NAME}_COPY_TO_PATH})
 
 add_custom_target(BUILD_AND_INSTALL_ALL ALL)
 add_dependencies(BUILD_AND_INSTALL_ALL BUILD_ALL)

@@ -1,10 +1,11 @@
 #pragma once
+#include <vector>
+
+#include <async++.h>
 
 #include "EasyHttpInterface.h"
 #include "EasyHttpOptionsBuilder.h"
-#include <async++.h>
-#include <vector>
-#include <optional>
+#include "session_cache/CprSessionCache.h"
 
 namespace ezhttp
 {
@@ -12,8 +13,12 @@ namespace ezhttp
     {
         static const int kMaxTasksExecPerFrame = 6;
         static const int kMaxThreads = 10;
+        static const int kMaxSessionsPerHost = kMaxThreads;
+        static const int kMaxAgeConnSeconds = 118; // curl uses this value by default (https://everything.curl.dev/transfers/conn/reuse.html)
 
         std::string ca_cert_path_;
+
+        CprSessionCache session_cache_;
 
         std::unique_ptr<async::fifo_scheduler> update_scheduler_;
         std::shared_ptr<async::threadpool_scheduler> request_scheduler_;
@@ -32,7 +37,7 @@ namespace ezhttp
         void CancelAllRequests() override;
 
     private:
-        std::unique_ptr<cpr::Session> CreateSessionWithCommonOptions(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options);
+        std::shared_ptr<cpr::Session> CreateSessionWithCommonOptions(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options);
         cpr::Response SendRequest(const std::shared_ptr<RequestControl>& request_control, RequestMethod method, const cpr::Url& url, const RequestOptions& options);
         cpr::Response SendHttpRequest(const std::shared_ptr<RequestControl>& request_control, RequestMethod method, const cpr::Url& url, const RequestOptions& options);
         cpr::Response FtpUpload(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options);

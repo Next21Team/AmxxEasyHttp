@@ -3,4 +3,4 @@
 	url = https://github.com/Amanieu/asyncplusplus.git
 [submodule "dep/cpr"]
 	path = dep/cpr
-	url = https://github.com/whoshuu/cpr
+	url = https://github.com/Next21Team/amxx_ezhttp_cpr

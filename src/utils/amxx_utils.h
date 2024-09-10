@@ -1,6 +1,5 @@
 #pragma once
-
-#include <amxxmodule.h>
+#include <sdk/amxxmodule.h>
 
 namespace utils
 {

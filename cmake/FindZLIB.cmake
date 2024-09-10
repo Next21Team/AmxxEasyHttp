@@ -7,7 +7,7 @@ find_path(ZLIB_INCLUDE_DIR
         PATHS ${AMXX_EASY_HTTP_ROOT}/dep/zlib/include NO_DEFAULT_PATH)
 
 find_library(ZLIB_LIBRARY
-        NAMES libz.a zlib_a.lib
+        NAMES zlib_a.lib libz.a
         PATHS ${AMXX_EASY_HTTP_ROOT}/dep/zlib/lib NO_DEFAULT_PATH)
 
 include(FindPackageHandleStandardArgs)
@@ -18,5 +18,3 @@ set_target_properties(ZLIB::ZLIB PROPERTIES
     IMPORTED_LINK_INTERFACE_LANGUAGES "C"
     IMPORTED_LOCATION "${ZLIB_LIBRARY}"
 )
-
-unset(ZLIB_LIBRARY CACHE)

@@ -1,12 +1,17 @@
 #include "EasyHttp.h"
+
 #include <utility>
 #include <filesystem>
+
+#include "session_factory/CprSessionFactory.h"
+#include "datetime_service/DateTimeService.h"
 
 using namespace ezhttp;
 using namespace std::chrono_literals;
 
 EasyHttp::EasyHttp(std::string ca_cert_path, int threads) :
-    ca_cert_path_(std::move(ca_cert_path))
+    ca_cert_path_(std::move(ca_cert_path)),
+    session_cache_(std::make_shared<CprSessionFactory>(), std::make_shared<DateTimeService>(), std::chrono::seconds(kMaxAgeConnSeconds), kMaxSessionsPerHost)
 {
     update_scheduler_ = std::make_unique<async::fifo_scheduler>();
     request_scheduler_ = std::make_shared<async::threadpool_scheduler>(threads);
@@ -21,6 +26,8 @@ std::shared_ptr<RequestControl> EasyHttp::SendRequest(RequestMethod method, cons
         Response ezhttp_response;
         {
             cpr::Response cpr_response = SendRequest(request_control, method, url, options);
+            session_cache_.ReturnSession(url.str(), cpr_response.GetCurlHolder());
+
             ezhttp_response = Response(cpr_response);
         }
         return ezhttp_response;
@@ -92,9 +99,9 @@ void EasyHttp::CancelAllRequests()
     }
 }
 
-std::unique_ptr<cpr::Session> EasyHttp::CreateSessionWithCommonOptions(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options)
+std::shared_ptr<cpr::Session> EasyHttp::CreateSessionWithCommonOptions(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options)
 {
-    auto session = std::make_unique<cpr::Session>();
+    auto session = session_cache_.GetSession(url.str());
 
 #ifdef LINUX
     cpr::SslOptions ssl_opt;
@@ -102,7 +109,6 @@ std::unique_ptr<cpr::Session> EasyHttp::CreateSessionWithCommonOptions(const std
     session->SetSslOptions(ssl_opt);
 #endif
 
-    session->SetUrl(url);
     session->SetProgressCallback(cpr::ProgressCallback(
         [request_control](cpr::cpr_off_t downloadTotal, cpr::cpr_off_t downloadNow, cpr::cpr_off_t uploadTotal, cpr::cpr_off_t uploadNow, intptr_t userdata) {
             std::lock_guard<std::mutex> lock_guard(request_control->control_mutex);
@@ -138,7 +144,7 @@ cpr::Response EasyHttp::SendRequest(const std::shared_ptr<RequestControl>& reque
 
 cpr::Response EasyHttp::SendHttpRequest(const std::shared_ptr<RequestControl>& request_control, RequestMethod method, const cpr::Url& url, const RequestOptions& options)
 {
-    std::unique_ptr<cpr::Session> session = CreateSessionWithCommonOptions(request_control, url, options);
+    std::shared_ptr<cpr::Session> session = CreateSessionWithCommonOptions(request_control, url, options);
 
     if (options.user_agent)
         session->SetUserAgent(*options.user_agent);
@@ -196,7 +202,7 @@ cpr::Response EasyHttp::SendHttpRequest(const std::shared_ptr<RequestControl>& r
 
 cpr::Response EasyHttp::FtpUpload(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options)
 {
-    std::unique_ptr<cpr::Session> session = CreateSessionWithCommonOptions(request_control, url, options);
+    std::shared_ptr<cpr::Session> session = CreateSessionWithCommonOptions(request_control, url, options);
 
     if (!options.file_path)
         return session->Complete(CURLE_READ_ERROR);
@@ -254,7 +260,7 @@ cpr::Response EasyHttp::FtpUpload(const std::shared_ptr<RequestControl>& request
 
 cpr::Response EasyHttp::FtpDownload(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options)
 {
-    std::unique_ptr<cpr::Session> session = CreateSessionWithCommonOptions(request_control, url, options);
+    std::shared_ptr<cpr::Session> session = CreateSessionWithCommonOptions(request_control, url, options);
 
     if (!options.file_path)
         return session->Complete(CURLE_READ_ERROR);
