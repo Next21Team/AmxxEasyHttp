@@ -1,20 +1,35 @@
+include(FindPackageHandleStandardArgs)
+
+###
+### Find includes and libraries
+###
+
 find_path(OPENSSL_INCLUDE_DIR
         NAMES openssl/opensslconf.h
         PATHS ${AMXX_EASY_HTTP_ROOT}/dep/openssl/include
-        NO_DEFAULT_PATH)
+        NO_DEFAULT_PATH
+        NO_CACHE
+)
 
 find_library(SSL_LIBRARY
         NAMES libssl.a
         PATHS ${AMXX_EASY_HTTP_ROOT}/dep/openssl/lib
-        NO_DEFAULT_PATH)
+        NO_DEFAULT_PATH
+        NO_CACHE
+)
 
 find_library(CRYPTO_LIBRARY
         NAMES libcrypto.a
         PATHS ${AMXX_EASY_HTTP_ROOT}/dep/openssl/lib
-        NO_DEFAULT_PATH)
+        NO_DEFAULT_PATH
+        NO_CACHE
+)
 
-include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(OpenSSL REQUIRED_VARS OPENSSL_INCLUDE_DIR SSL_LIBRARY CRYPTO_LIBRARY)
+
+###
+### Setup library
+###
 
 if (NOT TARGET OpenSSL::Crypto)
     add_library(OpenSSL::Crypto STATIC IMPORTED GLOBAL)
@@ -32,6 +47,3 @@ if (NOT TARGET OpenSSL::SSL)
             INTERFACE_LINK_LIBRARIES "OpenSSL::Crypto"
     )
 endif()
-
-unset(SSL_LIBRARY CACHE)
-unset(CRYPTO_LIBRARY CACHE)

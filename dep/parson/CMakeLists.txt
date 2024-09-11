@@ -14,7 +14,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         include
 )
 
-if (GNU)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(${PROJECT_NAME} PRIVATE
             -fno-rtti  # disable rtti to reduce the library size
             -Werror    # treat all warnings as error

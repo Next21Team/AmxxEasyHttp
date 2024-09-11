@@ -12,11 +12,11 @@ namespace ezhttp
         char* host = nullptr;
 
         rc = curl_url_set(curl_url_, CURLUPART_URL, url.c_str(), 0);
-        if (rc != CURLE_OK)
+        if (rc != CURLUE_OK)
             return "";
 
         rc = curl_url_get(curl_url_, CURLUPART_HOST, &host, 0);
-        if (rc != CURLE_OK)
+        if (rc != CURLUE_OK)
             return "";
 
         return { host };

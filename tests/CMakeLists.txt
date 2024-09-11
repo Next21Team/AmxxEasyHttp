@@ -14,7 +14,6 @@ target_link_libraries(${TARGET_NAME} PRIVATE
         GTest::gtest_main
         GTest::gmock
         GTest::gmock_main
-        cpr::cpr
         easy_http::easy_http
 )
 

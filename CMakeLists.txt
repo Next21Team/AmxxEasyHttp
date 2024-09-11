@@ -41,13 +41,21 @@ if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT CMAKE_CXX_COMPILER_ID STREQ
     message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}. Only GCC and MSVC are supported")
 endif ()
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(GCC ON)
+endif ()
+
 set(CMAKE_CXX_STANDARD 17)
 
-if (GNU)
+if (GCC)
     add_compile_options(
             -m32
             -static-libstdc++    # Static linking of the GCC C++ runtime
             -static-libgcc       # Static linking of the GCC library
+    )
+
+    add_link_options(
+            -m32
     )
 elseif (MSVC)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>") # Static linking of the MSVC's C++ runtime
@@ -58,6 +66,7 @@ endif ()
 ###
 
 set(CPR_USE_SYSTEM_CURL ON)
+set(CPR_ENABLE_SSL ON)
 if (UNIX)
     set(CPR_FORCE_OPENSSL_BACKEND ON)
 elseif (WIN32)

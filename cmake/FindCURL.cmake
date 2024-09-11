@@ -2,47 +2,99 @@ if (TARGET CURL::libcurl)
     return()
 endif()
 
+include(FindPackageHandleStandardArgs)
+include(CMakeFindDependencyMacro)
+
+###
+### Find includes and libraries
+###
+
 find_path(CURL_INCLUDE_DIR
         NAMES curl/curl.h
-        PATHS ${AMXX_EASY_HTTP_ROOT}/dep/curl/include NO_DEFAULT_PATH)
+        PATHS ${AMXX_EASY_HTTP_ROOT}/dep/curl/include
+        NO_DEFAULT_PATH
+        NO_CACHE
+)
 
 find_library(CURL_LIBRARY
         NAMES libcurl_a.lib libcurl.a
-        PATHS ${AMXX_EASY_HTTP_ROOT}/dep/curl/lib NO_DEFAULT_PATH)
+        PATHS ${AMXX_EASY_HTTP_ROOT}/dep/curl/lib
+        NO_DEFAULT_PATH
+        NO_CACHE
+)
 
 find_library(CURL_LIBRARY_DEBUG
         NAMES libcurl_a_debug.lib libcurl.a
-        PATHS ${AMXX_EASY_HTTP_ROOT}/dep/curl/lib NO_DEFAULT_PATH)
+        PATHS ${AMXX_EASY_HTTP_ROOT}/dep/curl/lib
+        NO_DEFAULT_PATH
+        NO_CACHE
+)
 
-include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(CURL REQUIRED_VARS CURL_LIBRARY CURL_LIBRARY_DEBUG CURL_INCLUDE_DIR)
 
-include(CMakeFindDependencyMacro)
-find_dependency(ZLIB)
+# Validate supported components
+if (CURL_FIND_COMPONENTS)
+    set(CURL_SUPPORTED_PROTOCOLS HTTP HTTPS SSL FTP FTPS)
+
+    foreach(component IN LISTS CURL_SUPPORTED_PROTOCOLS)
+        set(CURL_${component}_FOUND FALSE)
+    endforeach()
+
+    foreach(component ${CURL_FIND_COMPONENTS})
+        if (";${CURL_SUPPORTED_PROTOCOLS};" MATCHES ";${component};")
+            set(CURL_${component}_FOUND TRUE)
+        else ()
+            message(FATAL_ERROR "CURL: Required protocol ${component} is not found")
+        endif()
+    endforeach()
+endif ()
+
+###
+### Find dependencies
+###
+
+find_dependency(ZLIB REQUIRED)
+
 if (UNIX)
-    find_dependency(cares)
-    find_dependency(OpenSSL)
+    find_dependency(cares REQUIRED)
+    find_dependency(OpenSSL REQUIRED)
 endif()
 
-set(_supported_components HTTP HTTPS SSL FTP FTPS)
-foreach(_comp ${curl_FIND_COMPONENTS})
-    message(_comp)
-    if (NOT ";${_supported_components};" MATCHES ";${_comp};")
-        set(CURL_FOUND False)
-        set(CURL_NOT_FOUND_MESSAGE "Unsupported component: ${_comp}")
-    endif()
-endforeach()
+###
+### Setup library
+###
 
 add_library(CURL::libcurl STATIC IMPORTED GLOBAL)
 set_property(TARGET CURL::libcurl APPEND PROPERTY IMPORTED_CONFIGURATIONS Release)
 set_property(TARGET CURL::libcurl APPEND PROPERTY IMPORTED_CONFIGURATIONS Debug)
+
+target_include_directories(CURL::libcurl INTERFACE
+        ${CURL_INCLUDE_DIR}
+)
+
+target_compile_definitions(CURL::libcurl INTERFACE
+        "CURL_STATICLIB"
+)
+
+if (UNIX)
+    target_link_libraries(CURL::libcurl INTERFACE
+            ZLIB::ZLIB
+            CARES::libcares
+            OpenSSL::Crypto
+            OpenSSL::SSL
+    )
+elseif (WIN32)
+    target_link_libraries(CURL::libcurl INTERFACE
+            ZLIB::ZLIB
+            Ws2_32
+            Wldap32
+            Crypt32
+            Normaliz
+    )
+endif ()
+
 set_target_properties(CURL::libcurl PROPERTIES
-    INTERFACE_COMPILE_DEFINITIONS "CURL_STATICLIB"
-    INTERFACE_INCLUDE_DIRECTORIES "${CURL_INCLUDE_DIR}"
-
     IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "C;RC"
-    INTERFACE_LINK_LIBRARIES "${ZLIB_LIBRARY};$<IF:$<PLATFORM_ID:Linux>,cares;openssl,Ws2_32.lib;Wldap32.lib;Crypt32.lib;Normaliz.lib>"
-
     IMPORTED_LOCATION_RELEASE "${CURL_LIBRARY}"
     IMPORTED_LOCATION_DEBUG "${CURL_LIBRARY_DEBUG}"
 )

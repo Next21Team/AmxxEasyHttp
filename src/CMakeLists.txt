@@ -7,8 +7,10 @@ find_package(metamod REQUIRED)
 
 if (AMXX_EASY_HTTP_BUILD_STATIC)
     set(LIBRARY_BUILD_TYPE STATIC)
+    set(TARGET_LIBRARIES_SCOPE PUBLIC)
 else ()
     set(LIBRARY_BUILD_TYPE SHARED)
+    set(TARGET_LIBRARIES_SCOPE PRIVATE)
 endif ()
 
 add_library(${TARGET_NAME} ${LIBRARY_BUILD_TYPE}
@@ -53,7 +55,7 @@ add_library(${TARGET_NAME} ${LIBRARY_BUILD_TYPE}
         json/JsonNatives.h
 )
 
-target_link_libraries(${TARGET_NAME} PRIVATE
+target_link_libraries(${TARGET_NAME} ${TARGET_LIBRARIES_SCOPE}
         Threads::Threads
         Async++
         cpr::cpr
@@ -64,7 +66,7 @@ target_link_libraries(${TARGET_NAME} PRIVATE
 add_library(easy_http::easy_http ALIAS ${TARGET_NAME})
 
 target_include_directories(${TARGET_NAME} PUBLIC
-        /
+        ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_compile_definitions(${TARGET_NAME} PRIVATE
@@ -72,18 +74,18 @@ target_compile_definitions(${TARGET_NAME} PRIVATE
         HAVE_STDINT_H
         NO_MSVC8_AUTO_COMPAT
 
-        $<IF:$<BOOL:WIN32>,
+        $<IF:$<BOOL:UNIX>,
+        # Linux defines
+            LINUX,
         # Windows defines
             _WIN32
             _WIN32_WINNT=0x0600
             WIN32
-            WINVER=0x0600,
-        # Linux defines
-            LINUX
+            WINVER=0x0600
         >
 )
 
-if (GNU)
+if (GCC)
     target_compile_options(${TARGET_NAME} PRIVATE
             -fno-rtti  # disable rtti to reduce the library size
             -Werror    # treat all warnings as error
@@ -117,7 +119,7 @@ set_target_properties(${TARGET_NAME} PROPERTIES
         PDB_NAME ${OUTPUT_NAME}
 )
 
-if (UNIX)
+if (GCC)
     set_target_properties(${TARGET_NAME} PROPERTIES
             LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/AmxxEasyHttp.version
             LINK_FLAGS "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/AmxxEasyHttp.version"
