@@ -73,17 +73,20 @@ target_compile_definitions(${TARGET_NAME} PRIVATE
         NOMINMAX
         HAVE_STDINT_H
         NO_MSVC8_AUTO_COMPAT
+)
 
-        $<IF:$<BOOL:UNIX>,
-        # Linux defines
-            LINUX,
-        # Windows defines
+if (UNIX)
+    target_compile_definitions(${TARGET_NAME} PRIVATE
+            LINUX
+    )
+else ()
+    target_compile_definitions(${TARGET_NAME} PRIVATE
             _WIN32
             _WIN32_WINNT=0x0600
             WIN32
             WINVER=0x0600
-        >
-)
+    )
+endif ()
 
 if (GCC)
     target_compile_options(${TARGET_NAME} PRIVATE
