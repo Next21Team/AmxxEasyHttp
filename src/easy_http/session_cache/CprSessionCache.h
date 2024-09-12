@@ -22,6 +22,8 @@ namespace ezhttp
 
         std::unordered_map<std::string, std::vector<CurlHolderCacheItem>> cache_{};
 
+        std::mutex mutex_;
+
     public:
         CprSessionCache(std::shared_ptr<CprSessionFactoryInterface> session_factory, std::shared_ptr<DateTimeServiceInterface> date_time_service, std::chrono::seconds maxage_conn, uint32_t max_sessions_per_host);
 

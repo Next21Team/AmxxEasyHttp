@@ -18,6 +18,8 @@ namespace ezhttp
 
     std::shared_ptr<cpr::Session> CprSessionCache::GetSession(const std::string& url)
     {
+        std::lock_guard lock(mutex_);
+
         if (max_sessions_per_host_ == 0)
             return CreateSession(url);
 
@@ -56,6 +58,8 @@ namespace ezhttp
 
     void CprSessionCache::ReturnSession(const std::string& url, std::shared_ptr<cpr::CurlHolder> curl_holder)
     {
+        std::lock_guard lock(mutex_);
+
         if (max_sessions_per_host_ == 0)
             return;
 
