@@ -106,7 +106,7 @@ void EasyHttp::SetSessionCommonOptions(cpr::Session& session, const std::shared_
 #ifdef LINUX
     cpr::SslOptions ssl_opt;
     ssl_opt.ca_info = ca_cert_path_;
-    session->SetSslOptions(ssl_opt);
+    session.SetSslOptions(ssl_opt);
 #endif
 
     session.SetProgressCallback(cpr::ProgressCallback(
