@@ -4,6 +4,10 @@ endif()
 
 include(FindPackageHandleStandardArgs)
 
+###
+### Find includes and libraries
+###
+
 find_path(ZLIB_INCLUDE_DIR
         NAMES zlib.h
         PATHS ${AMXX_EASY_HTTP_ROOT}/dep/zlib/include

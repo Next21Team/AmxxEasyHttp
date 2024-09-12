@@ -27,6 +27,7 @@ add_library(${TARGET_NAME} ${LIBRARY_BUILD_TYPE}
         easy_http/Response.h
         easy_http/RequestOptions.h
         easy_http/RequestMethod.h
+        easy_http/RequestControl.h
         easy_http/UrlUtils.cpp
         easy_http/UrlUtils.h
         easy_http/session_cache/CprSessionCache.cpp

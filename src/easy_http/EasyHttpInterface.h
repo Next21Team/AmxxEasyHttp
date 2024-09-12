@@ -4,6 +4,7 @@
 #include "Response.h"
 #include "RequestOptions.h"
 #include "RequestMethod.h"
+#include "RequestControl.h"
 
 namespace ezhttp
 {
