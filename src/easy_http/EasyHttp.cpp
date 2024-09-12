@@ -24,12 +24,14 @@ std::shared_ptr<RequestControl> EasyHttp::SendRequest(RequestMethod method, cons
     auto task = async::spawn(*request_scheduler_, [this, request_control, method, url, options]()
     {
         Response ezhttp_response;
+
+        // Used scope to ensure that cpr::Response is destroyed before exiting the function.
+        // For some reason, if this is not done, double free (?) for std::shared_ptr<CurlHolder> occurs occasionally.
         {
             cpr::Response cpr_response = SendRequest(request_control, method, url, options);
-            session_cache_.ReturnSession(url.str(), cpr_response.GetCurlHolder());
-
             ezhttp_response = Response(cpr_response);
         }
+
         return ezhttp_response;
     })
     .then(*update_scheduler_, [request_control, on_complete](Response response)
@@ -94,24 +96,22 @@ void EasyHttp::CancelAllRequests()
 {
     for (auto& request : requests_)
     {
-        std::lock_guard<std::mutex> lock_guard(request->control_mutex);
+        std::lock_guard lock_guard(request->control_mutex);
         request->canceled = true;
     }
 }
 
-std::shared_ptr<cpr::Session> EasyHttp::CreateSessionWithCommonOptions(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options)
+void EasyHttp::SetSessionCommonOptions(cpr::Session& session, const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options)
 {
-    auto session = session_cache_.GetSession(url.str());
-
 #ifdef LINUX
     cpr::SslOptions ssl_opt;
     ssl_opt.ca_info = ca_cert_path_;
     session->SetSslOptions(ssl_opt);
 #endif
 
-    session->SetProgressCallback(cpr::ProgressCallback(
+    session.SetProgressCallback(cpr::ProgressCallback(
         [request_control](cpr::cpr_off_t downloadTotal, cpr::cpr_off_t downloadNow, cpr::cpr_off_t uploadTotal, cpr::cpr_off_t uploadNow, intptr_t userdata) {
-            std::lock_guard<std::mutex> lock_guard(request_control->control_mutex);
+            std::lock_guard lock_guard(request_control->control_mutex);
 
             request_control->progress = RequestControl::Progress{ (int32_t)(downloadTotal), (int32_t)(downloadNow), (int32_t)(uploadTotal), (int32_t)(uploadNow) };
 
@@ -119,55 +119,61 @@ std::shared_ptr<cpr::Session> EasyHttp::CreateSessionWithCommonOptions(const std
         }));
 
     if (options.timeout)
-        session->SetTimeout(*options.timeout);
+        session.SetTimeout(*options.timeout);
 
     if (options.connect_timeout)
-        session->SetConnectTimeout(*options.connect_timeout);
-
-    return session;
+        session.SetConnectTimeout(*options.connect_timeout);
 }
 
 cpr::Response EasyHttp::SendRequest(const std::shared_ptr<RequestControl>& request_control, RequestMethod method, const cpr::Url& url, const RequestOptions& options)
 {
+    std::unique_ptr<cpr::Session> session = session_cache_.GetSession(url.str());
+    SetSessionCommonOptions(*session, request_control, url, options);
+
+    cpr::Response response;
     switch (method)
     {
         case RequestMethod::FtpUpload:
-            return FtpUpload(request_control, url, options);
+            response = FtpUpload(*session, request_control, url, options);
+            break;
 
         case RequestMethod::FtpDownload:
-            return FtpDownload(request_control, url, options);
+            response = FtpDownload(*session, request_control, url, options);
+            break;
 
         default:
-            return SendHttpRequest(request_control, method, url, options);
+            response = SendHttpRequest(*session, request_control, method, url, options);
+            break;
     }
+
+    session_cache_.ReturnSession(*session);
+    return response;
 }
 
-cpr::Response EasyHttp::SendHttpRequest(const std::shared_ptr<RequestControl>& request_control, RequestMethod method, const cpr::Url& url, const RequestOptions& options)
+cpr::Response EasyHttp::SendHttpRequest(cpr::Session& session, const std::shared_ptr<RequestControl>& request_control, RequestMethod method, const cpr::Url& url, const RequestOptions& options)
 {
-    std::shared_ptr<cpr::Session> session = CreateSessionWithCommonOptions(request_control, url, options);
-
     if (options.user_agent)
-        session->SetUserAgent(*options.user_agent);
+        session.SetUserAgent(*options.user_agent);
 
     if (options.url_parameters)
-        session->SetParameters(*options.url_parameters);
+        session.SetParameters(*options.url_parameters);
 
     if (options.form_payload)
-        session->SetPayload(*options.form_payload);
+        session.SetPayload(*options.form_payload);
 
     if (options.body)
-        session->SetBody(*options.body);
+        session.SetBody(*options.body);
 
     if (options.header)
-        session->SetHeader(*options.header);
+        session.SetHeader(*options.header);
 
     if (options.cookies)
-        session->SetCookies(*options.cookies);
+        session.SetCookies(*options.cookies);
 
     if (options.proxy_url)
     {
         std::string protocol = url.str().substr(0, url.str().find(':'));
-        session->SetProxies({{protocol, *options.proxy_url}});
+        session.SetProxies({{protocol, *options.proxy_url}});
     }
 
     if (options.proxy_auth)
@@ -176,42 +182,40 @@ cpr::Response EasyHttp::SendHttpRequest(const std::shared_ptr<RequestControl>& r
         std::string password = options.proxy_auth->second;
 
         std::string protocol = url.str().substr(0, url.str().find(':'));
-        session->SetProxyAuth({{protocol, cpr::EncodedAuthentication{user, password}}});
+        session.SetProxyAuth({{protocol, cpr::EncodedAuthentication{user, password}}});
     }
 
     if (options.auth)
-        session->SetAuth(*options.auth);
+        session.SetAuth(*options.auth);
 
     switch (method)
     {
         case RequestMethod::HttpPost:
-            return session->Post();
+            return session.Post();
 
         case RequestMethod::HttpPut:
-            return session->Put();
+            return session.Put();
 
         case RequestMethod::HttpPatch:
-            return session->Patch();
+            return session.Patch();
 
         case RequestMethod::HttpDelete:
-            return session->Delete();
+            return session.Delete();
     }
 
-    return session->Get();
+    return session.Get();
 }
 
-cpr::Response EasyHttp::FtpUpload(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options)
+cpr::Response EasyHttp::FtpUpload(cpr::Session& session, const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options)
 {
-    std::shared_ptr<cpr::Session> session = CreateSessionWithCommonOptions(request_control, url, options);
-
     if (!options.file_path)
-        return session->Complete(CURLE_READ_ERROR);
+        return session.Complete(CURLE_READ_ERROR);
 
     std::ifstream file(*options.file_path, std::fstream::in | std::fstream::binary);
     if (!file.is_open())
-        return session->Complete(CURLE_READ_ERROR);
+        return session.Complete(CURLE_READ_ERROR);
 
-    session->SetReadCallback(cpr::ReadCallback([&file](char* buffer, size_t& size, intptr_t userdata) {
+    session.SetReadCallback(cpr::ReadCallback([&file](char* buffer, size_t& size, intptr_t userdata) {
         if (file.rdstate() & std::fstream::failbit ||
             file.rdstate() & std::fstream::eofbit)
         {
@@ -231,7 +235,7 @@ cpr::Response EasyHttp::FtpUpload(const std::shared_ptr<RequestControl>& request
         return true;
     }));
 
-    CURL* curl = session->GetCurlHolder()->handle;
+    CURL* curl = session.GetCurlHolder()->handle;
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
     curl_easy_setopt(curl, CURLOPT_TRANSFERTEXT, 0);
@@ -245,7 +249,7 @@ cpr::Response EasyHttp::FtpUpload(const std::shared_ptr<RequestControl>& request
 
     file.close();
 
-    cpr::Response resp = session->Complete(curl_result);
+    cpr::Response resp = session.Complete(curl_result);
     if (request_control->canceled)
     {
         long response_code;
@@ -258,23 +262,21 @@ cpr::Response EasyHttp::FtpUpload(const std::shared_ptr<RequestControl>& request
     return resp;
 }
 
-cpr::Response EasyHttp::FtpDownload(const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options)
+cpr::Response EasyHttp::FtpDownload(cpr::Session& session, const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options)
 {
-    std::shared_ptr<cpr::Session> session = CreateSessionWithCommonOptions(request_control, url, options);
-
     if (!options.file_path)
-        return session->Complete(CURLE_READ_ERROR);
+        return session.Complete(CURLE_READ_ERROR);
 
     std::ofstream file(*options.file_path, std::ofstream::out | std::ofstream::binary);
     if (!file.is_open())
-        return session->Complete(CURLE_READ_ERROR);
+        return session.Complete(CURLE_READ_ERROR);
 
-    session->SetWriteCallback(cpr::WriteCallback([&file](std::string data, intptr_t userdata) {
+    session.SetWriteCallback(cpr::WriteCallback([&file](std::string data, intptr_t userdata) {
         file.write(data.c_str(), data.size());
         return true;
     }));
 
-    CURL* curl = session->GetCurlHolder()->handle;
+    CURL* curl = session.GetCurlHolder()->handle;
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_TRANSFERTEXT, 0);
     if (options.require_secure)
@@ -286,7 +288,7 @@ cpr::Response EasyHttp::FtpDownload(const std::shared_ptr<RequestControl>& reque
 
     file.close();
 
-    cpr::Response resp = session->Complete(curl_result);
+    cpr::Response resp = session.Complete(curl_result);
     if (request_control->canceled)
     {
         std::filesystem::remove(*options.file_path);

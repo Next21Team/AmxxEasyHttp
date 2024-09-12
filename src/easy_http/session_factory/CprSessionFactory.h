@@ -8,6 +8,6 @@ namespace ezhttp
     class CprSessionFactory : public CprSessionFactoryInterface
     {
     public:
-        std::shared_ptr<cpr::Session> CreateSession(std::shared_ptr<cpr::CurlHolder> curl_holder = nullptr);
+        std::unique_ptr<cpr::Session> CreateSession(std::shared_ptr<cpr::CurlHolder> curl_holder) override;
     };
 }

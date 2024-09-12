@@ -16,7 +16,7 @@ namespace ezhttp
     {
     }
 
-    std::shared_ptr<cpr::Session> CprSessionCache::GetSession(const std::string& url)
+    std::unique_ptr<cpr::Session> CprSessionCache::GetSession(const std::string& url)
     {
         std::lock_guard lock(mutex_);
 
@@ -83,7 +83,7 @@ namespace ezhttp
         cache_items.emplace_back(curl_holder, current_time);
     }
 
-    std::shared_ptr<cpr::Session> CprSessionCache::CreateSession(const std::string& url, std::shared_ptr<cpr::CurlHolder> curl_holder)
+    std::unique_ptr<cpr::Session> CprSessionCache::CreateSession(const std::string& url, std::shared_ptr<cpr::CurlHolder> curl_holder)
     {
         auto session = session_factory_->CreateSession(curl_holder);
         session->SetUrl(url);

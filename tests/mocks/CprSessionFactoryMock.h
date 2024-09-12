@@ -17,5 +17,5 @@ public:
         });
     }
 
-    MOCK_METHOD(std::shared_ptr<cpr::Session>, CreateSession, (std::shared_ptr<cpr::CurlHolder> curl_holder), (override));
+    MOCK_METHOD(std::unique_ptr<cpr::Session>, CreateSession, (std::shared_ptr<cpr::CurlHolder> curl_holder), (override));
 };
