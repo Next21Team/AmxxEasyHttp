@@ -96,5 +96,5 @@ Building the library is done using CMake. You can run the CMake GUI to configure
 mkdir Release
 cd Release
 cmake .. -DCMAKE_BUILD_TYPE=Release
-make AmxxEasyHttp
+make easy_http
 ```
