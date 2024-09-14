@@ -50,12 +50,12 @@ set(CMAKE_CXX_STANDARD 17)
 if (GCC)
     add_compile_options(
             -m32
-            -static-libstdc++    # Static linking of the GCC C++ runtime
-            -static-libgcc       # Static linking of the GCC library
     )
 
     add_link_options(
             -m32
+            -static-libstdc++    # Static linking of the GCC C++ runtime
+            -static-libgcc       # Static linking of the GCC library
     )
 elseif (MSVC)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>") # Static linking of the MSVC's C++ runtime
@@ -81,6 +81,12 @@ add_subdirectory(dep/cpr)
 add_subdirectory(dep/asyncplusplus)
 add_subdirectory(dep/parson)
 add_subdirectory(src)
+
+if (GCC)
+    target_compile_options(cpr PRIVATE
+            -Wno-error=attribute-warning
+    )
+endif ()
 
 ###
 ### GTest setup

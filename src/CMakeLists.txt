@@ -93,7 +93,6 @@ if (GCC)
     target_compile_options(${TARGET_NAME} PRIVATE
             -fno-rtti  # disable rtti to reduce the library size
             -Werror    # treat all warnings as error
-            -Wno-error=attribute-warning
     )
 elseif (MSVC)
     target_compile_options(${TARGET_NAME} PRIVATE
