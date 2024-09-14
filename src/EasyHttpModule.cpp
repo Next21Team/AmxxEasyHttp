@@ -45,7 +45,7 @@ RequestId EasyHttpModule::SendRequest(RequestMethod method, const std::string& u
 
     auto& easy_http = GetEasyHttp(queue_id, options.plugin_end_behaviour);
 
-    ResponseCallback cb_proxy = [this, request_id, callback](const Response& response) {
+    EasyHttpInterface::ResponseCallback cb_proxy = [this, request_id, callback](const Response& response) {
         GetRequest(request_id).response = response;
         callback(request_id);
     };

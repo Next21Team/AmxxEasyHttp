@@ -17,14 +17,6 @@ enum class OptionsId : int { Null = 0 };
 enum class RequestId : int { Null = 0 };
 enum class QueueId : int { Null = 0, Main = 1 };
 
-struct RequestData
-{
-    std::shared_ptr<ezhttp::RequestControl> request_control;
-    // options_id is always valid as long as the RequestId associated with the object exists
-    OptionsId options_id;
-    ezhttp::Response response;
-};
-
 struct OptionsData
 {
     ezhttp::EasyHttpOptionsBuilder options_builder;
@@ -32,6 +24,15 @@ struct OptionsData
     std::optional<std::vector<cell>> user_data;
     PluginEndBehaviour plugin_end_behaviour = PluginEndBehaviour::CancelRequests;
     QueueId queue_id = QueueId::Main;
+};
+
+
+struct RequestData
+{
+    std::shared_ptr<ezhttp::RequestControl> request_control;
+    // options_id is always valid as long as the RequestId associated with the object exists
+    OptionsId options_id;
+    ezhttp::Response response;
 };
 
 struct EasyHttpPack
@@ -82,17 +83,17 @@ public:
 
     // When using delete_related_options, make sure that other requests do not use the same options as this one
     bool DeleteRequest(RequestId handle, bool delete_related_options = false);
-    [[nodiscard]] inline bool IsRequestExists(RequestId handle) { return requests_.contains(handle); }
-    [[nodiscard]] inline RequestData& GetRequest(RequestId handle) { return requests_.at(handle); }
+    [[nodiscard]] bool IsRequestExists(RequestId handle) { return requests_.contains(handle); }
+    [[nodiscard]] RequestData& GetRequest(RequestId handle) { return requests_.at(handle); }
 
     OptionsId CreateOptions();
     bool DeleteOptions(OptionsId handle);
-    [[nodiscard]] inline bool IsOptionsExists(OptionsId handle) const { return options_.contains(handle); }
-    [[nodiscard]] inline OptionsData& GetOptions(OptionsId handle) { return options_.at(handle); }
-    [[nodiscard]] inline ezhttp::EasyHttpOptionsBuilder& GetOptionsBuilder(OptionsId handle) { return options_.at(handle).options_builder; }
+    [[nodiscard]] bool IsOptionsExists(OptionsId handle) const { return options_.contains(handle); }
+    [[nodiscard]] OptionsData& GetOptions(OptionsId handle) { return options_.at(handle); }
+    [[nodiscard]] ezhttp::EasyHttpOptionsBuilder& GetOptionsBuilder(OptionsId handle) { return options_.at(handle).options_builder; }
 
     QueueId CreateQueue();
-    [[nodiscard]] inline bool IsQueueExists(QueueId handle) const { return easy_http_pack_.contains(handle); }
+    [[nodiscard]] bool IsQueueExists(QueueId handle) const { return easy_http_pack_.contains(handle); }
 
 private:
     void ResetMainAndRemoveUsersQueues();

@@ -10,6 +10,7 @@
 //
 // JSON Class
 //
+#pragma once
 
 #include "IJsonMngr.h"
 
@@ -17,7 +18,7 @@
 #include <vector>
 #include <deque>
 
-#include <amxxmodule.h>
+#include <sdk/amxxmodule.h>
 #include <parson.h>
 
 using namespace AMXX;

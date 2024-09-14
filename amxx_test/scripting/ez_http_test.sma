@@ -66,6 +66,8 @@ public test_get_parameters_complete(EzHttpRequest:request_id)
     new EzJSON:json_root = ezhttp_parse_json_response(request_id);
     new EzJSON:json_args = ezjson_object_get_value(json_root, "args");
     
+    server_print("test_get_parameters request elapsed: %f", ezhttp_get_elapsed(request_id));
+
     // asserts
 
     ASSERT_TRUE_MSG(ezjson_object_get_count(json_args) == 2, "expected 2 arguments");
@@ -98,6 +100,8 @@ public test_get_fail_by_timeout_complete(EzHttpRequest:request_id)
 {
     EZHTTP_OPTION_EXTRACT_TEST_DATA(request_id)
 
+    server_print("test_fail_by_timeout request elapsed: %f", ezhttp_get_elapsed(request_id));
+
     // asserts
 
     ASSERT_TRUE_MSG(ezhttp_get_error_code(request_id) == EZH_OPERATION_TIMEDOUT, "operation must be timeouted");
@@ -125,6 +129,8 @@ public test_post_form_complete(EzHttpRequest:request_id)
 
     new EzJSON:json_root = ezhttp_parse_json_response(request_id);
     new EzJSON:json_form = ezjson_object_get_value(json_root, "form");
+
+    server_print("test_post_form request elapsed: %f", ezhttp_get_elapsed(request_id));
 
     // asserts
 
@@ -161,6 +167,8 @@ START_ASYNC_TEST(test_post_body)
 public test_post_body_complete(EzHttpRequest:request_id)
 {
     EZHTTP_OPTION_EXTRACT_TEST_DATA(request_id)
+
+    server_print("test_post_body request elapsed: %f", ezhttp_get_elapsed(request_id));
 
     new EzJSON:json_root = ezhttp_parse_json_response(request_id);
 
@@ -201,6 +209,8 @@ public test_post_body_json_complete(EzHttpRequest:request_id)
     new EzJSON:json_root = ezhttp_parse_json_response(request_id);
     new EzJSON:json_data = ezjson_object_get_value(json_root, "json");
 
+    server_print("test_post_body_json request elapsed: %f", ezhttp_get_elapsed(request_id));
+
     // asserts
     new tmp_data[256];
 
@@ -233,6 +243,8 @@ public test_user_agent_complete(EzHttpRequest:request_id)
     new EzJSON:json_root = ezhttp_parse_json_response(request_id);
     new EzJSON:json_headers = ezjson_object_get_value(json_root, "headers");
 
+    server_print("test_user_agent request elapsed: %f", ezhttp_get_elapsed(request_id));
+
     // asserts
 
     new user_agent[256];
@@ -264,6 +276,8 @@ public test_headers_complete(EzHttpRequest:request_id)
 
     new EzJSON:json_root = ezhttp_parse_json_response(request_id);
     new EzJSON:json_headers = ezjson_object_get_value(json_root, "headers");
+
+    server_print("test_headers request elapsed: %f", ezhttp_get_elapsed(request_id));
 
     // asserts
 
@@ -302,6 +316,8 @@ public test_cookies_complete(EzHttpRequest:request_id)
     new EzJSON:json_root = ezhttp_parse_json_response(request_id);
     new EzJSON:json_cookies = ezjson_object_get_value(json_root, "cookies");
 
+    server_print("test_cookies request elapsed: %f", ezhttp_get_elapsed(request_id));
+
     // asserts
 
     new tmp_data[256];
@@ -338,6 +354,8 @@ public test_save_to_file_complete(EzHttpRequest:request_id)
 
     ezhttp_save_data_to_file(request_id, "addons/amxmodx/test_save.txt");
 
+    server_print("test_save_to_file request elapsed: %f", ezhttp_get_elapsed(request_id));
+
     // asserts
 
     new text[128];
@@ -368,6 +386,8 @@ START_ASYNC_TEST(test_auth)
 public test_auth_complete(EzHttpRequest:request_id)
 {
     EZHTTP_OPTION_EXTRACT_TEST_DATA(request_id)
+
+    server_print("test_auth_complete request elapsed: %f", ezhttp_get_elapsed(request_id));
 
     new EzJSON:json_root = ezhttp_parse_json_response(request_id);
 
