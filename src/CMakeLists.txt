@@ -118,7 +118,7 @@ endif ()
 
 set_target_properties(${TARGET_NAME} PROPERTIES
         PREFIX ""
-        OUTPUT_NAME ${OUTPUT_NAME}
+        OUTPUT_NAME "${OUTPUT_NAME}$<$<BOOL:${UNIX}>:_i386>"
         PDB_NAME ${OUTPUT_NAME}
 )
 
