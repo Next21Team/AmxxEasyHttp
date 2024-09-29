@@ -1,10 +1,10 @@
 #pragma once
 #include <functional>
 
-#include "Response.h"
+#include "Response.hpp"
 #include "RequestOptions.h"
 #include "RequestMethod.h"
-#include "RequestControl.h"
+#include "RequestControlInterface.h"
 
 namespace ezhttp
 {
@@ -16,7 +16,7 @@ namespace ezhttp
     public:
         virtual ~EasyHttpInterface() = default;
 
-        virtual std::shared_ptr<RequestControl> SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const ResponseCallback& on_complete) = 0;
+        virtual std::shared_ptr<RequestControlInterface> SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const ResponseCallback& on_complete) = 0;
         virtual void RunFrame() = 0;
         virtual int GetActiveRequestCount() = 0;
 

@@ -1,104 +1,108 @@
 #pragma once
+#include <memory>
+#include <utility>
 
-#include "easy_http/EasyHttpInterface.h"
-#include "easy_http/EasyHttpOptionsBuilder.h"
-#include "utils/ContainerWithHandles.h"
-#include "sdk/amxxmodule.h"
-#include <async++.h>
-#include <vector>
+#include <easy_http/EasyHttp.h>
+#include <utils/ContainerWithHandles.h>
 
-enum class PluginEndBehaviour
+#include "Handles.h"
+#include "EasyHttpHolder.hpp"
+#include "OptionsData.hpp"
+#include "RequestData.hpp"
+
+namespace ezhttp_amxx
 {
-    CancelRequests,
-    ForgetRequests
-};
-
-enum class OptionsId : int { Null = 0 };
-enum class RequestId : int { Null = 0 };
-enum class QueueId : int { Null = 0, Main = 1 };
-
-struct OptionsData
-{
-    ezhttp::EasyHttpOptionsBuilder options_builder;
-
-    std::optional<std::vector<cell>> user_data;
-    PluginEndBehaviour plugin_end_behaviour = PluginEndBehaviour::CancelRequests;
-    QueueId queue_id = QueueId::Main;
-};
-
-
-struct RequestData
-{
-    std::shared_ptr<ezhttp::RequestControl> request_control;
-    // options_id is always valid as long as the RequestId associated with the object exists
-    OptionsId options_id;
-    ezhttp::Response response;
-};
-
-struct EasyHttpPack
-{
-    std::unique_ptr<ezhttp::EasyHttpInterface> forgettable_easy_http = nullptr;
-    std::unique_ptr<ezhttp::EasyHttpInterface> terminating_easy_http = nullptr;
-
-    EasyHttpPack() = default;
-
-    EasyHttpPack(const EasyHttpPack& other) = delete;
-    EasyHttpPack& operator=(const EasyHttpPack& other) = delete;
-
-    EasyHttpPack(EasyHttpPack&& other) noexcept
+    class NamedHolderKey
     {
-        forgettable_easy_http = std::move(other.forgettable_easy_http);
-        terminating_easy_http = std::move(other.terminating_easy_http);
-    }
+        std::string plugin_{};
+        std::string name_{};
 
-    EasyHttpPack& operator=(EasyHttpPack&& other) noexcept
+    public:
+        NamedHolderKey(std::string plugin, std::string name) :
+            plugin_(std::move(plugin)),
+            name_(std::move(name))
+        {
+        }
+
+        [[nodiscard]] const std::string& get_plugin() const
+        {
+            return plugin_;
+        }
+
+        [[nodiscard]] const std::string& get_name() const
+        {
+            return name_;
+        }
+
+        friend bool operator== (const NamedHolderKey& c1, const NamedHolderKey& c2)
+        {
+            return c1.plugin_ == c2.plugin_ &&
+                   c2.name_ == c1.name_;
+        }
+
+        friend bool operator!= (const NamedHolderKey& c1, const NamedHolderKey& c2) { return !operator==(c1, c2); }
+    };
+
+    struct NamedHolderKeyHash
     {
-        forgettable_easy_http = std::move(other.forgettable_easy_http);
-        terminating_easy_http = std::move(other.terminating_easy_http);
-        return *this;
-    }
-};
+        std::size_t operator()(const NamedHolderKey& key) const noexcept
+        {
+            std::size_t h1 = std::hash<std::string>{}(key.get_plugin());
+            std::size_t h2 = std::hash<std::string>{}(key.get_name());
+            return h1 ^ (h2 << 1);
+        }
+    };
 
-using ModuleRequestCallback = std::function<void(RequestId request_id)>;
+    class EasyHttpModule
+    {
+        const int kMainHoldersThreads = 6;
 
-class EasyHttpModule
-{
-    const int kMainQueueThreads = 6;
+        std::string ca_cert_path_{};
 
-    std::string ca_cert_path_;
+        utils::ContainerWithHandles<EasyHandle, EasyHttpHolder> easy_http_holders_{};
+        // Key - EasyHandle belonging to PluginEndBehaviour::CancelRequests. It is this EasyHandle that returns the CreateLegacyEasyHttp method.
+        // Value - EasyHandle belonging to PluginEndBehaviour::ForgetRequests
+        std::unordered_map<EasyHandle, EasyHandle> legacy_easy_http_linking_{};
+        std::unordered_map<NamedHolderKey, EasyHandle, NamedHolderKeyHash> holders_names_{};
 
-    std::vector<std::unique_ptr<ezhttp::EasyHttpInterface>> forgotten_easy_http_;
-    utils::ContainerWithHandles<QueueId, EasyHttpPack> easy_http_pack_;
-    utils::ContainerWithHandles<OptionsId, OptionsData> options_;
-    utils::ContainerWithHandles<RequestId, RequestData> requests_;
+        utils::ContainerWithHandles<OptionsId, OptionsData> options_{};
+        utils::ContainerWithHandles<RequestId, RequestData> requests_{};
 
-public:
-    explicit EasyHttpModule(std::string ca_cert_path);
-    ~EasyHttpModule();
+        EasyHandle main_forgetting_easy_handle_{};
+        EasyHandle main_cancelling_easy_handle_{};
 
-    void RunFrame();
-    void ServerDeactivate();
+    public:
+        explicit EasyHttpModule(std::string ca_cert_path);
+        ~EasyHttpModule();
 
-    RequestId SendRequest(ezhttp::RequestMethod method, const std::string& url, OptionsId options_id, const ModuleRequestCallback& callback);
+        void RunFrame();
+        void ServerDeactivate();
 
-    // When using delete_related_options, make sure that other requests do not use the same options as this one
-    bool DeleteRequest(RequestId handle, bool delete_related_options = false);
-    [[nodiscard]] bool IsRequestExists(RequestId handle) { return requests_.contains(handle); }
-    [[nodiscard]] RequestData& GetRequest(RequestId handle) { return requests_.at(handle); }
+        RequestId SendRequest(ezhttp::RequestMethod method, const std::string& url, OptionsId options_id, const std::function<void(RequestId request_id)>& callback);
+        [[nodiscard]] bool IsRequestExists(RequestId handle);
+        [[nodiscard]] RequestData& GetRequest(RequestId handle);
+        void DeleteRequest(RequestId request_id);
 
-    OptionsId CreateOptions();
-    bool DeleteOptions(OptionsId handle);
-    [[nodiscard]] bool IsOptionsExists(OptionsId handle) const { return options_.contains(handle); }
-    [[nodiscard]] OptionsData& GetOptions(OptionsId handle) { return options_.at(handle); }
-    [[nodiscard]] ezhttp::EasyHttpOptionsBuilder& GetOptionsBuilder(OptionsId handle) { return options_.at(handle).options_builder; }
+        // returns EasyHandle::Null if queue already exists
+        EasyHandle CreateNamedEasyHttp(const std::string& plugin_name, const std::string& name, PluginEndBehaviour plugin_end_behaviour, int threads);
+        EasyHandle CreateEasyHttp(const std::string& plugin_name, PluginEndBehaviour plugin_end_behaviour, int threads);
+        // Prior to 1.4.0, two easy_http were created for each queue created, one for each PluginEndBehaviour.
+        // This method emulates that behavior.
+        EasyHandle CreateLegacyEasyHttp(const std::string& plugin_name, int threads);
+        [[nodiscard]] bool IsEasyHttpExists(EasyHandle easy_handle);
+        [[nodiscard]] bool IsNamedEasyHttpExists(const std::string& plugin_name, const std::string& name);
+        [[nodiscard]] EasyHandle GetNamedEasyHttpHandle(const std::string& plugin_name, const std::string& name);
 
-    QueueId CreateQueue();
-    [[nodiscard]] bool IsQueueExists(QueueId handle) const { return easy_http_pack_.contains(handle); }
+        [[nodiscard]] OptionsId CreateOptions();
+        [[nodiscard]] bool IsOptionsExists(OptionsId handle) const;
+        [[nodiscard]] OptionsData& GetOptions(OptionsId handle);
+        bool DeleteOptions(OptionsId handle);
 
-private:
-    void ResetMainAndRemoveUsersQueues();
-    void RunFrameEasyHttp();
-    void RunCleanupFrameForForgottenEasyHttp();
-    std::unique_ptr<ezhttp::EasyHttpInterface>& GetEasyHttp(QueueId queue_id, PluginEndBehaviour end_map_behaviour);
-};
-
+    private:
+        EasyHandle GetEasyHandleByOptions(const OptionsData& options);
+        EasyHttpHolder CreateEasyHttpInternal(PluginEndBehaviour plugin_end_behaviour, int threads, const std::string& plugin_name, const std::string& name = "");
+        void RunFrameEasyHttps();
+        void CancelAndForgetEasyHttps();
+        void DestroyEasyHttps();
+    };
+}

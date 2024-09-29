@@ -17,7 +17,7 @@ EasyHttp::EasyHttp(std::string ca_cert_path, int threads) :
     request_scheduler_ = std::make_shared<async::threadpool_scheduler>(threads);
 }
 
-std::shared_ptr<RequestControl> EasyHttp::SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const ResponseCallback& on_complete)
+std::shared_ptr<RequestControlInterface> EasyHttp::SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const ResponseCallback& on_complete)
 {
     auto request_control = std::make_shared<RequestControl>();
 
@@ -36,14 +36,13 @@ std::shared_ptr<RequestControl> EasyHttp::SendRequest(RequestMethod method, cons
     })
     .then(*update_scheduler_, [request_control, on_complete](Response response)
     {
-        request_control->completed = true;
+        request_control->set_completed_unsafe();
 
-        if (!request_control->forgotten)
+        if (!request_control->is_forgotten_unsafe())
             on_complete(std::move(response));
     });
 
-    tasks_.emplace_back(std::move(task));
-    requests_.emplace_back(request_control);
+    tasks_.emplace_back(std::move(task), request_control);
 
     return request_control;
 }
@@ -70,34 +69,31 @@ void EasyHttp::RunFrame()
     // erase completed tasks
     for (auto it = tasks_.begin(); it != tasks_.end(); )
     {
-        if (!it->valid() || it->ready())
+        auto& task = it->get_task();
+
+        if (task.ready())
             it = tasks_.erase(it);
         else
             ++it;
     }
+}
 
-    // erase completed requests
-    for (auto it = requests_.begin(); it != requests_.end(); )
-    {
-        if ((*it)->completed)
-            it = requests_.erase(it);
-        else
-            ++it;
-    }
+int EasyHttp::GetActiveRequestCount()
+{
+    return tasks_.size();
 }
 
 void EasyHttp::ForgetAllRequests()
 {
-    for (auto& request : requests_)
-        request->forgotten = true;
+    for (auto& task_data : tasks_)
+        task_data.get_request_control()->set_forgotten_unsafe();
 }
 
 void EasyHttp::CancelAllRequests()
 {
-    for (auto& request : requests_)
+    for (auto& task_data : tasks_)
     {
-        std::lock_guard lock_guard(request->control_mutex);
-        request->canceled = true;
+        task_data.get_request_control()->CancelRequest();
     }
 }
 
@@ -111,11 +107,13 @@ void EasyHttp::SetSessionCommonOptions(cpr::Session& session, const std::shared_
 
     session.SetProgressCallback(cpr::ProgressCallback(
         [request_control](cpr::cpr_off_t downloadTotal, cpr::cpr_off_t downloadNow, cpr::cpr_off_t uploadTotal, cpr::cpr_off_t uploadNow, intptr_t userdata) {
-            std::lock_guard lock_guard(request_control->control_mutex);
+            std::lock_guard lock_guard(request_control->get_mutex());
 
-            request_control->progress = RequestControl::Progress{ (int32_t)(downloadTotal), (int32_t)(downloadNow), (int32_t)(uploadTotal), (int32_t)(uploadNow) };
+            request_control->set_progress_unsafe(
+                    RequestProgress{(int32_t) (downloadTotal), (int32_t) (downloadNow), (int32_t) (uploadTotal),
+                                    (int32_t) (uploadNow)});
 
-            return !request_control->canceled;
+            return !request_control->is_cancelled_unsafe();
         }));
 
     if (options.timeout)
@@ -250,7 +248,7 @@ cpr::Response EasyHttp::FtpUpload(cpr::Session& session, const std::shared_ptr<R
     file.close();
 
     cpr::Response resp = session.Complete(curl_result);
-    if (request_control->canceled)
+    if (request_control->IsCancelled())
     {
         long response_code;
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
@@ -289,7 +287,7 @@ cpr::Response EasyHttp::FtpDownload(cpr::Session& session, const std::shared_ptr
     file.close();
 
     cpr::Response resp = session.Complete(curl_result);
-    if (request_control->canceled)
+    if (request_control->IsCancelled())
     {
         std::filesystem::remove(*options.file_path);
 

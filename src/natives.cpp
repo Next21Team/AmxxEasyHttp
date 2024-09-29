@@ -12,10 +12,11 @@
 #include "utils/amxx_utils.h"
 
 using namespace ezhttp;
+using namespace ezhttp_amxx;
 
 bool ValidateOptionsId(AMX* amx, OptionsId options_id);
 bool ValidateRequestId(AMX* amx, RequestId request_id);
-bool ValidateQueueId(AMX* amx, QueueId queue_id);
+bool ValidateQueueId(AMX* amx, EasyHandle queue_id);
 template <class TMethod> void SetKeyValueOption(AMX* amx, cell* params, TMethod method);
 template <class TMethod> void SetStringOption(AMX* amx, cell* params, TMethod method);
 RequestId SendRequest(AMX* amx, RequestMethod method, OptionsId options_id, const std::string& url, const std::string& callback);
@@ -102,7 +103,7 @@ cell AMX_NATIVE_CALL ezhttp_option_set_body_from_json(AMX* amx, cell* params)
     if (json_str == nullptr)
         return 0;
 
-    g_EasyHttpModule->GetOptions(options_id).options_builder.SetBody(json_str);
+    g_EasyHttpModule->GetOptions(options_id).get_options_builder().SetBody(json_str);
     g_JsonManager->FreeString(json_str);
 
     return 1;
@@ -138,7 +139,7 @@ cell AMX_NATIVE_CALL ezhttp_option_set_timeout(AMX* amx, cell* params)
     if (!ValidateOptionsId(amx, options_id))
         return 0;
 
-    g_EasyHttpModule->GetOptions(options_id).options_builder.SetTimeout(timeout_ms);
+    g_EasyHttpModule->GetOptions(options_id).get_options_builder().SetTimeout(timeout_ms);
     return 0;
 }
 
@@ -151,7 +152,7 @@ cell AMX_NATIVE_CALL ezhttp_option_set_connect_timeout(AMX* amx, cell* params)
     if (!ValidateOptionsId(amx, options_id))
         return 0;
 
-    g_EasyHttpModule->GetOptions(options_id).options_builder.SetConnectTimeout(timeout_ms);
+    g_EasyHttpModule->GetOptions(options_id).get_options_builder().SetConnectTimeout(timeout_ms);
     return 0;
 }
 
@@ -190,7 +191,7 @@ cell AMX_NATIVE_CALL ezhttp_option_set_user_data(AMX* amx, cell* params)
     user_data.resize(data_len);
     MF_CopyAmxMemory(user_data.data(), data_addr, data_len);
 
-    g_EasyHttpModule->GetOptions(options_id).user_data = user_data;
+    g_EasyHttpModule->GetOptions(options_id).set_user_data(user_data);
     return 0;
 }
 
@@ -203,7 +204,7 @@ cell AMX_NATIVE_CALL ezhttp_option_set_plugin_end_behaviour(AMX* amx, cell* para
     if (!ValidateOptionsId(amx, options_id))
         return 0;
 
-    g_EasyHttpModule->GetOptions(options_id).plugin_end_behaviour = plugin_end_behaviour;
+    g_EasyHttpModule->GetOptions(options_id).set_plugin_end_behaviour(plugin_end_behaviour);
     return 0;
 }
 
@@ -211,7 +212,7 @@ cell AMX_NATIVE_CALL ezhttp_option_set_plugin_end_behaviour(AMX* amx, cell* para
 cell AMX_NATIVE_CALL ezhttp_option_set_queue(AMX* amx, cell* params)
 {
     auto options_id = (OptionsId)params[1];
-    auto queue_id = (QueueId)params[2];
+    auto queue_id = (EasyHandle)params[2];
 
     if (!ValidateOptionsId(amx, options_id))
         return 0;
@@ -219,7 +220,7 @@ cell AMX_NATIVE_CALL ezhttp_option_set_queue(AMX* amx, cell* params)
     if (!ValidateQueueId(amx, queue_id))
         return 0;
 
-    g_EasyHttpModule->GetOptions(options_id).queue_id = queue_id;
+    g_EasyHttpModule->GetOptions(options_id).set_easy_handle(queue_id);
     return 0;
 }
 
@@ -310,9 +311,7 @@ cell AMX_NATIVE_CALL ezhttp_cancel_request(AMX* amx, cell* params)
         return 0;
 
     RequestData& request_data = g_EasyHttpModule->GetRequest(request_id);
-
-    std::lock_guard<std::mutex> lock_guard(request_data.request_control->control_mutex);
-    request_data.request_control->canceled = true;
+    request_data.get_request_control().CancelRequest();
 
     return 0;
 }
@@ -325,14 +324,14 @@ cell AMX_NATIVE_CALL ezhttp_request_progress(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    auto& request_control = g_EasyHttpModule->GetRequest(request_id).request_control;
-    std::lock_guard<std::mutex> lock_guard(request_control->control_mutex);
+    auto& request_control = g_EasyHttpModule->GetRequest(request_id).get_request_control();
+    RequestProgress progress = request_control.GetProgress();
 
     cell* p = MF_GetAmxAddr(amx, params[2]);
-    p[0] = request_control->progress.download_now;
-    p[1] = request_control->progress.download_total;
-    p[2] = request_control->progress.upload_now;
-    p[3] = request_control->progress.upload_total;
+    p[0] = progress.download_now;
+    p[1] = progress.download_total;
+    p[2] = progress.upload_now;
+    p[3] = progress.upload_total;
 
     return 0;
 }
@@ -344,7 +343,7 @@ cell AMX_NATIVE_CALL ezhttp_get_http_code(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).get_response();
 
     return response.status_code;
 }
@@ -357,7 +356,7 @@ cell AMX_NATIVE_CALL ezhttp_get_data(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id) || max_len == 0)
         return 0;
 
-    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).get_response();
 
     utils::SetAmxStringUTF8CharSafe(amx, params[2], response.text.c_str(), response.text.length(), max_len);
 
@@ -373,7 +372,7 @@ cell AMX_NATIVE_CALL ezhttp_parse_json_response(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).get_response();
 
     JS_Handle json_handle;
     bool result = g_JsonManager->Parse(response.text.c_str(), &json_handle, false, with_comments);
@@ -389,7 +388,7 @@ cell AMX_NATIVE_CALL ezhttp_get_url(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id) || max_len == 0)
         return 0;
 
-    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).get_response();
 
     utils::SetAmxStringUTF8CharSafe(amx, params[2], response.url.c_str(), response.url.str().length(), max_len);
 
@@ -407,7 +406,7 @@ cell AMX_NATIVE_CALL ezhttp_save_data_to_file(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).get_response();
 
     if (response.text.empty())
         return 0;
@@ -430,7 +429,7 @@ cell AMX_NATIVE_CALL ezhttp_save_data_to_file2(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).get_response();
 
     return std::fwrite(response.text.data(), sizeof(char), response.text.length(), file_handle);
 }
@@ -442,7 +441,7 @@ cell AMX_NATIVE_CALL ezhttp_get_headers_count(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).get_response();
 
     return response.header.size();
 }
@@ -457,7 +456,7 @@ cell AMX_NATIVE_CALL ezhttp_get_headers(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).get_response();
 
     const std::string header_key(key, key_len);
     if (response.header.count(header_key) == 1)
@@ -484,7 +483,7 @@ cell AMX_NATIVE_CALL ezhttp_iterate_headers(AMX* amx, cell* params)
         return 0;
 
     const RequestData& request = g_EasyHttpModule->GetRequest(request_id);
-    const cpr::Header& header = request.response.header;
+    const cpr::Header& header = request.get_response().header;
 
 
     return 0;
@@ -497,7 +496,7 @@ cell AMX_NATIVE_CALL ezhttp_get_elapsed(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).get_response();
 
     return amx_ftoc(response.elapsed);
 }
@@ -509,7 +508,7 @@ cell AMX_NATIVE_CALL ezhttp_get_cookies_count(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).get_response();
 
     size_t size = response.cookies.end() - response.cookies.begin();
     return (cell)size;
@@ -525,7 +524,7 @@ cell AMX_NATIVE_CALL ezhttp_get_cookies(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).get_response();
 
     const std::string cookie_key(key, key_len);
 
@@ -554,7 +553,7 @@ cell AMX_NATIVE_CALL ezhttp_get_error_code(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).get_response();
 
     return (cell)response.error.code;
 }
@@ -567,7 +566,7 @@ cell AMX_NATIVE_CALL ezhttp_get_error_message(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id) || max_len == 0)
         return 0;
 
-    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).get_response();
 
     utils::SetAmxStringUTF8CharSafe(amx, params[2], response.error.message.c_str(), response.error.message.length(), max_len);
 
@@ -581,7 +580,7 @@ cell AMX_NATIVE_CALL ezhttp_get_redirect_count(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).get_response();
 
     return response.redirect_count;
 }
@@ -593,7 +592,7 @@ cell AMX_NATIVE_CALL ezhttp_get_uploaded_bytes(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).get_response();
 
     return response.uploaded_bytes;
 }
@@ -605,7 +604,7 @@ cell AMX_NATIVE_CALL ezhttp_get_downloaded_bytes(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    const Response& response = g_EasyHttpModule->GetRequest(request_id).response;
+    const Response& response = g_EasyHttpModule->GetRequest(request_id).get_response();
 
     return response.downloaded_bytes;
 }
@@ -618,10 +617,10 @@ cell AMX_NATIVE_CALL ezhttp_get_user_data(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    OptionsId options_id = g_EasyHttpModule->GetRequest(request_id).options_id;
+    OptionsId options_id = g_EasyHttpModule->GetRequest(request_id).get_options_id();
     OptionsData options = g_EasyHttpModule->GetOptions(options_id);
 
-    const std::optional<std::vector<cell>>& user_data = options.user_data;
+    const std::optional<std::vector<cell>>& user_data = options.get_user_data();
     if (!user_data)
         return 0;
 
@@ -648,7 +647,7 @@ cell AMX_NATIVE_CALL ezhttp_ftp_upload(AMX* amx, cell* params)
     if (options_id == OptionsId::Null)
         options_id = g_EasyHttpModule->CreateOptions();
 
-    auto& builder = g_EasyHttpModule->GetOptionsBuilder(options_id);
+    auto& builder = g_EasyHttpModule->GetOptions(options_id).get_options_builder();
     builder.SetFilePath(MF_BuildPathname("%s", local_file));
     builder.SetSecure(secure);
 
@@ -674,7 +673,7 @@ cell AMX_NATIVE_CALL ezhttp_ftp_upload2(AMX* amx, cell* params)
     if (options_id == OptionsId::Null)
         options_id = g_EasyHttpModule->CreateOptions();
 
-    auto& builder = g_EasyHttpModule->GetOptionsBuilder(options_id);
+    auto& builder = g_EasyHttpModule->GetOptions(options_id).get_options_builder();
     builder.SetFilePath(MF_BuildPathname("%s", local_file));
     builder.SetSecure(secure);
 
@@ -701,7 +700,7 @@ cell AMX_NATIVE_CALL ezhttp_ftp_download(AMX* amx, cell* params)
     if (options_id == OptionsId::Null)
         options_id = g_EasyHttpModule->CreateOptions();
 
-    auto& builder = g_EasyHttpModule->GetOptionsBuilder(options_id);
+    auto& builder = g_EasyHttpModule->GetOptions(options_id).get_options_builder();
     builder.SetFilePath(MF_BuildPathname("%s", local_file));
     builder.SetSecure(secure);
 
@@ -724,7 +723,7 @@ cell AMX_NATIVE_CALL ezhttp_ftp_download2(AMX* amx, cell* params)
     bool secure = params[4];
     auto options_id = (OptionsId)params[5];
 
-    auto& builder = g_EasyHttpModule->GetOptionsBuilder(options_id);
+    auto& builder = g_EasyHttpModule->GetOptions(options_id).get_options_builder();
     builder.SetFilePath(MF_BuildPathname("%s", local_file));
     builder.SetSecure(secure);
 
@@ -735,7 +734,32 @@ cell AMX_NATIVE_CALL ezhttp_ftp_download2(AMX* amx, cell* params)
 
 cell AMX_NATIVE_CALL ezhttp_create_queue(AMX* amx, cell* params)
 {
-    return (cell)g_EasyHttpModule->CreateQueue();
+    int plugin_id = MF_FindScriptByAmx(amx);
+    std::string plugin_name = MF_GetScriptName(plugin_id);
+
+    uint32_t params_count = *params / sizeof(cell);
+
+    if (params_count == 0)
+        return (cell)g_EasyHttpModule->CreateLegacyEasyHttp(plugin_name, 1);
+
+    auto plugin_end_behaviour = (PluginEndBehaviour)params[1];
+    return (cell)g_EasyHttpModule->CreateEasyHttp(plugin_name, plugin_end_behaviour, 1);
+}
+
+cell AMX_NATIVE_CALL ezhttp_create_named_queue(AMX* amx, cell* params)
+{
+    int queue_name_len;
+    std::string queue_name = MF_GetAmxString(amx, params[1], 0, &queue_name_len);
+    auto plugin_end_behaviour = (PluginEndBehaviour)params[2];
+
+    std::string plugin_name = utils::GetPluginName(amx);
+
+    EasyHandle handle = g_EasyHttpModule->GetNamedEasyHttpHandle(plugin_name, queue_name);
+
+    if (handle == ezhttp_amxx::EasyHandle::Null)
+        handle = g_EasyHttpModule->CreateNamedEasyHttp(plugin_name, queue_name, plugin_end_behaviour, 1);
+
+    return (cell)handle;
 }
 
 cell AMX_NATIVE_CALL ezhttp_steam_to_steam64(AMX* amx, cell* params)
@@ -787,14 +811,14 @@ RequestId SendRequest(AMX* amx, RequestMethod method, OptionsId options_id, cons
     auto on_complete = [callback_id](RequestId request_id) {
         if (callback_id == -1)
         {
-            g_EasyHttpModule->DeleteRequest(request_id, true);
+            g_EasyHttpModule->DeleteRequest(request_id);
             return;
         }
 
         MF_ExecuteForward(callback_id, request_id);
         MF_UnregisterSPForward(callback_id);
 
-        g_EasyHttpModule->DeleteRequest(request_id, true);
+        g_EasyHttpModule->DeleteRequest(request_id);
     };
 
     RequestId request_id = g_EasyHttpModule->SendRequest(method, url, options_id, on_complete);
@@ -824,9 +848,9 @@ bool ValidateRequestId(AMX* amx, RequestId request_id)
     return true;
 }
 
-bool ValidateQueueId(AMX* amx, QueueId queue_id)
+bool ValidateQueueId(AMX* amx, EasyHandle queue_id)
 {
-    if (!g_EasyHttpModule->IsQueueExists(queue_id))
+    if (!g_EasyHttpModule->IsEasyHttpExists(queue_id))
     {
         MF_LogError(amx, AMX_ERR_NATIVE, "Queue id %d not exists", queue_id);
         return false;
@@ -847,7 +871,7 @@ void SetKeyValueOption(AMX* amx, cell* params, TMethod method)
     if (!ValidateOptionsId(amx, options_id))
         return;
 
-    (g_EasyHttpModule->GetOptions(options_id).options_builder.*method)(std::string(key, key_len), std::string(value, value_len));
+    (g_EasyHttpModule->GetOptions(options_id).get_options_builder().*method)(std::string(key, key_len), std::string(value, value_len));
 }
 
 template <class TMethod>
@@ -860,7 +884,7 @@ void SetStringOption(AMX* amx, cell* params, TMethod method)
     if (!ValidateOptionsId(amx, options_id))
         return;
 
-    (g_EasyHttpModule->GetOptions(options_id).options_builder.*method)(std::string(value, value_len));
+    (g_EasyHttpModule->GetOptions(options_id).get_options_builder().*method)(std::string(value, value_len));
 }
 
 AMX_NATIVE_INFO g_Natives[] =
@@ -924,6 +948,7 @@ AMX_NATIVE_INFO g_Natives[] =
 
     // queue
     { "ezhttp_create_queue",                ezhttp_create_queue },
+    { "ezhttp_create_named_queue",          ezhttp_create_named_queue },
 
     // special
     { "_ezhttp_steam_to_steam64",           ezhttp_steam_to_steam64 },

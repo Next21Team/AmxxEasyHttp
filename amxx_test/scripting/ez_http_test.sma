@@ -406,6 +406,14 @@ public test_auth_complete(EzHttpRequest:request_id)
     END_ASYNC_TEST()
 }
 
+START_ASYNC_TEST(test_named_queue)
+{
+    new EzHttpQueue:queue = ezhttp_create_queue(EZH_CANCEL_REQUEST);
+
+    new EzHttpOptions:opt_1 = ezhttp_create_options();
+    ezhttp_option_set_queue(opt, opt_1);
+}
+
 START_ASYNC_TEST(test_ftp_download)
 {
     new EzHttpOptions:opt = ezhttp_create_options();

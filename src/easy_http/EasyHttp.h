@@ -4,7 +4,9 @@
 #include <async++.h>
 
 #include "EasyHttpInterface.h"
-#include "EasyHttpOptionsBuilder.h"
+#include "EasyHttpOptionsBuilder.hpp"
+#include "RequestControl.hpp"
+#include "TaskData.hpp"
 #include "session_cache/CprSessionCache.h"
 
 namespace ezhttp
@@ -23,16 +25,15 @@ namespace ezhttp
         std::unique_ptr<async::fifo_scheduler> update_scheduler_;
         std::shared_ptr<async::threadpool_scheduler> request_scheduler_;
 
-        std::vector<async::task<void>> tasks_;
-        std::vector<std::shared_ptr<RequestControl>> requests_;
+        std::vector<TaskData> tasks_;
 
     public:
         explicit EasyHttp(std::string ca_cert_path, int threads = kMaxThreads);
         ~EasyHttp() override;
 
-        std::shared_ptr<RequestControl> SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const ResponseCallback& on_complete) override;
+        std::shared_ptr<RequestControlInterface> SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const ResponseCallback& on_complete) override;
         void RunFrame() override;
-        int GetActiveRequestCount() override { return tasks_.size(); }
+        int GetActiveRequestCount() override;
         void ForgetAllRequests() override;
         void CancelAllRequests() override;
 

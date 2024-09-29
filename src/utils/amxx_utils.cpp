@@ -9,4 +9,12 @@ namespace utils
 
         return MF_SetAmxString(amx, amx_addr, source, maxlen);
     }
+
+    std::string GetPluginName(AMX* amx)
+    {
+        int plugin_id = MF_FindScriptByAmx(amx);
+        std::string plugin_name = MF_GetScriptName(plugin_id);
+
+        return plugin_name;
+    }
 }

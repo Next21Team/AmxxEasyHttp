@@ -9,7 +9,6 @@
 #include "../datetime_service/DateTimeServiceInterface.h"
 
 #include "CurlHolderCacheItem.h"
-#include "HostCacheItem.h"
 
 namespace ezhttp
 {

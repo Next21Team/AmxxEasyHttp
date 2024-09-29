@@ -9,7 +9,8 @@ if (AMXX_EASY_HTTP_BUILD_STATIC)
     set(LIBRARY_BUILD_TYPE STATIC)
     set(TARGET_LIBRARIES_SCOPE PUBLIC)
 else ()
-    set(LIBRARY_BUILD_TYPE SHARED)
+    set(LIBRARY_BUILD_TYPE SHARED
+            easy_http/RequestControlInterface.h)
     set(TARGET_LIBRARIES_SCOPE PRIVATE)
 endif ()
 
@@ -17,17 +18,24 @@ add_library(${TARGET_NAME} ${LIBRARY_BUILD_TYPE}
         sdk/amxxmodule.cpp
         sdk/amxxmodule.h
         sdk/moduleconfig.h
-        module.cpp
+        natives.cpp
         EasyHttpModule.cpp
         EasyHttpModule.h
+        EasyHttpHolder.hpp
+        PluginEndBehaviour.h
+        OptionsData.hpp
+        RequestData.hpp
+        Handles.h
         easy_http/EasyHttpInterface.h
         easy_http/EasyHttp.cpp
         easy_http/EasyHttp.h
-        easy_http/EasyHttpOptionsBuilder.h
-        easy_http/Response.h
+        easy_http/EasyHttpOptionsBuilder.hpp
+        easy_http/Response.hpp
         easy_http/RequestOptions.h
         easy_http/RequestMethod.h
-        easy_http/RequestControl.h
+        easy_http/RequestProgress.hpp
+        easy_http/RequestControl.hpp
+        easy_http/TaskData.hpp
         easy_http/UrlUtils.cpp
         easy_http/UrlUtils.h
         easy_http/session_cache/CprSessionCache.cpp
@@ -36,8 +44,6 @@ add_library(${TARGET_NAME} ${LIBRARY_BUILD_TYPE}
         easy_http/session_cache/CurlHolderCacheItem.h
         easy_http/session_factory/CprSessionFactory.cpp
         easy_http/session_factory/CprSessionFactory.h
-        easy_http/session_cache/HostCacheItem.cpp
-        easy_http/session_cache/HostCacheItem.h
         easy_http/session_factory/CprSessionFactoryInterface.h
         easy_http/datetime_service/DateTimeServiceInterface.h
         easy_http/datetime_service/DateTimeService.cpp
@@ -61,6 +67,7 @@ target_link_libraries(${TARGET_NAME} ${TARGET_LIBRARIES_SCOPE}
         Async++
         cpr::cpr
         parson::parson
+        matchit::matchit
         HLSDK::HLSDK_includes
         metamod::metamod
 )

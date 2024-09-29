@@ -131,7 +131,17 @@ native EzHttpRequest:ezhttp_ftp_download(const user[], const password[], const h
 native EzHttpRequest:ezhttp_ftp_download2(const uri[], const local_file[], const on_complete[], EzHttpFtpSecurity:security = EZH_UNSECURE, EzHttpOptions:options_id = EzHttpOptions:0);
 
 
-native EzHttpQueue:ezhttp_create_queue();
+native EzHttpQueue:ezhttp_create_queue(EzHttpPluginEndBehaviour:plugin_end_behaviour);
+
+/**
+ * Creates a new, or returns an existing named queue.
+ *
+ * @param name
+ * @param plugin_end_behaviour
+ *
+ * @return                      EzHttpQueue handle, 0 if error occurred
+ */
+native EzHttpQueue:ezhttp_create_named_queue(const name[], EzHttpPluginEndBehaviour:plugin_end_behaviour);
 
 //
 
