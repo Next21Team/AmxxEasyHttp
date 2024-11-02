@@ -66,12 +66,12 @@ public ftp_upload_complete(EzHttpRequest:request_id)
 * Url encoded POST values
 * Basic authentication
 * Connection and request timeout specification
-* Timeout for low speed connection
 * Cookie support
 * Proxy support
 * OpenSSL and WinSSL support for HTTPS requests
 * FTP/FTPES download and upload support
 * Built-in JSON support
+* HTTP keep-alive support
 
 ## Advanced features
 
