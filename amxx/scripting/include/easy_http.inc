@@ -143,7 +143,7 @@ native EzHttpQueue:ezhttp_create_queue(EzHttpPluginEndBehaviour:plugin_end_behav
  */
 native EzHttpQueue:ezhttp_create_named_queue(const name[], EzHttpPluginEndBehaviour:plugin_end_behaviour);
 
-//
+native _ezhttp_steam_to_steam64(const steam_id[], steam_id_64[], max_len);
 
 /*
  * JSON types

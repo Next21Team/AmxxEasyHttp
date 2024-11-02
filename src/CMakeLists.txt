@@ -48,7 +48,7 @@ add_library(${TARGET_NAME} ${LIBRARY_BUILD_TYPE}
         easy_http/datetime_service/DateTimeServiceInterface.h
         easy_http/datetime_service/DateTimeService.cpp
         easy_http/datetime_service/DateTimeService.h
-        utils/ContainerWithHandles.h
+        utils/ContainerWithHandles.hpp
         utils/ftp_utils.h
         utils/ftp_utils.cpp
         utils/string_utils.h
@@ -60,6 +60,7 @@ add_library(${TARGET_NAME} ${LIBRARY_BUILD_TYPE}
         json/JsonMngr.h
         json/JsonNatives.cpp
         json/JsonNatives.h
+        utils/Result.hpp
 )
 
 target_link_libraries(${TARGET_NAME} ${TARGET_LIBRARIES_SCOPE}

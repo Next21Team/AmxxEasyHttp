@@ -821,9 +821,24 @@ RequestId SendRequest(AMX* amx, RequestMethod method, OptionsId options_id, cons
         g_EasyHttpModule->DeleteRequest(request_id);
     };
 
-    RequestId request_id = g_EasyHttpModule->SendRequest(method, url, options_id, on_complete);
+    auto request_id = g_EasyHttpModule->SendRequest(method, url, options_id, on_complete);
+    if (request_id.has_error())
+    {
+        switch (request_id.get_error())
+        {
+        case SendRequestError::EasyHandleNotFound:
+            MF_LogError(amx, AMX_ERR_NATIVE, "Queue is not exists");
+            break;
 
-    return request_id;
+        case SendRequestError::IncompatibleOptions_EasyHandleAndPluginEndBehaviour:
+            MF_LogError(amx, AMX_ERR_NATIVE, "Incompatible options: you cannot set the queue option and the EzHttpPluginEndBehaviour::EZH_FORGET_REQUEST option at the same time");
+            break;
+        }
+
+        return RequestId::Null;
+    }
+
+    return *request_id;
 }
 
 bool ValidateOptionsId(AMX* amx, OptionsId options_id)

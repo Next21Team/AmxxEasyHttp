@@ -41,18 +41,21 @@ namespace ezhttp_amxx
         CancelAndForgetEasyHttps();
     }
 
-    RequestId EasyHttpModule::SendRequest(ezhttp::RequestMethod method, const std::string& url, OptionsId options_id, const std::function<void(RequestId request_id)>& callback)
+    ResultT<RequestId, SendRequestError> EasyHttpModule::SendRequest(ezhttp::RequestMethod method, const std::string& url, OptionsId options_id, const std::function<void(RequestId request_id)>& callback)
     {
         if (options_id == OptionsId::Null)
             options_id = CreateOptions();
 
         OptionsData& options_data = GetOptions(options_id);
-        EasyHandle easy_handle = GetEasyHandleByOptions(options_data);
+        auto easy_handle = GetEasyHandleByOptions(options_data);
 
-        if (easy_handle == EasyHandle::Null)
-            return RequestId::Null;
+        if (easy_handle.has_error())
+        {
+            SendRequestError error = easy_handle.get_error();
+            return error;
+        }
 
-        auto& easy_http = easy_http_holders_.at(easy_handle).get_easy_http();
+        auto& easy_http = easy_http_holders_.at(*easy_handle).get_easy_http();
 
         RequestId request_id = requests_.Add(RequestData());
         RequestData& request_data = GetRequest(request_id);
@@ -174,23 +177,22 @@ namespace ezhttp_amxx
         return options_.Remove(handle);
     }
 
-    EasyHandle EasyHttpModule::GetEasyHandleByOptions(const OptionsData& options)
+    ResultT<EasyHandle, SendRequestError> EasyHttpModule::GetEasyHandleByOptions(const OptionsData& options)
     {
         using namespace matchit;
 
-        EasyHandle easy_handle = EasyHandle::Null;
-
         if (options.get_easy_handle() == EasyHandle::Null)
         {
-            easy_handle = match(options.get_plugin_end_behaviour()) (
+            return  match(options.get_plugin_end_behaviour()) (
                 pattern | none = main_cancelling_easy_handle_,
                 pattern | PluginEndBehaviour::CancelRequests = main_cancelling_easy_handle_,
                 pattern | PluginEndBehaviour::ForgetRequests = main_forgetting_easy_handle_
             );
         }
-        else if (easy_http_holders_.contains(options.get_easy_handle()))
+
+        if (easy_http_holders_.contains(options.get_easy_handle()))
         {
-            easy_handle = match(options.get_plugin_end_behaviour()) (
+            EasyHandle handle = match(options.get_plugin_end_behaviour()) (
                 pattern | none = options.get_easy_handle(),
                 pattern | PluginEndBehaviour::CancelRequests = options.get_easy_handle(),
                 pattern | PluginEndBehaviour::ForgetRequests = [this, &options]()
@@ -198,12 +200,18 @@ namespace ezhttp_amxx
                     if (legacy_easy_http_linking_.count(options.get_easy_handle()) > 0)
                         return legacy_easy_http_linking_[options.get_easy_handle()];
 
-                    return EasyHandle::Null;
+                    // IncompatibleOptions_EasyHandleAndPluginEndBehaviour
+                    return EasyHandle::Null; // TODO else means that CancelRequests was destroyed, or it is not a legacy queue
                 }
             );
+
+            if (handle == EasyHandle::Null)
+                return SendRequestError::IncompatibleOptions_EasyHandleAndPluginEndBehaviour;
+
+            return handle;
         }
 
-        return easy_handle;
+        return SendRequestError::EasyHandleNotFound;
     }
 
     EasyHttpHolder EasyHttpModule::CreateEasyHttpInternal(PluginEndBehaviour plugin_end_behaviour, int threads, const std::string& plugin_name, const std::string& name)

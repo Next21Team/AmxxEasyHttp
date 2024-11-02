@@ -1,9 +1,11 @@
 #pragma once
 #include <memory>
 #include <utility>
+#include <variant>
 
 #include <easy_http/EasyHttp.h>
-#include <utils/ContainerWithHandles.h>
+#include <utils/ContainerWithHandles.hpp>
+#include <utils/Result.hpp>
 
 #include "Handles.h"
 #include "EasyHttpHolder.hpp"
@@ -12,6 +14,12 @@
 
 namespace ezhttp_amxx
 {
+    enum class SendRequestError
+    {
+        EasyHandleNotFound,
+        IncompatibleOptions_EasyHandleAndPluginEndBehaviour
+    };
+
     class NamedHolderKey
     {
         std::string plugin_{};
@@ -78,7 +86,7 @@ namespace ezhttp_amxx
         void RunFrame();
         void ServerDeactivate();
 
-        RequestId SendRequest(ezhttp::RequestMethod method, const std::string& url, OptionsId options_id, const std::function<void(RequestId request_id)>& callback);
+        ResultT<RequestId, SendRequestError> SendRequest(ezhttp::RequestMethod method, const std::string& url, OptionsId options_id, const std::function<void(RequestId request_id)>& callback);
         [[nodiscard]] bool IsRequestExists(RequestId handle);
         [[nodiscard]] RequestData& GetRequest(RequestId handle);
         void DeleteRequest(RequestId request_id);
@@ -99,7 +107,7 @@ namespace ezhttp_amxx
         bool DeleteOptions(OptionsId handle);
 
     private:
-        EasyHandle GetEasyHandleByOptions(const OptionsData& options);
+        ResultT<EasyHandle, SendRequestError> GetEasyHandleByOptions(const OptionsData& options);
         EasyHttpHolder CreateEasyHttpInternal(PluginEndBehaviour plugin_end_behaviour, int threads, const std::string& plugin_name, const std::string& name = "");
         void RunFrameEasyHttps();
         void CancelAndForgetEasyHttps();
