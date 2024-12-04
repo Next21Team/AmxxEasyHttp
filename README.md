@@ -12,6 +12,18 @@ public http_get()
     ezhttp_get("https://httpbin.org/get", "http_complete")
 }
 
+public http_get_with_data()
+{
+    new dat[1];
+    dat[0] = 1337;
+    ezhttp_get("https://httpbin.org/get", "http_complete_with_data", .parameter = dat, .parameter_len = sizeof(dat));
+}
+
+public http_complete_with_data(EzHttpRequest:request_id, const data[])
+{
+    server_print("data[0]: %d", data[0]);
+}
+
 public http_post()
 {
     new EzHttpOptions:options_id = ezhttp_create_options()
