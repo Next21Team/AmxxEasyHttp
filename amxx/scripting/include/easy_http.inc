@@ -84,11 +84,11 @@ native ezhttp_option_set_plugin_end_behaviour(EzHttpOptions:options_id, EzHttpPl
 native ezhttp_option_set_queue(EzHttpOptions:options_id, EzHttpQueue:end_map_behaviour);
 
 // request natives
-native EzHttpRequest:ezhttp_get(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0, const parameter[] = {}, const parameter_len = 0);
-native EzHttpRequest:ezhttp_post(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0, const parameter[] = {}, const parameter_len = 0);
-native EzHttpRequest:ezhttp_put(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0, const parameter[] = {}, const parameter_len = 0);
-native EzHttpRequest:ezhttp_patch(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0, const parameter[] = {}, const parameter_len = 0);
-native EzHttpRequest:ezhttp_delete(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0, const parameter[] = {}, const parameter_len = 0);
+native EzHttpRequest:ezhttp_get(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0, const data[] = {}, const data_len = 0);
+native EzHttpRequest:ezhttp_post(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0, const data[] = {}, const data_len = 0);
+native EzHttpRequest:ezhttp_put(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0, const data[] = {}, const data_len = 0);
+native EzHttpRequest:ezhttp_patch(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0, const data[] = {}, const data_len = 0);
+native EzHttpRequest:ezhttp_delete(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0, const data[] = {}, const data_len = 0);
 native ezhttp_is_request_exists(EzHttpRequest:request_id);
 native ezhttp_cancel_request(EzHttpRequest:request_id);
 native ezhttp_request_progress(EzHttpRequest:request_id, progress[EzHttpProgress]); // it's not recommend to use this too frequently (every frame)

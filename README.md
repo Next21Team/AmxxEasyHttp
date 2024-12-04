@@ -16,7 +16,7 @@ public http_get_with_data()
 {
     new dat[1];
     dat[0] = 1337;
-    ezhttp_get("https://httpbin.org/get", "http_complete_with_data", .parameter = dat, .parameter_len = sizeof(dat));
+    ezhttp_get("https://httpbin.org/get", "http_complete_with_data", .data = dat, .data_len = sizeof(dat));
 }
 
 public http_complete_with_data(EzHttpRequest:request_id, const data[])
