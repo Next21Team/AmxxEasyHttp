@@ -16,7 +16,23 @@ public http_get_with_data()
 {
     new dat[1];
     dat[0] = 1337;
-    ezhttp_get("https://httpbin.org/get", "http_complete_with_data", .data = dat, .data_len = sizeof(dat));
+
+    ezhttp_get(
+        .url = "https://httpbin.org/get", 
+        .on_complete = "http_complete_with_data", 
+        .data = dat, 
+        .data_len = sizeof(dat)
+    );
+
+    // OR like that. Prefer the second variant if you use options
+    new EzHttpOptions:options = ezhttp_create_options()
+    ezhttp_option_set_user_data(options, dat, sizeof(dat))
+
+    ezhttp_get(
+        .url = "https://httpbin.org/get", 
+        .on_complete = "http_complete_with_data", 
+        .options_id = options
+    );
 }
 
 public http_complete_with_data(EzHttpRequest:request_id, const data[])
@@ -56,8 +72,21 @@ public http_complete(EzHttpRequest:request_id)
 
 public ftp_upload()
 {
-    ezhttp_ftp_upload("user", "password", "127.0.0.1", "wads/cstrike_1.wad", "cstrike.wad", "ftp_upload_complete")
-    ezhttp_ftp_upload2("ftp://user:password@127.0.0.1/wads/cstrike_2.wad", "cstrike.wad", "ftp_upload_complete", EZH_SECURE_EXPLICIT)
+    ezhttp_ftp_upload(
+        .user = "user", 
+        .password = "password", 
+        .host = "127.0.0.1", 
+        .remote_file = "wads/cstrike_1.wad", 
+        .local_file = "cstrike.wad", 
+        .on_complete = "ftp_upload_complete"
+    )
+
+    ezhttp_ftp_upload2(
+        .uri = "ftp://user:password@127.0.0.1/wads/cstrike_2.wad", 
+        .local_file = "cstrike.wad", 
+        .on_complete = "ftp_upload_complete",
+        .security = EZH_SECURE_EXPLICIT
+    )
 }
 
 public ftp_upload_complete(EzHttpRequest:request_id)
