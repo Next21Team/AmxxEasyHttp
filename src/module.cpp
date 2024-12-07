@@ -18,7 +18,7 @@ bool ValidateRequestId(AMX* amx, RequestId request_id);
 bool ValidateQueueId(AMX* amx, QueueId queue_id);
 template <class TMethod> void SetKeyValueOption(AMX* amx, cell* params, TMethod method);
 template <class TMethod> void SetStringOption(AMX* amx, cell* params, TMethod method);
-RequestId SendRequest(AMX* amx, RequestMethod method, OptionsId options_id, const std::string& url, const std::string& callback);
+RequestId SendRequest(AMX* amx, RequestMethod method, OptionsId options_id, const std::string& url, const std::string& callback, cell* data = nullptr, int data_len = 0);
 
 std::unique_ptr<EasyHttpModule> g_EasyHttpModule;
 std::unique_ptr<JSONMngr> g_JsonManager;
@@ -226,71 +226,141 @@ cell AMX_NATIVE_CALL ezhttp_option_set_queue(AMX* amx, cell* params)
 // native EzHttpRequest:ezhttp_get(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0);
 cell AMX_NATIVE_CALL ezhttp_get(AMX* amx, cell* params)
 {
+    enum { arg_count, arg_url, arg_callback, arg_option_id, arg_data, arg_data_len };
+
     int url_len;
-    char* url = MF_GetAmxString(amx, params[1], 0, &url_len);
+    char* url = MF_GetAmxString(amx, params[arg_url], 0, &url_len);
 
     int callback_len;
-    char* callback = MF_GetAmxString(amx, params[2], 1, &callback_len);
+    char* callback = MF_GetAmxString(amx, params[arg_callback], 1, &callback_len);
 
-    auto options_id = (OptionsId)params[3];
+    int data_len = 0;
+    cell* data = nullptr;
+    if (params[arg_count] > 3)
+    {
+        data_len = params[arg_data_len];
+        if (data_len > 0)
+        {
+            data = new cell[data_len];
+            MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
+        }
+    }
 
-    return (cell)SendRequest(amx, RequestMethod::HttpGet, options_id, std::string(url, url_len), std::string(callback, callback_len));
+    auto options_id = (OptionsId)params[arg_option_id];
+
+    return (cell)SendRequest(amx, RequestMethod::HttpGet, options_id, std::string(url, url_len), std::string(callback, callback_len), data, data_len);
 }
 
 // native EzHttpRequest:ezhttp_post(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0);
 cell AMX_NATIVE_CALL ezhttp_post(AMX* amx, cell* params)
 {
+    enum { arg_count, arg_url, arg_callback, arg_option_id, arg_data, arg_data_len };
+
     int url_len;
-    char* url = MF_GetAmxString(amx, params[1], 0, &url_len);
+    char* url = MF_GetAmxString(amx, params[arg_url], 0, &url_len);
 
     int callback_len;
-    char* callback = MF_GetAmxString(amx, params[2], 1, &callback_len);
+    char* callback = MF_GetAmxString(amx, params[arg_callback], 1, &callback_len);
 
-    auto options_id = (OptionsId)params[3];
+    int data_len = 0;
+    cell* data = nullptr;
+    if (params[arg_count] > 3)
+    {
+        data_len = params[arg_data_len];
+        if (data_len > 0)
+        {
+            data = new cell[data_len];
+            MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
+        }
+    }
 
-    return (cell)SendRequest(amx, RequestMethod::HttpPost, options_id, std::string(url, url_len), std::string(callback, callback_len));
+    auto options_id = (OptionsId)params[arg_option_id];
+
+    return (cell)SendRequest(amx, RequestMethod::HttpPost, options_id, std::string(url, url_len), std::string(callback, callback_len), data, data_len);
 }
 
 // native EzHttpRequest:ezhttp_put(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0);
 cell AMX_NATIVE_CALL ezhttp_put(AMX* amx, cell* params)
 {
+    enum { arg_count, arg_url, arg_callback, arg_option_id, arg_data, arg_data_len };
+
     int url_len;
-    char* url = MF_GetAmxString(amx, params[1], 0, &url_len);
+    char* url = MF_GetAmxString(amx, params[arg_url], 0, &url_len);
 
     int callback_len;
-    char* callback = MF_GetAmxString(amx, params[2], 1, &callback_len);
+    char* callback = MF_GetAmxString(amx, params[arg_callback], 1, &callback_len);
 
-    auto options_id = (OptionsId)params[3];
+    int data_len = 0;
+    cell* data = nullptr;
+    if (params[arg_count] > 3)
+    {
+        data_len = params[arg_data_len];
+        if (data_len > 0)
+        {
+            data = new cell[data_len];
+            MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
+        }
+    }
 
-    return (cell)SendRequest(amx, RequestMethod::HttpPut, options_id, std::string(url, url_len), std::string(callback, callback_len));
+    auto options_id = (OptionsId)params[arg_option_id];
+
+    return (cell)SendRequest(amx, RequestMethod::HttpPut, options_id, std::string(url, url_len), std::string(callback, callback_len), data, data_len);
 }
 
 // native EzHttpRequest:ezhttp_patch(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0);
 cell AMX_NATIVE_CALL ezhttp_patch(AMX* amx, cell* params)
 {
+    enum { arg_count, arg_url, arg_callback, arg_option_id, arg_data, arg_data_len };
+
     int url_len;
-    char* url = MF_GetAmxString(amx, params[1], 0, &url_len);
+    char* url = MF_GetAmxString(amx, params[arg_url], 0, &url_len);
 
     int callback_len;
-    char* callback = MF_GetAmxString(amx, params[2], 1, &callback_len);
+    char* callback = MF_GetAmxString(amx, params[arg_callback], 1, &callback_len);
 
-    auto options_id = (OptionsId)params[3];
+    int data_len = 0;
+    cell* data = nullptr;
+    if (params[arg_count] > 3)
+    {
+        data_len = params[arg_data_len];
+        if (data_len > 0)
+        {
+            data = new cell[data_len];
+            MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
+        }
+    }
 
-    return (cell)SendRequest(amx, RequestMethod::HttpPatch, options_id, std::string(url, url_len), std::string(callback, callback_len));
+    auto options_id = (OptionsId)params[arg_option_id];
+
+    return (cell)SendRequest(amx, RequestMethod::HttpPatch, options_id, std::string(url, url_len), std::string(callback, callback_len), data, data_len);
 }
 
 // native EzHttpRequest:ezhttp_delete(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0);
 cell AMX_NATIVE_CALL ezhttp_delete(AMX* amx, cell* params)
 {
+    enum { arg_count, arg_url, arg_callback, arg_option_id, arg_data, arg_data_len };
+
     int url_len;
-    char* url = MF_GetAmxString(amx, params[1], 0, &url_len);
+    char* url = MF_GetAmxString(amx, params[arg_url], 0, &url_len);
 
     int callback_len;
-    char* callback = MF_GetAmxString(amx, params[2], 1, &callback_len);
+    char* callback = MF_GetAmxString(amx, params[arg_callback], 1, &callback_len);
 
-    auto options_id = (OptionsId)params[3];
+    int data_len = 0;
+    cell* data = nullptr;
+    if (params[arg_count] > 3)
+    {
+        data_len = params[arg_data_len];
+        if (data_len > 0)
+        {
+            data = new cell[data_len];
+            MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
+        }
+    }
 
-    return (cell)SendRequest(amx, RequestMethod::HttpDelete, options_id, std::string(url, url_len), std::string(callback, callback_len));
+    auto options_id = (OptionsId)params[arg_option_id];
+
+    return (cell)SendRequest(amx, RequestMethod::HttpDelete, options_id, std::string(url, url_len), std::string(callback, callback_len), data, data_len);
 }
 
 // native ezhttp_is_request_exists(EzHttpRequest:request_id);
@@ -771,29 +841,43 @@ cell AMX_NATIVE_CALL ezhttp_steam_to_steam64(AMX* amx, cell* params)
     return 1;
 }
 
-RequestId SendRequest(AMX* amx, RequestMethod method, OptionsId options_id, const std::string& url, const std::string& callback)
+RequestId SendRequest(AMX* amx, RequestMethod method, OptionsId options_id, const std::string& url, const std::string& callback, cell* data, const int data_len)
 {
     int callback_id = -1;
     if (!callback.empty())
     {
-        callback_id = MF_RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_DONE);
+        if (data == nullptr)
+        {
+            callback_id = MF_RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_DONE);
+        } else {
+            callback_id = MF_RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_ARRAY, FP_DONE);
+        }
+
         if (callback_id == -1)
         {
+            delete data;
             MF_LogError(amx, AMX_ERR_NATIVE, "Callback function \"%s\" is not exists", callback.c_str());
             return RequestId::Null;
         }
     }
 
-    auto on_complete = [callback_id](RequestId request_id) {
+    auto on_complete = [callback_id, data, data_len](RequestId request_id) {
         if (callback_id == -1)
         {
+            delete data;
             g_EasyHttpModule->DeleteRequest(request_id, true);
             return;
         }
 
-        MF_ExecuteForward(callback_id, request_id);
+        if (data == nullptr)
+        {
+            MF_ExecuteForward(callback_id, request_id);
+        } else {
+            MF_ExecuteForward(callback_id, request_id, MF_PrepareCellArray(data, data_len));
+        }
         MF_UnregisterSPForward(callback_id);
 
+        delete data;
         g_EasyHttpModule->DeleteRequest(request_id, true);
     };
 
