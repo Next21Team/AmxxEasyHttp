@@ -826,9 +826,16 @@ RequestId SendRequest(AMX* amx, RequestMethod method, OptionsId options_id, cons
     int callback_id = -1;
     if (!callback.empty())
     {
-        callback_id = MF_RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_ARRAY, FP_DONE);
+        if (data == nullptr)
+        {
+            callback_id = MF_RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_DONE);
+        } else {
+            callback_id = MF_RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_ARRAY, FP_DONE);
+        }
+
         if (callback_id == -1)
         {
+            delete data;
             MF_LogError(amx, AMX_ERR_NATIVE, "Callback function \"%s\" is not exists", callback.c_str());
             return RequestId::Null;
         }
@@ -837,15 +844,20 @@ RequestId SendRequest(AMX* amx, RequestMethod method, OptionsId options_id, cons
     auto on_complete = [callback_id, data, data_len](RequestId request_id) {
         if (callback_id == -1)
         {
+            delete data;
             g_EasyHttpModule->DeleteRequest(request_id, true);
             return;
         }
 
-        MF_ExecuteForward(callback_id, request_id, MF_PrepareCellArray(data, data_len));
+        if (data == nullptr)
+        {
+            MF_ExecuteForward(callback_id, request_id);
+        } else {
+            MF_ExecuteForward(callback_id, request_id, MF_PrepareCellArray(data, data_len));
+        }
         MF_UnregisterSPForward(callback_id);
 
         delete data;
-
         g_EasyHttpModule->DeleteRequest(request_id, true);
     };
 
