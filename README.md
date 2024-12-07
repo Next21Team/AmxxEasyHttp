@@ -12,6 +12,34 @@ public http_get()
     ezhttp_get("https://httpbin.org/get", "http_complete")
 }
 
+public http_get_with_data()
+{
+    new dat[1];
+    dat[0] = 1337;
+
+    ezhttp_get(
+        .url = "https://httpbin.org/get", 
+        .on_complete = "http_complete_with_data", 
+        .data = dat, 
+        .data_len = sizeof(dat)
+    );
+
+    // OR like that. Prefer the second variant if you use options
+    new EzHttpOptions:options = ezhttp_create_options()
+    ezhttp_option_set_user_data(options, dat, sizeof(dat))
+
+    ezhttp_get(
+        .url = "https://httpbin.org/get", 
+        .on_complete = "http_complete_with_data", 
+        .options_id = options
+    );
+}
+
+public http_complete_with_data(EzHttpRequest:request_id, const data[])
+{
+    server_print("data[0]: %d", data[0]);
+}
+
 public http_post()
 {
     new EzHttpOptions:options_id = ezhttp_create_options()

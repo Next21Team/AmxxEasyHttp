@@ -117,38 +117,6 @@ native ezhttp_option_set_body(EzHttpOptions:options_id, const body[]);
 native bool:ezhttp_option_set_body_from_json(EzHttpOptions:options_id, EzJSON:json, bool:pretty = false);
 
 /**
- * Appends a body to the HTTP request.
- *
- * @param options_id         Options identifier created via ezhttp_create_options().
- * @param body               The body to append.
- *
- * @noreturn
- */
-native ezhttp_option_append_body(EzHttpOptions:options_id, const body[]);
-
-/**
- * Sets a header for the HTTP request.
- *
- * @param options_id         Options identifier created via ezhttp_create_options().
- * @param key                The key of the header.
- * @param value              The value of the header.
- *
- * @noreturn
- */
-native ezhttp_option_set_header(EzHttpOptions:options_id, const key[], const value[]);
-
-/**
- * Sets a cookie for the HTTP request.
- *
- * @param options_id         Options identifier created via ezhttp_create_options().
- * @param key                The key of the cookie.
- * @param value              The value of the cookie.
- *
- * @noreturn
- */
-native ezhttp_option_set_cookie(EzHttpOptions:options_id, const key[], const value[]);
-
-/**
  * Sets a timeout for the HTTP request. 
  *
  * @note                     Specify 0 to disable timeout and make the request wait indefinitely.
@@ -256,10 +224,18 @@ native EzHttpQueue:ezhttp_create_queue();
  * @param on_complete       Function to call when the request is complete.
  *                          Signature: public on_complete(EzHttpRequest:request_id)
  * @param options_id        Options identifier created via ezhttp_create_options().
+ * @param data              Data to send with the request.
+ * @param data_len          Length of the data.
  *
  * @return                  Request identifier.
  */
-native EzHttpRequest:ezhttp_get(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0);
+native EzHttpRequest:ezhttp_get(
+    const url[] = "", 
+    const on_complete[] = "", 
+    EzHttpOptions:options_id = EzHttpOptions:0,
+    const data[] = {}, 
+    const data_len = 0 
+);
 
 /**
  * Performs a POST request.
@@ -268,10 +244,18 @@ native EzHttpRequest:ezhttp_get(const url[], const on_complete[], EzHttpOptions:
  * @param on_complete       Function to call when the request is complete.
  *                          Signature: public on_complete(EzHttpRequest:request_id)
  * @param options_id        Options identifier created via ezhttp_create_options().
+ * @param data              Data to send with the request.
+ * @param data_len          Length of the data.
  *
  * @return                  Request identifier.
  */
-native EzHttpRequest:ezhttp_post(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0);
+native EzHttpRequest:ezhttp_post(
+    const url[] = "", 
+    const on_complete[] = "", 
+    EzHttpOptions:options_id = EzHttpOptions:0,
+    const data[] = {}, 
+    const data_len = 0 
+);
 
 /**
  * Performs a PUT request.
@@ -280,10 +264,18 @@ native EzHttpRequest:ezhttp_post(const url[], const on_complete[], EzHttpOptions
  * @param on_complete       Function to call when the request is complete.
  *                          Signature: public on_complete(EzHttpRequest:request_id)
  * @param options_id        Options identifier created via ezhttp_create_options().
+ * @param data              Data to send with the request.
+ * @param data_len          Length of the data.
  *
  * @return                  Request identifier.
  */
-native EzHttpRequest:ezhttp_put(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0);
+native EzHttpRequest:ezhttp_put(
+    const url[] = "", 
+    const on_complete[] = "", 
+    EzHttpOptions:options_id = EzHttpOptions:0,
+    const data[] = {}, 
+    const data_len = 0 
+);
 
 /**
  * Performs a PATCH request.
@@ -292,10 +284,18 @@ native EzHttpRequest:ezhttp_put(const url[], const on_complete[], EzHttpOptions:
  * @param on_complete       Function to call when the request is complete.
  *                          Signature: public on_complete(EzHttpRequest:request_id)
  * @param options_id        Options identifier created via ezhttp_create_options().
+ * @param data              Data to send with the request.
+ * @param data_len          Length of the data.
  *
  * @return                  Request identifier.
  */
-native EzHttpRequest:ezhttp_patch(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0);
+native EzHttpRequest:ezhttp_patch(
+    const url[] = "", 
+    const on_complete[] = "", 
+    EzHttpOptions:options_id = EzHttpOptions:0,
+    const data[] = {}, 
+    const data_len = 0 
+);
 
 /**
  * Performs a DELETE request.
@@ -304,10 +304,18 @@ native EzHttpRequest:ezhttp_patch(const url[], const on_complete[], EzHttpOption
  * @param on_complete       Function to call when the request is complete.
  *                          Signature: public on_complete(EzHttpRequest:request_id)
  * @param options_id        Options identifier created via ezhttp_create_options().
+ * @param data              Data to send with the request.
+ * @param data_len          Length of the data.
  *
  * @return                  Request identifier.
  */
-native EzHttpRequest:ezhttp_delete(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0);
+native EzHttpRequest:ezhttp_delete(
+    const url[] = "", 
+    const on_complete[] = "", 
+    EzHttpOptions:options_id = EzHttpOptions:0,
+    const data[] = {}, 
+    const data_len = 0 
+);
 
 /**
  * Checks if a request exists.
