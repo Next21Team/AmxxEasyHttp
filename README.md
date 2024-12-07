@@ -44,8 +44,21 @@ public http_complete(EzHttpRequest:request_id)
 
 public ftp_upload()
 {
-    ezhttp_ftp_upload("user", "password", "127.0.0.1", "wads/cstrike_1.wad", "cstrike.wad", "ftp_upload_complete")
-    ezhttp_ftp_upload2("ftp://user:password@127.0.0.1/wads/cstrike_2.wad", "cstrike.wad", "ftp_upload_complete", EZH_SECURE_EXPLICIT)
+    ezhttp_ftp_upload(
+        .user = "user", 
+        .password = "password", 
+        .host = "127.0.0.1", 
+        .remote_file = "wads/cstrike_1.wad", 
+        .local_file = "cstrike.wad", 
+        .on_complete = "ftp_upload_complete"
+    )
+
+    ezhttp_ftp_upload2(
+        .uri = "ftp://user:password@127.0.0.1/wads/cstrike_2.wad", 
+        .local_file = "cstrike.wad", 
+        .on_complete = "ftp_upload_complete",
+        .security = EZH_SECURE_EXPLICIT
+    )
 }
 
 public ftp_upload_complete(EzHttpRequest:request_id)
