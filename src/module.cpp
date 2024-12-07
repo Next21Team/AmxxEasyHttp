@@ -234,12 +234,16 @@ cell AMX_NATIVE_CALL ezhttp_get(AMX* amx, cell* params)
     int callback_len;
     char* callback = MF_GetAmxString(amx, params[arg_callback], 1, &callback_len);
 
+    int data_len = 0;
     cell* data = nullptr;
-    const int data_len = params[arg_data_len];
-    if (data_len > 0)
+    if (params[arg_count] > 3)
     {
-        data = new cell[data_len];
-        MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
+        data_len = params[arg_data_len];
+        if (data_len > 0)
+        {
+            data = new cell[data_len];
+            MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
+        }
     }
 
     auto options_id = (OptionsId)params[arg_option_id];
@@ -258,12 +262,16 @@ cell AMX_NATIVE_CALL ezhttp_post(AMX* amx, cell* params)
     int callback_len;
     char* callback = MF_GetAmxString(amx, params[arg_callback], 1, &callback_len);
 
+    int data_len = 0;
     cell* data = nullptr;
-    const int data_len = params[arg_data_len];
-    if (data_len > 0)
+    if (params[arg_count] > 3)
     {
-        data = new cell[data_len];
-        MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
+        data_len = params[arg_data_len];
+        if (data_len > 0)
+        {
+            data = new cell[data_len];
+            MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
+        }
     }
 
     auto options_id = (OptionsId)params[arg_option_id];
@@ -282,12 +290,16 @@ cell AMX_NATIVE_CALL ezhttp_put(AMX* amx, cell* params)
     int callback_len;
     char* callback = MF_GetAmxString(amx, params[arg_callback], 1, &callback_len);
 
+    int data_len = 0;
     cell* data = nullptr;
-    const int data_len = params[arg_data_len];
-    if (data_len > 0)
+    if (params[arg_count] > 3)
     {
-        data = new cell[data_len];
-        MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
+        data_len = params[arg_data_len];
+        if (data_len > 0)
+        {
+            data = new cell[data_len];
+            MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
+        }
     }
 
     auto options_id = (OptionsId)params[arg_option_id];
@@ -306,12 +318,16 @@ cell AMX_NATIVE_CALL ezhttp_patch(AMX* amx, cell* params)
     int callback_len;
     char* callback = MF_GetAmxString(amx, params[arg_callback], 1, &callback_len);
 
+    int data_len = 0;
     cell* data = nullptr;
-    const int data_len = params[arg_data_len];
-    if (data_len > 0)
+    if (params[arg_count] > 3)
     {
-        data = new cell[data_len];
-        MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
+        data_len = params[arg_data_len];
+        if (data_len > 0)
+        {
+            data = new cell[data_len];
+            MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
+        }
     }
 
     auto options_id = (OptionsId)params[arg_option_id];
@@ -330,12 +346,16 @@ cell AMX_NATIVE_CALL ezhttp_delete(AMX* amx, cell* params)
     int callback_len;
     char* callback = MF_GetAmxString(amx, params[arg_callback], 1, &callback_len);
 
+    int data_len = 0;
     cell* data = nullptr;
-    const int data_len = params[arg_data_len];
-    if (data_len > 0)
+    if (params[arg_count] > 3)
     {
-        data = new cell[data_len];
-        MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
+        data_len = params[arg_data_len];
+        if (data_len > 0)
+        {
+            data = new cell[data_len];
+            MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
+        }
     }
 
     auto options_id = (OptionsId)params[arg_option_id];
