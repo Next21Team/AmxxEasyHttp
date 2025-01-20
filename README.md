@@ -139,3 +139,17 @@ cd Release
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make easy_http
 ```
+
+### Building with Docker
+
+You can use Docker to build AmxxEasyHttp for Linux. Create the image once with the command:
+
+```
+docker build -t amxx-ezhttp-builder .
+```
+
+Run the Docker container to build the module:
+
+```
+docker run --rm -v .:/ezhttp amxx-ezhttp-builder
+```
