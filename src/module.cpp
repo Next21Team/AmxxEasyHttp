@@ -1014,6 +1014,7 @@ AMX_NATIVE_INFO g_Natives[] =
     { nullptr,                              nullptr },
 };
 
+cvar_t cvar_ezhttp_version = { "ezhttp_version", MODULE_VERSION, FCVAR_SERVER | FCVAR_SPONLY };
 
 void OnAmxxAttach()
 {
@@ -1021,6 +1022,8 @@ void OnAmxxAttach()
     MF_AddNatives(g_JsonNatives);
 
     CreateModules();
+
+    CVAR_REGISTER(&cvar_ezhttp_version);
 }
 
 void OnAmxxDetach()
