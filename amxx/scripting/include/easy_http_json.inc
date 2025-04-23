@@ -148,7 +148,7 @@ native EzJSON:ezjson_init_string(const value[]);
  *
  * @return                  EzJSON handle, EzInvalid_JSON if error occurred
  */
-native EzJSON:ezjson_init_number(value);
+native EzJSON:ezjson_init_number(any:value);
 
 /**
  * Inits a real number.
@@ -348,7 +348,7 @@ native bool:ezjson_array_replace_string(EzJSON:array, index, const string[]);
  * @return                  True if succeed, false otherwise
  * @error                   If passed handle is not a valid array
  */
-native bool:ezjson_array_replace_number(EzJSON:array, index, number);
+native bool:ezjson_array_replace_number(EzJSON:array, index, any:number);
 
 /**
  * Replaces an element in the array with real number.
@@ -416,7 +416,7 @@ native bool:ezjson_array_append_string(EzJSON:array, const string[]);
  * @return                  True if succeed, false otherwise
  * @error                   If passed handle is not a valid array
  */
-native bool:ezjson_array_append_number(EzJSON:array, number);
+native bool:ezjson_array_append_number(EzJSON:array, any:number);
 
 /**
  * Appends a real number in the array.
@@ -649,7 +649,7 @@ native bool:ezjson_object_set_string(EzJSON:object, const name[], const string[]
  * @return                  True if succeed, false otherwise
  * @error                   If passed handle is not a valid object
  */
-native bool:ezjson_object_set_number(EzJSON:object, const name[], number, bool:dot_not = false);
+native bool:ezjson_object_set_number(EzJSON:object, const name[], any:number, bool:dot_not = false);
 
 /**
  * Sets a real number in the object.
