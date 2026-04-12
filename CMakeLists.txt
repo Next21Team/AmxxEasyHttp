@@ -26,9 +26,26 @@ set(CMAKE_MODULE_PATH
 if (AMXX_EASY_HTTP_BUILD_TESTS)
     set(AMXX_EASY_HTTP_BUILD_STATIC ON)
 else ()
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/bin/${CMAKE_BUILD_TYPE})
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-    set(CMAKE_PDB_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/pdb/${CMAKE_BUILD_TYPE})
+    set(AMXX_EASY_HTTP_BIN_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/bin)
+    set(AMXX_EASY_HTTP_PDB_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/pdb)
+
+    if (CMAKE_CONFIGURATION_TYPES)
+        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${AMXX_EASY_HTTP_BIN_OUTPUT_DIRECTORY})
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${AMXX_EASY_HTTP_BIN_OUTPUT_DIRECTORY})
+        set(CMAKE_PDB_OUTPUT_DIRECTORY ${AMXX_EASY_HTTP_PDB_OUTPUT_DIRECTORY})
+
+        foreach (config ${CMAKE_CONFIGURATION_TYPES})
+            string(TOUPPER ${config} config_upper)
+
+            set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${config_upper} ${AMXX_EASY_HTTP_BIN_OUTPUT_DIRECTORY}/${config})
+            set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${config_upper} ${AMXX_EASY_HTTP_BIN_OUTPUT_DIRECTORY}/${config})
+            set(CMAKE_PDB_OUTPUT_DIRECTORY_${config_upper} ${AMXX_EASY_HTTP_PDB_OUTPUT_DIRECTORY}/${config})
+        endforeach ()
+    else ()
+        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${AMXX_EASY_HTTP_BIN_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE})
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+        set(CMAKE_PDB_OUTPUT_DIRECTORY ${AMXX_EASY_HTTP_PDB_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE})
+    endif ()
 endif ()
 
 set(BUILD_SHARED_LIBS OFF) # BUILD_SHARED_LIBS only affect external dependencies
@@ -78,7 +95,6 @@ endif ()
 ###
 
 add_subdirectory(dep/cpr)
-add_subdirectory(dep/asyncplusplus)
 add_subdirectory(dep/parson)
 add_subdirectory(src)
 
@@ -126,13 +142,19 @@ endif ()
 
 set(MAIN_TARGET_NAME easy_http)
 
-add_custom_target(BUILD_ALL ALL)
+add_custom_target(BUILD_ALL)
 add_dependencies(BUILD_ALL ${MAIN_TARGET_NAME})
 
-add_custom_target(INSTALL_ALL
-        COMMENT "Copying '${MAIN_TARGET_NAME}' library to '$ENV{${MAIN_TARGET_NAME}_COPY_TO_PATH}'"
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${MAIN_TARGET_NAME}> $ENV{${MAIN_TARGET_NAME}_COPY_TO_PATH})
+set(MAIN_TARGET_COPY_TO_PATH "$ENV{${MAIN_TARGET_NAME}_COPY_TO_PATH}")
 
-add_custom_target(BUILD_AND_INSTALL_ALL ALL)
-add_dependencies(BUILD_AND_INSTALL_ALL BUILD_ALL)
-add_dependencies(BUILD_AND_INSTALL_ALL INSTALL_ALL)
+if (NOT "${MAIN_TARGET_COPY_TO_PATH}" STREQUAL "")
+    add_custom_target(INSTALL_ALL
+            COMMENT "Copying '${MAIN_TARGET_NAME}' library to '${MAIN_TARGET_COPY_TO_PATH}'"
+            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${MAIN_TARGET_NAME}> "${MAIN_TARGET_COPY_TO_PATH}")
+
+    add_custom_target(BUILD_AND_INSTALL_ALL)
+    add_dependencies(BUILD_AND_INSTALL_ALL BUILD_ALL)
+    add_dependencies(BUILD_AND_INSTALL_ALL INSTALL_ALL)
+else ()
+    message(STATUS "Skipping INSTALL_ALL and BUILD_AND_INSTALL_ALL targets because environment variable '${MAIN_TARGET_NAME}_COPY_TO_PATH' is not set.")
+endif ()

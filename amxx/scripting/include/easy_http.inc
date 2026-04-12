@@ -607,7 +607,8 @@ native EzHttpRequest:ezhttp_ftp_upload2(
  * @param password           The password to use for the FTP connection.
  * @param host               The host to connect to.
  * @param remote_file        The remote file to download.
- * @param local_file         The local file to save to.
+ * @param local_file         The local file to save to. If the remote path uses wildcard matching
+ *                           or this argument points to a directory, downloaded files keep their remote names.
  * @param on_complete        The function to call when the download is complete.
  *                           Signature: public on_complete(EzHttpRequest:request_id)
  * @param security           Member of EzHttpFtpSecurity. The security strategy use for the FTP connection.
@@ -629,8 +630,10 @@ native EzHttpRequest:ezhttp_ftp_download(
 /**
  * Downloads a file from a remote server using FTP by URI.
  *
- * @param uri                The URI to download from.
- * @param local_file         The local file to save to.
+ * @param uri                The URI to download from. Supports wildcard matching in the remote file name,
+ *                           for example ftp://user:password@127.0.0.1/demos/hltv_demo_*.dem
+ * @param local_file         The local file to save to. If the URI uses wildcard matching
+ *                           or this argument points to a directory, downloaded files keep their remote names.
  * @param on_complete        The function to call when the download is complete.
  *                           Signature: public on_complete(EzHttpRequest:request_id)
  * @param security           Member of EzHttpFtpSecurity. The security strategy use for the FTP connection.

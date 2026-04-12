@@ -3,6 +3,7 @@ set(TARGET_NAME "AmxxEasyHttp-tests")
 include(GoogleTest)
 
 add_executable(${TARGET_NAME}
+        ftp_utils_tests.cpp
         session_cache_tests.cpp
         CurlHolderComparer.h
         mocks/CprSessionFactoryMock.h

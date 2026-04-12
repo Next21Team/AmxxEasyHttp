@@ -24,9 +24,24 @@ TEST_LIST_ASYNC = {
     { "test_save_to_file",      "test save to file" },
     { "test_fail_by_timeout",   "test timeout" },
     { "test_ftp_download",      "test ftp download" },
+    { "test_ftp_download_wildcard", "test ftp download wildcard" },
     { "test_ftp_upload",        "test ftp upload" },
+    { "test_ftp_upload2",       "test ftp upload by uri with special chars in credentials" },
     TEST_LIST_END
 };
+
+#define FTP_WILDCARD_DOWNLOAD_DIR "ezhttp_test_ftp_wildcard"
+#define FTP_WILDCARD_FILE_1 "ezhttp_test_ftp_wildcard/hello-2.12.tar.gz.sig"
+#define FTP_WILDCARD_FILE_2 "ezhttp_test_ftp_wildcard/hello-2.12.1.tar.gz.sig"
+#define FTP_WILDCARD_FILE_3 "ezhttp_test_ftp_wildcard/hello-2.12.2.tar.gz.sig"
+
+stock cleanup_ftp_wildcard_download_dir()
+{
+    delete_file(FTP_WILDCARD_FILE_1);
+    delete_file(FTP_WILDCARD_FILE_2);
+    delete_file(FTP_WILDCARD_FILE_3);
+    rmdir(FTP_WILDCARD_DOWNLOAD_DIR);
+}
 
 public plugin_init()
 {
@@ -412,22 +427,48 @@ START_ASYNC_TEST(test_ftp_download)
 
     EZHTTP_OPTION_SET_TEST_DATA(opt)
 
-    ezhttp_ftp_download2("ftp://speedtest.tele2.net/5MB.zip", "ezhttp_test_ftp_download_5MB.zip", "test_ftp_download_complete", EZH_UNSECURE, opt);
+    ezhttp_ftp_download2("ftp://demo:password@test.rebex.net/readme.txt", "ezhttp_test_ftp_download_readme.txt", "test_ftp_download_complete", EZH_UNSECURE, opt);
 }
 
 public test_ftp_download_complete(EzHttpRequest:request_id)
 {
-    const expected_file_size = 5242880;
+    const expected_file_size = 379;
 
     EZHTTP_OPTION_EXTRACT_TEST_DATA(request_id)
 
     // asserts
 
     ASSERT_INT_EQ(EzHttpErrorCode:EZH_OK, ezhttp_get_error_code(request_id));
-    new size = filesize("ezhttp_test_ftp_download_5MB.zip");
+    new size = filesize("ezhttp_test_ftp_download_readme.txt");
     ASSERT_INT_EQ_MSG(expected_file_size, size, fmt("expected %d but was %d", expected_file_size, size));
 
-    delete_file("ezhttp_test_ftp_download_5MB.zip");
+    delete_file("ezhttp_test_ftp_download_readme.txt");
+    END_ASYNC_TEST()
+}
+
+START_ASYNC_TEST(test_ftp_download_wildcard)
+{
+    new EzHttpOptions:opt = ezhttp_create_options();
+
+    cleanup_ftp_wildcard_download_dir();
+    EZHTTP_OPTION_SET_TEST_DATA(opt)
+
+    ezhttp_ftp_download("", "", "ftp.gnu.org", "gnu/hello/hello-2.12*.tar.gz.sig", FTP_WILDCARD_DOWNLOAD_DIR, "test_ftp_download_wildcard_complete", EZH_UNSECURE, opt);
+}
+
+public test_ftp_download_wildcard_complete(EzHttpRequest:request_id)
+{
+    EZHTTP_OPTION_EXTRACT_TEST_DATA(request_id)
+
+    // asserts
+
+    ASSERT_INT_EQ(EzHttpErrorCode:EZH_OK, ezhttp_get_error_code(request_id));
+    ASSERT_TRUE_MSG(dir_exists(FTP_WILDCARD_DOWNLOAD_DIR), "wildcard download directory was not created");
+    ASSERT_TRUE_MSG(file_exists(FTP_WILDCARD_FILE_1), "expected hello-2.12.tar.gz.sig to be downloaded");
+    ASSERT_TRUE_MSG(file_exists(FTP_WILDCARD_FILE_2), "expected hello-2.12.1.tar.gz.sig to be downloaded");
+    ASSERT_TRUE_MSG(file_exists(FTP_WILDCARD_FILE_3), "expected hello-2.12.2.tar.gz.sig to be downloaded");
+
+    cleanup_ftp_wildcard_download_dir();
     END_ASYNC_TEST()
 }
 
@@ -437,10 +478,30 @@ START_ASYNC_TEST(test_ftp_upload)
 
     EZHTTP_OPTION_SET_TEST_DATA(opt)
 
-    ezhttp_ftp_upload2("ftp://speedtest.tele2.net/upload/cstrike.ico", "cstrike.ico", "test_ftp_upload_complete", EZH_UNSECURE, opt);
+    ezhttp_ftp_upload("anonymous", "test@example.com", "ftp.cs.brown.edu", "incoming/ezhttp_test_cstrike.ico", "cstrike.ico", "test_ftp_upload_complete", EZH_UNSECURE, opt);
 }
 
 public test_ftp_upload_complete(EzHttpRequest:request_id)
+{
+    EZHTTP_OPTION_EXTRACT_TEST_DATA(request_id)
+
+    // asserts
+
+    ASSERT_INT_EQ(EzHttpErrorCode:EZH_OK, ezhttp_get_error_code(request_id));
+
+    END_ASYNC_TEST()
+}
+
+START_ASYNC_TEST(test_ftp_upload2)
+{
+    new EzHttpOptions:opt = ezhttp_create_options();
+
+    EZHTTP_OPTION_SET_TEST_DATA(opt)
+
+    ezhttp_ftp_upload2("ftp://anonymous:test@example.com@ftp.cs.brown.edu/incoming/ezhttp_test_cstrike_uri.ico", "cstrike.ico", "test_ftp_upload2_complete", EZH_UNSECURE, opt);
+}
+
+public test_ftp_upload2_complete(EzHttpRequest:request_id)
 {
     EZHTTP_OPTION_EXTRACT_TEST_DATA(request_id)
 

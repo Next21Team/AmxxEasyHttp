@@ -1,0 +1,71 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    name: Windows x86
+    runs-on: windows-2022
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure
+        run: >
+          cmake -S . -B cmake-build-win32
+          -G "Visual Studio 17 2022"
+          -A Win32
+          -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build cmake-build-win32 --target easy_http --config Release --parallel
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: easy_http-windows-win32
+          path: |
+            out/bin/Release/**
+            out/pdb/Release/**
+          if-no-files-found: error
+          retention-days: 14
+
+  build-linux:
+    name: Linux i386
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake gcc-multilib g++-multilib make
+
+      - name: Configure
+        run: cmake -S . -B cmake-build-linux -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build cmake-build-linux --target easy_http --parallel
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: easy_http-linux-i386
+          path: out/bin/Release/easy_http_amxx_i386.so
+          if-no-files-found: error
+          retention-days: 14
