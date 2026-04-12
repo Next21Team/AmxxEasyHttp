@@ -1,7 +1,9 @@
 #pragma once
+#include <condition_variable>
+#include <deque>
+#include <mutex>
+#include <thread>
 #include <vector>
-
-#include <async++.h>
 
 #include "EasyHttpInterface.h"
 #include "EasyHttpOptionsBuilder.h"
@@ -20,27 +22,53 @@ namespace ezhttp
 
         CprSessionCache session_cache_;
 
-        std::unique_ptr<async::fifo_scheduler> update_scheduler_;
-        std::shared_ptr<async::threadpool_scheduler> request_scheduler_;
+        struct PendingRequest
+        {
+            std::shared_ptr<RequestControl> request_control;
+            RequestMethod method;
+            cpr::Url url;
+            RequestOptions options;
+            ResponseCallback on_complete;
+        };
 
-        std::vector<async::task<void>> tasks_;
+        struct CompletedRequest
+        {
+            std::shared_ptr<RequestControl> request_control;
+            Response response;
+            ResponseCallback on_complete;
+        };
+
+        std::mutex pending_requests_mutex_;
+        std::condition_variable pending_requests_cv_;
+        std::deque<PendingRequest> pending_requests_;
+
+        std::mutex completed_requests_mutex_;
+        std::deque<CompletedRequest> completed_requests_;
+
+        std::vector<std::thread> worker_threads_;
         std::vector<std::shared_ptr<RequestControl>> requests_;
+        bool stop_requested_{false};
 
     public:
         explicit EasyHttp(std::string ca_cert_path, int threads = kMaxThreads);
         ~EasyHttp() override;
 
-        std::shared_ptr<RequestControl> SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const ResponseCallback& on_complete) override;
+        std::shared_ptr<RequestControl> SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const ResponseCallback &on_complete) override;
         void RunFrame() override;
-        int GetActiveRequestCount() override { return tasks_.size(); }
+        int GetActiveRequestCount() override { return static_cast<int>(requests_.size()); }
         void ForgetAllRequests() override;
         void CancelAllRequests() override;
 
     private:
-        cpr::Response SendRequest(const std::shared_ptr<RequestControl>& request_control, RequestMethod method, const cpr::Url& url, const RequestOptions& options);
-        void SetSessionCommonOptions(cpr::Session& session, const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options);
-        cpr::Response SendHttpRequest(cpr::Session& session, const std::shared_ptr<RequestControl>& request_control, RequestMethod method, const cpr::Url& url, const RequestOptions& options);
-        cpr::Response FtpUpload(cpr::Session& session, const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options);
-        cpr::Response FtpDownload(cpr::Session& session, const std::shared_ptr<RequestControl>& request_control, const cpr::Url& url, const RequestOptions& options);
+        void WorkerLoop();
+        bool TryPopCompletedRequest(CompletedRequest &completed_request);
+        Response CreateErrorResponse(const cpr::Url &url, cpr::ErrorCode code, std::string message) const;
+        Response SendRequest(const std::shared_ptr<RequestControl> &request_control, RequestMethod method, const cpr::Url &url, const RequestOptions &options);
+        void SetSessionCommonOptions(cpr::Session &session, const std::shared_ptr<RequestControl> &request_control, const cpr::Url &url, const RequestOptions &options);
+        Response SendHttpRequest(cpr::Session &session, const std::shared_ptr<RequestControl> &request_control, RequestMethod method, const cpr::Url &url, const RequestOptions &options);
+        Response FtpUpload(cpr::Session &session, const std::shared_ptr<RequestControl> &request_control, const cpr::Url &url, const RequestOptions &options);
+        Response FtpDownload(cpr::Session &session, const std::shared_ptr<RequestControl> &request_control, const cpr::Url &url, const RequestOptions &options);
+        Response FtpDownloadSingle(cpr::Session &session, const std::shared_ptr<RequestControl> &request_control, const cpr::Url &url, const RequestOptions &options);
+        Response FtpDownloadWildcard(cpr::Session &session, const std::shared_ptr<RequestControl> &request_control, const cpr::Url &url, const RequestOptions &options);
     };
 }

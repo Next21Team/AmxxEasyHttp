@@ -97,6 +97,15 @@ public ftp_upload_complete(EzHttpRequest:request_id)
 
     server_print("FTP upload complete. Error: %d. Uploaded: %d kb. Elapsed: %f sec", error_code, uploaded_kb, elapsed_sec)
 }
+
+public ftp_download_by_mask()
+{
+    ezhttp_ftp_download2(
+        .uri = "ftp://user:password@127.0.0.1/demos/hltv_demo_*.dem",
+        .local_file = "addons/amxmodx/data/demos/",
+        .on_complete = "ftp_download_complete"
+    )
+}
 ```
 
 ## Features
@@ -111,6 +120,7 @@ public ftp_upload_complete(EzHttpRequest:request_id)
 * Proxy support
 * OpenSSL and WinSSL support for HTTPS requests
 * FTP/FTPES download and upload support
+* FTP wildcard download support
 * Built-in JSON support
 * HTTP keep-alive support
 

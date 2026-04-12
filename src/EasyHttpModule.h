@@ -4,7 +4,6 @@
 #include "easy_http/EasyHttpOptionsBuilder.h"
 #include "utils/ContainerWithHandles.h"
 #include "sdk/amxxmodule.h"
-#include <async++.h>
 #include <vector>
 
 enum class PluginEndBehaviour

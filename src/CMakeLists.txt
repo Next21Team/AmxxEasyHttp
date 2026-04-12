@@ -58,7 +58,6 @@ add_library(${TARGET_NAME} ${LIBRARY_BUILD_TYPE}
 
 target_link_libraries(${TARGET_NAME} ${TARGET_LIBRARIES_SCOPE}
         Threads::Threads
-        Async++
         cpr::cpr
         parson::parson
         HLSDK::HLSDK_includes

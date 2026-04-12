@@ -380,9 +380,7 @@ cell AMX_NATIVE_CALL ezhttp_cancel_request(AMX* amx, cell* params)
         return 0;
 
     RequestData& request_data = g_EasyHttpModule->GetRequest(request_id);
-
-    std::lock_guard<std::mutex> lock_guard(request_data.request_control->control_mutex);
-    request_data.request_control->canceled = true;
+    request_data.request_control->canceled.store(true);
 
     return 0;
 }
@@ -396,13 +394,13 @@ cell AMX_NATIVE_CALL ezhttp_request_progress(AMX* amx, cell* params)
         return 0;
 
     auto& request_control = g_EasyHttpModule->GetRequest(request_id).request_control;
-    std::lock_guard<std::mutex> lock_guard(request_control->control_mutex);
+    const auto progress = request_control->GetProgress();
 
     cell* p = MF_GetAmxAddr(amx, params[2]);
-    p[0] = request_control->progress.download_now;
-    p[1] = request_control->progress.download_total;
-    p[2] = request_control->progress.upload_now;
-    p[3] = request_control->progress.upload_total;
+    p[0] = progress.download_now;
+    p[1] = progress.download_total;
+    p[2] = progress.upload_now;
+    p[3] = progress.upload_total;
 
     return 0;
 }
@@ -472,7 +470,6 @@ cell AMX_NATIVE_CALL ezhttp_save_data_to_file(AMX* amx, cell* params)
 
     int file_path_len;
     char* file_path = MF_GetAmxString(amx, params[2], 0, &file_path_len);
-    cell max_len = params[3];
 
     if (!ValidateRequestId(amx, request_id))
         return 0;
@@ -717,6 +714,8 @@ cell AMX_NATIVE_CALL ezhttp_ftp_upload(AMX* amx, cell* params)
 
     if (options_id == OptionsId::Null)
         options_id = g_EasyHttpModule->CreateOptions();
+    else if (!ValidateOptionsId(amx, options_id))
+        return 0;
 
     auto& builder = g_EasyHttpModule->GetOptionsBuilder(options_id);
     builder.SetFilePath(MF_BuildPathname("%s", local_file));
@@ -743,6 +742,8 @@ cell AMX_NATIVE_CALL ezhttp_ftp_upload2(AMX* amx, cell* params)
 
     if (options_id == OptionsId::Null)
         options_id = g_EasyHttpModule->CreateOptions();
+    else if (!ValidateOptionsId(amx, options_id))
+        return 0;
 
     auto& builder = g_EasyHttpModule->GetOptionsBuilder(options_id);
     builder.SetFilePath(MF_BuildPathname("%s", local_file));
@@ -770,6 +771,8 @@ cell AMX_NATIVE_CALL ezhttp_ftp_download(AMX* amx, cell* params)
 
     if (options_id == OptionsId::Null)
         options_id = g_EasyHttpModule->CreateOptions();
+    else if (!ValidateOptionsId(amx, options_id))
+        return 0;
 
     auto& builder = g_EasyHttpModule->GetOptionsBuilder(options_id);
     builder.SetFilePath(MF_BuildPathname("%s", local_file));
@@ -793,6 +796,11 @@ cell AMX_NATIVE_CALL ezhttp_ftp_download2(AMX* amx, cell* params)
 
     bool secure = params[4];
     auto options_id = (OptionsId)params[5];
+
+    if (options_id == OptionsId::Null)
+        options_id = g_EasyHttpModule->CreateOptions();
+    else if (!ValidateOptionsId(amx, options_id))
+        return 0;
 
     auto& builder = g_EasyHttpModule->GetOptionsBuilder(options_id);
     builder.SetFilePath(MF_BuildPathname("%s", local_file));
@@ -843,6 +851,12 @@ cell AMX_NATIVE_CALL ezhttp_steam_to_steam64(AMX* amx, cell* params)
 
 RequestId SendRequest(AMX* amx, RequestMethod method, OptionsId options_id, const std::string& url, const std::string& callback, cell* data, const int data_len)
 {
+    if (options_id != OptionsId::Null && !ValidateOptionsId(amx, options_id))
+    {
+        delete[] data;
+        return RequestId::Null;
+    }
+
     int callback_id = -1;
     if (!callback.empty())
     {
@@ -855,7 +869,7 @@ RequestId SendRequest(AMX* amx, RequestMethod method, OptionsId options_id, cons
 
         if (callback_id == -1)
         {
-            delete data;
+            delete[] data;
             MF_LogError(amx, AMX_ERR_NATIVE, "Callback function \"%s\" is not exists", callback.c_str());
             return RequestId::Null;
         }
@@ -864,7 +878,7 @@ RequestId SendRequest(AMX* amx, RequestMethod method, OptionsId options_id, cons
     auto on_complete = [callback_id, data, data_len](RequestId request_id) {
         if (callback_id == -1)
         {
-            delete data;
+            delete[] data;
             g_EasyHttpModule->DeleteRequest(request_id, true);
             return;
         }
@@ -877,7 +891,7 @@ RequestId SendRequest(AMX* amx, RequestMethod method, OptionsId options_id, cons
         }
         MF_UnregisterSPForward(callback_id);
 
-        delete data;
+        delete[] data;
         g_EasyHttpModule->DeleteRequest(request_id, true);
     };
 
