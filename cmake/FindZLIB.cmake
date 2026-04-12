@@ -34,3 +34,12 @@ set_target_properties(ZLIB::ZLIB PROPERTIES
         IMPORTED_LINK_INTERFACE_LANGUAGES "C"
         IMPORTED_LOCATION "${ZLIB_LIBRARY}"
 )
+
+if (MSVC)
+    # The vendored Windows zlib archive was built with external debug info,
+    # but its companion PDB is not shipped with the repository.
+    # Ignore that third-party linker warning without affecting other libraries.
+    set_property(TARGET ZLIB::ZLIB APPEND PROPERTY
+            INTERFACE_LINK_OPTIONS /IGNORE:4099
+    )
+endif ()

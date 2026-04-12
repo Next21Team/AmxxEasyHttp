@@ -98,21 +98,16 @@ elseif (MSVC)
             /GR-       # disable rtti to reduce the library size
             /WX        # treat all warnings as error
             /EHsc      # NEVER catch SEH exceptions by catch(...); c functions cannot throw exceptions
+            $<$<CONFIG:Release>:/Zi>  # produce a PDB file for release builds
     )
 
-    if (CMAKE_BUILD_TYPE MATCHES Release)
-        target_compile_options(${TARGET_NAME} PRIVATE
-                /Zi              # produce a PDB file
-        )
-
-        target_link_options(${TARGET_NAME} PRIVATE
-                /LTCG            # enables whole program optimization on link-time
-                /INCREMENTAL:NO  # /INCREMENTAL is not compatible with /LTCG
-                /DEBUG           # enables PDB generation
-                /OPT:REF         # eliminates functions and data that are never referenced
-                /OPT:ICF         # enables COMDAT folding
-        )
-    endif ()
+    target_link_options(${TARGET_NAME} PRIVATE
+            $<$<CONFIG:Release>:/LTCG>            # enables whole program optimization on link-time
+            $<$<CONFIG:Release>:/INCREMENTAL:NO>  # /INCREMENTAL is not compatible with /LTCG
+            $<$<CONFIG:Release>:/DEBUG>           # enables PDB generation
+            $<$<CONFIG:Release>:/OPT:REF>         # eliminates functions and data that are never referenced
+            $<$<CONFIG:Release>:/OPT:ICF>         # enables COMDAT folding
+    )
 endif ()
 
 set_target_properties(${TARGET_NAME} PROPERTIES
