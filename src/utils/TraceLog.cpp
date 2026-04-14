@@ -4,9 +4,12 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
+#include <ctime>
 #include <filesystem>
+#include <functional>
 #include <mutex>
 #include <string>
+#include <thread>
 
 #ifdef _WIN32
 #include <Windows.h>
