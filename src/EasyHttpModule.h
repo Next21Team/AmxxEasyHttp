@@ -4,6 +4,8 @@
 #include "easy_http/EasyHttpOptionsBuilder.h"
 #include "utils/ContainerWithHandles.h"
 #include "sdk/amxxmodule.h"
+#include <memory>
+#include <optional>
 #include <vector>
 
 enum class PluginEndBehaviour
@@ -28,10 +30,13 @@ struct OptionsData
 
 struct RequestData
 {
+    uint32_t generation = 0;
     std::shared_ptr<ezhttp::RequestControl> request_control;
-    // options_id is always valid as long as the RequestId associated with the object exists
-    OptionsId options_id;
     ezhttp::Response response;
+    std::optional<std::vector<cell>> user_data;
+    std::unique_ptr<cell[]> callback_data;
+    int callback_data_len = 0;
+    int callback_id = -1;
 };
 
 struct EasyHttpPack
@@ -58,13 +63,12 @@ struct EasyHttpPack
     }
 };
 
-using ModuleRequestCallback = std::function<void(RequestId request_id)>;
-
 class EasyHttpModule
 {
     const int kMainQueueThreads = 6;
 
     std::string ca_cert_path_;
+    uint32_t next_request_generation_ = 0;
 
     std::vector<std::unique_ptr<ezhttp::EasyHttpInterface>> forgotten_easy_http_;
     utils::ContainerWithHandles<QueueId, EasyHttpPack> easy_http_pack_;
@@ -78,24 +82,36 @@ public:
     void RunFrame();
     void ServerDeactivate();
 
-    RequestId SendRequest(ezhttp::RequestMethod method, const std::string& url, OptionsId options_id, const ModuleRequestCallback& callback);
+    RequestId SendRequest(
+        ezhttp::RequestMethod method,
+        const std::string& url,
+        OptionsData options,
+        int callback_id = -1,
+        std::unique_ptr<cell[]> callback_data = nullptr,
+        int callback_data_len = 0
+    );
 
-    // When using delete_related_options, make sure that other requests do not use the same options as this one
-    bool DeleteRequest(RequestId handle, bool delete_related_options = false);
+    bool DeleteRequest(RequestId handle);
     [[nodiscard]] bool IsRequestExists(RequestId handle) { return requests_.contains(handle); }
     [[nodiscard]] RequestData& GetRequest(RequestId handle) { return requests_.at(handle); }
+    [[nodiscard]] const RequestData& GetRequest(RequestId handle) const { return requests_.at(handle); }
 
     OptionsId CreateOptions();
     bool DeleteOptions(OptionsId handle);
     [[nodiscard]] bool IsOptionsExists(OptionsId handle) const { return options_.contains(handle); }
     [[nodiscard]] OptionsData& GetOptions(OptionsId handle) { return options_.at(handle); }
+    [[nodiscard]] const OptionsData& GetOptions(OptionsId handle) const { return options_.at(handle); }
     [[nodiscard]] ezhttp::EasyHttpOptionsBuilder& GetOptionsBuilder(OptionsId handle) { return options_.at(handle).options_builder; }
+    [[nodiscard]] OptionsData CreateOptionsSnapshot(OptionsId handle) const { return options_.at(handle); }
 
     QueueId CreateQueue();
     [[nodiscard]] bool IsQueueExists(QueueId handle) const { return easy_http_pack_.contains(handle); }
 
 private:
-    void ResetMainAndRemoveUsersQueues();
+    void FinalizeRequest(RequestId handle);
+    void CleanupCompletedForgottenRequests();
+    void ShutdownWithoutCallbacks();
+    void ResetForMapChangeWithoutCallbacks();
     void RunFrameEasyHttp();
     void RunCleanupFrameForForgottenEasyHttp();
     std::unique_ptr<ezhttp::EasyHttpInterface>& GetEasyHttp(QueueId queue_id, PluginEndBehaviour end_map_behaviour);

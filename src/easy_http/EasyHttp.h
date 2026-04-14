@@ -45,6 +45,7 @@ namespace ezhttp
         std::mutex completed_requests_mutex_;
         std::deque<CompletedRequest> completed_requests_;
 
+        mutable std::mutex requests_mutex_;
         std::vector<std::thread> worker_threads_;
         std::vector<std::shared_ptr<RequestControl>> requests_;
         bool stop_requested_{false};
@@ -55,13 +56,22 @@ namespace ezhttp
 
         std::shared_ptr<RequestControl> SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const ResponseCallback &on_complete) override;
         void RunFrame() override;
-        int GetActiveRequestCount() override { return static_cast<int>(requests_.size()); }
+        int GetActiveRequestCount() override
+        {
+            std::lock_guard lock_guard(requests_mutex_);
+            return static_cast<int>(requests_.size());
+        }
+        void DropCompletedRequestsWithoutCallbacks() override;
         void ForgetAllRequests() override;
         void CancelAllRequests() override;
 
     private:
         void WorkerLoop();
         bool TryPopCompletedRequest(CompletedRequest &completed_request);
+        void ClearTrackedRequestsWithoutCallbacks();
+        void TrackRequest(const std::shared_ptr<RequestControl>& request_control);
+        void FinishTrackedRequest(const std::shared_ptr<RequestControl>& request_control);
+        bool ShouldReuseSession(const std::shared_ptr<RequestControl>& request_control, const Response& response) const;
         Response CreateErrorResponse(const cpr::Url &url, cpr::ErrorCode code, std::string message) const;
         Response SendRequest(const std::shared_ptr<RequestControl> &request_control, RequestMethod method, const cpr::Url &url, const RequestOptions &options);
         void SetSessionCommonOptions(cpr::Session &session, const std::shared_ptr<RequestControl> &request_control, const cpr::Url &url, const RequestOptions &options);

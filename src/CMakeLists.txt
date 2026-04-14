@@ -43,6 +43,8 @@ add_library(${TARGET_NAME} ${LIBRARY_BUILD_TYPE}
         easy_http/datetime_service/DateTimeService.cpp
         easy_http/datetime_service/DateTimeService.h
         utils/ContainerWithHandles.h
+        utils/TraceLog.cpp
+        utils/TraceLog.h
         utils/ftp_utils.h
         utils/ftp_utils.cpp
         utils/string_utils.h

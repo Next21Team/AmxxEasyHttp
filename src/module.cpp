@@ -10,6 +10,7 @@
 #include "utils/ftp_utils.h"
 #include "utils/string_utils.h"
 #include "utils/amxx_utils.h"
+#include "utils/TraceLog.h"
 
 using namespace ezhttp;
 
@@ -18,21 +19,50 @@ bool ValidateRequestId(AMX* amx, RequestId request_id);
 bool ValidateQueueId(AMX* amx, QueueId queue_id);
 template <class TMethod> void SetKeyValueOption(AMX* amx, cell* params, TMethod method);
 template <class TMethod> void SetStringOption(AMX* amx, cell* params, TMethod method);
-RequestId SendRequest(AMX* amx, RequestMethod method, OptionsId options_id, const std::string& url, const std::string& callback, cell* data = nullptr, int data_len = 0);
+using OptionsConfigurer = std::function<void(OptionsData&)>;
+RequestId DispatchRequest(
+    AMX* amx,
+    RequestMethod method,
+    OptionsId options_id,
+    const std::string& url,
+    const std::string& callback,
+    std::unique_ptr<cell[]> data = nullptr,
+    int data_len = 0,
+    const OptionsConfigurer& configure = {}
+);
 
 std::unique_ptr<EasyHttpModule> g_EasyHttpModule;
 std::unique_ptr<JSONMngr> g_JsonManager;
+bool g_MapChangeResetDone = false;
+
+namespace
+{
+    cvar_t cvar_ezhttp_trace = { "ezhttp_trace_log", "0", FCVAR_SERVER | FCVAR_SPONLY };
+
+    void RefreshTraceLogSetting()
+    {
+        ezhttp::trace::SetEnabled(CVAR_GET_FLOAT("ezhttp_trace_log") != 0.0f);
+    }
+}
 
 void CreateModules()
 {
+    ezhttp::trace::Initialize(MF_BuildPathname("addons/amxmodx/logs/ezhttp_trace.log"));
+    RefreshTraceLogSetting();
+    ezhttp::trace::Writef("module", "CreateModules begin");
     g_EasyHttpModule = std::make_unique<EasyHttpModule>(MF_BuildPathname("addons/amxmodx/data/amxx_easy_http_cacert.pem"));
     g_JsonManager = std::make_unique<JSONMngr>();
+    g_MapChangeResetDone = false;
+    ezhttp::trace::Writef("module", "CreateModules done easy_http=%p json=%p", g_EasyHttpModule.get(), g_JsonManager.get());
 }
 
 void DestroyModules()
 {
+    ezhttp::trace::Writef("module", "DestroyModules begin easy_http=%p json=%p", g_EasyHttpModule.get(), g_JsonManager.get());
     g_EasyHttpModule.reset();
     g_JsonManager.reset();
+    ezhttp::trace::Writef("module", "DestroyModules done");
+    ezhttp::trace::Shutdown();
 }
 
 // native EzHttpOptions:ezhttp_create_options();
@@ -248,7 +278,8 @@ cell AMX_NATIVE_CALL ezhttp_get(AMX* amx, cell* params)
 
     auto options_id = (OptionsId)params[arg_option_id];
 
-    return (cell)SendRequest(amx, RequestMethod::HttpGet, options_id, std::string(url, url_len), std::string(callback, callback_len), data, data_len);
+    std::unique_ptr<cell[]> request_data(data);
+    return (cell)DispatchRequest(amx, RequestMethod::HttpGet, options_id, std::string(url, url_len), std::string(callback, callback_len), std::move(request_data), data_len);
 }
 
 // native EzHttpRequest:ezhttp_post(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0);
@@ -276,7 +307,8 @@ cell AMX_NATIVE_CALL ezhttp_post(AMX* amx, cell* params)
 
     auto options_id = (OptionsId)params[arg_option_id];
 
-    return (cell)SendRequest(amx, RequestMethod::HttpPost, options_id, std::string(url, url_len), std::string(callback, callback_len), data, data_len);
+    std::unique_ptr<cell[]> request_data(data);
+    return (cell)DispatchRequest(amx, RequestMethod::HttpPost, options_id, std::string(url, url_len), std::string(callback, callback_len), std::move(request_data), data_len);
 }
 
 // native EzHttpRequest:ezhttp_put(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0);
@@ -304,7 +336,8 @@ cell AMX_NATIVE_CALL ezhttp_put(AMX* amx, cell* params)
 
     auto options_id = (OptionsId)params[arg_option_id];
 
-    return (cell)SendRequest(amx, RequestMethod::HttpPut, options_id, std::string(url, url_len), std::string(callback, callback_len), data, data_len);
+    std::unique_ptr<cell[]> request_data(data);
+    return (cell)DispatchRequest(amx, RequestMethod::HttpPut, options_id, std::string(url, url_len), std::string(callback, callback_len), std::move(request_data), data_len);
 }
 
 // native EzHttpRequest:ezhttp_patch(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0);
@@ -332,7 +365,8 @@ cell AMX_NATIVE_CALL ezhttp_patch(AMX* amx, cell* params)
 
     auto options_id = (OptionsId)params[arg_option_id];
 
-    return (cell)SendRequest(amx, RequestMethod::HttpPatch, options_id, std::string(url, url_len), std::string(callback, callback_len), data, data_len);
+    std::unique_ptr<cell[]> request_data(data);
+    return (cell)DispatchRequest(amx, RequestMethod::HttpPatch, options_id, std::string(url, url_len), std::string(callback, callback_len), std::move(request_data), data_len);
 }
 
 // native EzHttpRequest:ezhttp_delete(const url[], const on_complete[], EzHttpOptions:options_id = EzHttpOptions:0);
@@ -360,7 +394,8 @@ cell AMX_NATIVE_CALL ezhttp_delete(AMX* amx, cell* params)
 
     auto options_id = (OptionsId)params[arg_option_id];
 
-    return (cell)SendRequest(amx, RequestMethod::HttpDelete, options_id, std::string(url, url_len), std::string(callback, callback_len), data, data_len);
+    std::unique_ptr<cell[]> request_data(data);
+    return (cell)DispatchRequest(amx, RequestMethod::HttpDelete, options_id, std::string(url, url_len), std::string(callback, callback_len), std::move(request_data), data_len);
 }
 
 // native ezhttp_is_request_exists(EzHttpRequest:request_id);
@@ -685,10 +720,7 @@ cell AMX_NATIVE_CALL ezhttp_get_user_data(AMX* amx, cell* params)
     if (!ValidateRequestId(amx, request_id))
         return 0;
 
-    OptionsId options_id = g_EasyHttpModule->GetRequest(request_id).options_id;
-    OptionsData options = g_EasyHttpModule->GetOptions(options_id);
-
-    const std::optional<std::vector<cell>>& user_data = options.user_data;
+    const std::optional<std::vector<cell>>& user_data = g_EasyHttpModule->GetRequest(request_id).user_data;
     if (!user_data)
         return 0;
 
@@ -712,18 +744,21 @@ cell AMX_NATIVE_CALL ezhttp_ftp_upload(AMX* amx, cell* params)
 
     std::string url = utils::ConstructFtpUrl(user, password, host, remote_file);
 
-    if (options_id == OptionsId::Null)
-        options_id = g_EasyHttpModule->CreateOptions();
-    else if (!ValidateOptionsId(amx, options_id))
-        return 0;
+    const std::string local_file_path = MF_BuildPathname("%s", local_file);
 
-    auto& builder = g_EasyHttpModule->GetOptionsBuilder(options_id);
-    builder.SetFilePath(MF_BuildPathname("%s", local_file));
-    builder.SetSecure(secure);
-
-    SendRequest(amx, RequestMethod::FtpUpload, options_id, url, callback);
-
-    return 0;
+    return (cell)DispatchRequest(
+        amx,
+        RequestMethod::FtpUpload,
+        options_id,
+        url,
+        callback,
+        nullptr,
+        0,
+        [local_file_path, secure](OptionsData& request_options) {
+            request_options.options_builder.SetFilePath(local_file_path);
+            request_options.options_builder.SetSecure(secure);
+        }
+    );
 }
 
 cell AMX_NATIVE_CALL ezhttp_ftp_upload2(AMX* amx, cell* params)
@@ -740,18 +775,21 @@ cell AMX_NATIVE_CALL ezhttp_ftp_upload2(AMX* amx, cell* params)
     bool secure = params[4];
     auto options_id = (OptionsId)params[5];
 
-    if (options_id == OptionsId::Null)
-        options_id = g_EasyHttpModule->CreateOptions();
-    else if (!ValidateOptionsId(amx, options_id))
-        return 0;
+    const std::string local_file_path = MF_BuildPathname("%s", local_file);
 
-    auto& builder = g_EasyHttpModule->GetOptionsBuilder(options_id);
-    builder.SetFilePath(MF_BuildPathname("%s", local_file));
-    builder.SetSecure(secure);
-
-    SendRequest(amx, RequestMethod::FtpUpload, options_id, std::string(url_str, url_str_len), std::string(callback, callback_len));
-
-    return 0;
+    return (cell)DispatchRequest(
+        amx,
+        RequestMethod::FtpUpload,
+        options_id,
+        std::string(url_str, url_str_len),
+        std::string(callback, callback_len),
+        nullptr,
+        0,
+        [local_file_path, secure](OptionsData& request_options) {
+            request_options.options_builder.SetFilePath(local_file_path);
+            request_options.options_builder.SetSecure(secure);
+        }
+    );
 }
 
 cell AMX_NATIVE_CALL ezhttp_ftp_download(AMX* amx, cell* params)
@@ -769,18 +807,21 @@ cell AMX_NATIVE_CALL ezhttp_ftp_download(AMX* amx, cell* params)
 
     std::string url = utils::ConstructFtpUrl(user, password, host, remote_file);
 
-    if (options_id == OptionsId::Null)
-        options_id = g_EasyHttpModule->CreateOptions();
-    else if (!ValidateOptionsId(amx, options_id))
-        return 0;
+    const std::string local_file_path = MF_BuildPathname("%s", local_file);
 
-    auto& builder = g_EasyHttpModule->GetOptionsBuilder(options_id);
-    builder.SetFilePath(MF_BuildPathname("%s", local_file));
-    builder.SetSecure(secure);
-
-    SendRequest(amx, RequestMethod::FtpDownload, options_id, url, callback);
-
-    return 0;
+    return (cell)DispatchRequest(
+        amx,
+        RequestMethod::FtpDownload,
+        options_id,
+        url,
+        callback,
+        nullptr,
+        0,
+        [local_file_path, secure](OptionsData& request_options) {
+            request_options.options_builder.SetFilePath(local_file_path);
+            request_options.options_builder.SetSecure(secure);
+        }
+    );
 }
 
 cell AMX_NATIVE_CALL ezhttp_ftp_download2(AMX* amx, cell* params)
@@ -797,18 +838,21 @@ cell AMX_NATIVE_CALL ezhttp_ftp_download2(AMX* amx, cell* params)
     bool secure = params[4];
     auto options_id = (OptionsId)params[5];
 
-    if (options_id == OptionsId::Null)
-        options_id = g_EasyHttpModule->CreateOptions();
-    else if (!ValidateOptionsId(amx, options_id))
-        return 0;
+    const std::string local_file_path = MF_BuildPathname("%s", local_file);
 
-    auto& builder = g_EasyHttpModule->GetOptionsBuilder(options_id);
-    builder.SetFilePath(MF_BuildPathname("%s", local_file));
-    builder.SetSecure(secure);
-
-    SendRequest(amx, RequestMethod::FtpDownload, options_id, std::string(url_str, url_str_len), std::string(callback, callback_len));
-
-    return 0;
+    return (cell)DispatchRequest(
+        amx,
+        RequestMethod::FtpDownload,
+        options_id,
+        std::string(url_str, url_str_len),
+        std::string(callback, callback_len),
+        nullptr,
+        0,
+        [local_file_path, secure](OptionsData& request_options) {
+            request_options.options_builder.SetFilePath(local_file_path);
+            request_options.options_builder.SetSecure(secure);
+        }
+    );
 }
 
 cell AMX_NATIVE_CALL ezhttp_create_queue(AMX* amx, cell* params)
@@ -849,18 +893,24 @@ cell AMX_NATIVE_CALL ezhttp_steam_to_steam64(AMX* amx, cell* params)
     return 1;
 }
 
-RequestId SendRequest(AMX* amx, RequestMethod method, OptionsId options_id, const std::string& url, const std::string& callback, cell* data, const int data_len)
+RequestId DispatchRequest(
+    AMX* amx,
+    RequestMethod method,
+    OptionsId options_id,
+    const std::string& url,
+    const std::string& callback,
+    std::unique_ptr<cell[]> data,
+    const int data_len,
+    const OptionsConfigurer& configure
+)
 {
     if (options_id != OptionsId::Null && !ValidateOptionsId(amx, options_id))
-    {
-        delete[] data;
         return RequestId::Null;
-    }
 
     int callback_id = -1;
     if (!callback.empty())
     {
-        if (data == nullptr)
+        if (!data)
         {
             callback_id = MF_RegisterSPForwardByName(amx, callback.c_str(), FP_CELL, FP_DONE);
         } else {
@@ -869,33 +919,26 @@ RequestId SendRequest(AMX* amx, RequestMethod method, OptionsId options_id, cons
 
         if (callback_id == -1)
         {
-            delete[] data;
             MF_LogError(amx, AMX_ERR_NATIVE, "Callback function \"%s\" is not exists", callback.c_str());
             return RequestId::Null;
         }
     }
 
-    auto on_complete = [callback_id, data, data_len](RequestId request_id) {
-        if (callback_id == -1)
-        {
-            delete[] data;
-            g_EasyHttpModule->DeleteRequest(request_id, true);
-            return;
-        }
+    OptionsData request_options = options_id == OptionsId::Null
+        ? OptionsData{}
+        : g_EasyHttpModule->CreateOptionsSnapshot(options_id);
 
-        if (data == nullptr)
-        {
-            MF_ExecuteForward(callback_id, request_id);
-        } else {
-            MF_ExecuteForward(callback_id, request_id, MF_PrepareCellArray(data, data_len));
-        }
-        MF_UnregisterSPForward(callback_id);
+    if (configure)
+        configure(request_options);
 
-        delete[] data;
-        g_EasyHttpModule->DeleteRequest(request_id, true);
-    };
-
-    RequestId request_id = g_EasyHttpModule->SendRequest(method, url, options_id, on_complete);
+    RequestId request_id = g_EasyHttpModule->SendRequest(
+        method,
+        url,
+        std::move(request_options),
+        callback_id,
+        std::move(data),
+        data_len
+    );
 
     return request_id;
 }
@@ -1035,9 +1078,10 @@ void OnAmxxAttach()
     MF_AddNatives(g_Natives);
     MF_AddNatives(g_JsonNatives);
 
-    CreateModules();
-
     CVAR_REGISTER(&cvar_ezhttp_version);
+    CVAR_REGISTER(&cvar_ezhttp_trace);
+
+    CreateModules();
 }
 
 void OnAmxxDetach()
@@ -1045,8 +1089,32 @@ void OnAmxxDetach()
     DestroyModules();
 }
 
+void OnPluginsUnloading()
+{
+    RefreshTraceLogSetting();
+    ezhttp::trace::Writef("module", "OnPluginsUnloading enter easy_http=%p json=%p mapchange_reset_done=%d", g_EasyHttpModule.get(), g_JsonManager.get(), g_MapChangeResetDone);
+
+    if (g_EasyHttpModule && !g_MapChangeResetDone)
+        g_EasyHttpModule->ServerDeactivate();
+
+    if (g_JsonManager)
+        g_JsonManager->FreeAllHandles();
+
+    ezhttp::trace::Writef("module", "OnPluginsUnloading exit");
+}
+
+void ServerActivate(edict_t* /*pEdictList*/, int /*edictCount*/, int /*clientMax*/)
+{
+    g_MapChangeResetDone = false;
+    RefreshTraceLogSetting();
+    ezhttp::trace::Writef("module", "Metamod ServerActivate mapchange_reset_done=%d", g_MapChangeResetDone);
+    SET_META_RESULT(MRES_IGNORED);
+}
+
 void StartFrame()
 {
+    RefreshTraceLogSetting();
+
     if (g_EasyHttpModule)
         g_EasyHttpModule->RunFrame();
 
@@ -1055,16 +1123,25 @@ void StartFrame()
 
 void ServerDeactivate()
 {
+    RefreshTraceLogSetting();
+    ezhttp::trace::Writef("module", "Metamod ServerDeactivate enter easy_http=%p json=%p", g_EasyHttpModule.get(), g_JsonManager.get());
+
     if (g_EasyHttpModule)
         g_EasyHttpModule->ServerDeactivate();
 
+    g_MapChangeResetDone = true;
+
     if (g_JsonManager)
         g_JsonManager->FreeAllHandles();
+
+    ezhttp::trace::Writef("module", "Metamod ServerDeactivate exit mapchange_reset_done=%d", g_MapChangeResetDone);
 
     SET_META_RESULT(MRES_IGNORED);
 }
 
 void GameShutdown()
 {
+    RefreshTraceLogSetting();
+    ezhttp::trace::Writef("module", "GameShutdown");
     DestroyModules();
 }
