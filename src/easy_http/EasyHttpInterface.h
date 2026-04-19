@@ -19,6 +19,7 @@ namespace ezhttp
         virtual std::shared_ptr<RequestControl> SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const ResponseCallback& on_complete) = 0;
         virtual void RunFrame() = 0;
         virtual int GetActiveRequestCount() = 0;
+        virtual void DropCompletedRequestsWithoutCallbacks() = 0;
 
         // No callback functions will be called for all current requests
         virtual void ForgetAllRequests() = 0;

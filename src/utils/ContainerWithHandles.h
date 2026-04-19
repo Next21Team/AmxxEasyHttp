@@ -102,6 +102,11 @@ namespace utils
             return values_.at(handle);
         }
 
+        const TValue& at(THandle handle) const
+        {
+            return values_.at(handle);
+        }
+
         bool contains(THandle handle) const
         {
             return values_.count(handle) == 1;
@@ -118,7 +123,7 @@ namespace utils
             }
             else
             {
-                while (values_.count(handle) > 1)
+                while (values_.count(handle) > 0)
                     handle = (THandle)((int)handle + 1);
             }
 

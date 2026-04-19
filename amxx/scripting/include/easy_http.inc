@@ -55,10 +55,21 @@ enum EzHttpPluginEndBehaviour
 /**
  * Creates new options object. This object allows you to configure your request by specifying 
  * such parameters as user agent, query parameters, headers, and etc.
+ * Options are reusable request templates. Their values are copied into a request when it is sent.
  *
  * @return                  EzHttpOptions handle.
  */
 native EzHttpOptions:ezhttp_create_options();
+
+/**
+ * Destroys an options object previously created via ezhttp_create_options().
+ * It is safe to destroy an options object after sending a request because the request keeps its own snapshot.
+ *
+ * @param options_id        Options identifier created via ezhttp_create_options().
+ *
+ * @return                  True if the options object existed and was destroyed, false otherwise.
+ */
+native bool:ezhttp_destroy_options(EzHttpOptions:options_id);
 
 /**
  * Sets user-agent string for a request.
@@ -205,6 +216,7 @@ native ezhttp_option_set_auth(EzHttpOptions:options_id, const user[], const pass
 
 /**
  * Sets a custom request data for the HTTP request.
+ * The data is copied into the request when it is sent, so reusing or destroying the options later is safe.
  *
  * @param options_id         Options identifier created via ezhttp_create_options().
  * @param data               The user data to set.
@@ -546,6 +558,7 @@ native ezhttp_get_downloaded_bytes(EzHttpRequest:request_id);
 
 /**
  * Returns the custom data associated with the request set by ezhttp_option_set_user_data.
+ * This is the snapshot captured when the request was sent.
  *
  * @param request_id        The request identifier.
  * @param data              The buffer to store the user data.
