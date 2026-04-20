@@ -51,21 +51,44 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install build dependencies
+      - name: Build in Ubuntu 14.04 container
         run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake gcc-multilib g++-multilib make
-
-      - name: Configure
-        run: cmake -S . -B cmake-build-linux -DCMAKE_BUILD_TYPE=Release
-
-      - name: Build
-        run: cmake --build cmake-build-linux --target easy_http --parallel
+          docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace ubuntu:14.04 bash -c '
+            set -e
+            
+            # Add PPA for newer GCC
+            apt-get update
+            apt-get install -y software-properties-common
+            add-apt-repository -y ppa:ubuntu-toolchain-r/test
+            apt-get update
+            
+            # Install build dependencies with multilib support
+            apt-get install -y \
+              gcc-9 g++-9 gcc-9-multilib g++-9-multilib \
+              make git wget \
+              libc6-dev libc6-dev-i386 \
+              lib32stdc++-9-dev
+            
+            # Install CMake 3.10+
+            wget -q https://cmake.org/files/v3.16/cmake-3.16.9-Linux-x86_64.tar.gz
+            tar -xzf cmake-3.16.9-Linux-x86_64.tar.gz
+            export PATH=$(pwd)/cmake-3.16.9-Linux-x86_64/bin:$PATH
+            
+            # Set GCC 9 as default
+            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90
+            update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 90
+            
+            # Build
+            mkdir -p build
+            cd build
+            cmake .. -DCMAKE_BUILD_TYPE=Release
+            cmake --build . --target easy_http -j$(nproc)
+          '
 
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
         with:
           name: easy_http-linux-i386
-          path: out/bin/Release/easy_http_amxx_i386.so
+          path: build/easy_http_amxx_i386.so
           if-no-files-found: error
           retention-days: 14
