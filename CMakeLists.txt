@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.15)
 project(AmxxEasyHttp
         VERSION        1.5.0
         DESCRIPTION    "HTTP, HTTPS and FTP for AMXX plugins"
