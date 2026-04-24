@@ -56,14 +56,20 @@ enum EzHttpPluginEndBehaviour
  * Creates new options object. This object allows you to configure your request by specifying 
  * such parameters as user agent, query parameters, headers, and etc.
  * Options are reusable request templates. Their values are copied into a request when it is sent.
+ * By default the options handle is destroyed automatically when the last request using it finishes.
+ *
+ * @param auto_destroy       When true, the handle is released automatically after it becomes idle.
+ *                           Set to false when you want to keep reusing the same handle across
+ *                           multiple request lifecycles and destroy it manually later.
  *
  * @return                  EzHttpOptions handle.
  */
-native EzHttpOptions:ezhttp_create_options();
+native EzHttpOptions:ezhttp_create_options(bool:auto_destroy = true);
 
 /**
  * Destroys an options object previously created via ezhttp_create_options().
  * It is safe to destroy an options object after sending a request because the request keeps its own snapshot.
+ * This is mainly useful when ezhttp_create_options(.auto_destroy = false) was used or when you want eager cleanup.
  *
  * @param options_id        Options identifier created via ezhttp_create_options().
  *
@@ -235,6 +241,7 @@ native ezhttp_option_set_user_data(EzHttpOptions:options_id, const data[], len);
  *                              * EZH_CANCEL_REQUEST to cancel the request;
  *                              * EZH_FORGET_REQUEST to complete the request, but ignore its result
  *                              (callback will not be called).
+ *                              Passing any other value raises a native error.
  *
  * @noreturn
  */
@@ -578,6 +585,7 @@ native ezhttp_get_user_data(EzHttpRequest:request_id, data[]);
  * @param on_complete        The function to call when the upload is complete.
  *                           Signature: public on_complete(EzHttpRequest:request_id)
  * @param security           Member of EzHttpFtpSecurity. The security strategy use for the FTP connection.
+ *                           Passing any other value raises a native error.
  * @param options_id         The options to use for the request.
  *
  * @return                   The request handle.
@@ -601,6 +609,7 @@ native EzHttpRequest:ezhttp_ftp_upload(
  * @param on_complete        The function to call when the upload is complete.
  *                           Signature: public on_complete(EzHttpRequest:request_id)
  * @param security           Member of EzHttpFtpSecurity. The security strategy use for the FTP connection.
+ *                           Passing any other value raises a native error.
  * @param options_id         The options to use for the request.
  *
  * @return                   The request handle.
@@ -625,6 +634,7 @@ native EzHttpRequest:ezhttp_ftp_upload2(
  * @param on_complete        The function to call when the download is complete.
  *                           Signature: public on_complete(EzHttpRequest:request_id)
  * @param security           Member of EzHttpFtpSecurity. The security strategy use for the FTP connection.
+ *                           Passing any other value raises a native error.
  * @param options_id         The options to use for the request.
  *
  * @return                   The request handle.
@@ -650,6 +660,7 @@ native EzHttpRequest:ezhttp_ftp_download(
  * @param on_complete        The function to call when the download is complete.
  *                           Signature: public on_complete(EzHttpRequest:request_id)
  * @param security           Member of EzHttpFtpSecurity. The security strategy use for the FTP connection.
+ *                           Passing any other value raises a native error.
  * @param options_id         The options to use for the request.
  *
  * @return                   The request handle.

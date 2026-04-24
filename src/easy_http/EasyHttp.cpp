@@ -390,6 +390,14 @@ Response EasyHttp::SendRequest(const std::shared_ptr<RequestControl> &request_co
     Response response;
     switch (method)
     {
+    case RequestMethod::HttpGet:
+    case RequestMethod::HttpPost:
+    case RequestMethod::HttpPut:
+    case RequestMethod::HttpPatch:
+    case RequestMethod::HttpDelete:
+        response = SendHttpRequest(*session, request_control, method, url, options);
+        break;
+
     case RequestMethod::FtpUpload:
         response = FtpUpload(*session, request_control, url, options);
         break;
@@ -399,7 +407,7 @@ Response EasyHttp::SendRequest(const std::shared_ptr<RequestControl> &request_co
         break;
 
     default:
-        response = SendHttpRequest(*session, request_control, method, url, options);
+        response = CreateErrorResponse(url, cpr::ErrorCode::INTERNAL_ERROR, "Unsupported request method");
         break;
     }
 
@@ -461,6 +469,10 @@ Response EasyHttp::SendHttpRequest(cpr::Session &session, const std::shared_ptr<
     Response response;
     switch (method)
     {
+    case RequestMethod::HttpGet:
+        response = Response(session.Get());
+        break;
+
     case RequestMethod::HttpPost:
         response = Response(session.Post());
         break;
@@ -478,7 +490,7 @@ Response EasyHttp::SendHttpRequest(cpr::Session &session, const std::shared_ptr<
         break;
 
     default:
-        response = Response(session.Get());
+        response = CreateErrorResponse(url, cpr::ErrorCode::INTERNAL_ERROR, "Unsupported HTTP request method");
         break;
     }
 

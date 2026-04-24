@@ -68,6 +68,14 @@ public http_complete(EzHttpRequest:request_id)
     ezhttp_save_data_to_file(request_id, fmt("addons/amxmodx/response_%d.json", request_id))
 }
 
+// ezhttp_create_options() now uses auto_destroy = true by default.
+// The handle is cleaned up automatically after the last request using it finishes.
+// If you want to keep the same options handle alive for later reuse, create it like this:
+//
+// new EzHttpOptions:reusable = ezhttp_create_options(.auto_destroy = false)
+// ...
+// ezhttp_destroy_options(reusable)
+
 // --------------------------------------------------------------------
 
 public ftp_upload()

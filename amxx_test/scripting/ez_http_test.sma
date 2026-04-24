@@ -24,7 +24,9 @@ TEST_LIST_ASYNC = {
     { "test_save_to_file",      "test save to file" },
     { "test_fail_by_timeout",   "test timeout" },
     { "test_options_reuse_concurrent", "test reusing the same options in concurrent requests" },
+    { "test_options_reuse_sequential", "test reusing the same options after completion when auto destroy is disabled" },
     { "test_user_data_snapshot", "test request keeps user data snapshot from dispatch time" },
+    { "test_options_auto_destroy_default", "test options auto destroy after becoming idle by default" },
     { "test_destroy_options_after_dispatch", "test options can be destroyed after dispatch" },
     { "test_ftp_download",      "test ftp download" },
     { "test_ftp_download_wildcard", "test ftp download wildcard" },
@@ -47,9 +49,16 @@ new g_TestOptionsReuseConcurrent[_TestT];
 new g_TestOptionsReuseConcurrentCompleted = 0;
 new bool:g_TestOptionsReuseConcurrentFinished = false;
 
+new g_TestOptionsReuseSequential[_TestT];
+new EzHttpOptions:g_TestOptionsReuseSequentialHandle = EzHttpOptions:0;
+new bool:g_TestOptionsReuseSequentialSecondDispatchStarted = false;
+
 new g_TestUserDataSnapshot[_TestT];
 new g_TestUserDataSnapshotCompleted = 0;
 new bool:g_TestUserDataSnapshotFinished = false;
+
+new g_TestOptionsAutoDestroyDefault[_TestT];
+new EzHttpOptions:g_TestOptionsAutoDestroyDefaultHandle = EzHttpOptions:0;
 
 new bool:g_TestDestroyOptionsAfterDispatchDestroyed = false;
 new EzHttpRequest:g_TestDestroyOptionsAfterDispatchRequestId = EzHttpRequest:0;
@@ -129,12 +138,38 @@ stock build_test_url(url[], max_len, const path[])
     formatex(url[len], max_len - len, "%s", path);
 }
 
-stock cleanup_ftp_wildcard_download_dir()
+stock bool:cleanup_ftp_wildcard_download_dir()
 {
-    delete_file(FTP_WILDCARD_FILE_1);
-    delete_file(FTP_WILDCARD_FILE_2);
-    delete_file(FTP_WILDCARD_FILE_3);
+    if (!dir_exists(FTP_WILDCARD_DOWNLOAD_DIR))
+    {
+        return true;
+    }
+
+    // ftp.gnu.org can add new hello-2.12.x signature files over time,
+    // so cleanup enumerates the directory instead of deleting a fixed list.
+    new entry[PLATFORM_MAX_PATH];
+    new full_path[PLATFORM_MAX_PATH];
+    new FileType:type;
+    new dir = open_dir(FTP_WILDCARD_DOWNLOAD_DIR, entry, charsmax(entry), type);
+
+    if (dir)
+    {
+        do
+        {
+            if (!equal(entry, ".") && !equal(entry, "..") && type == FileType_File)
+            {
+                formatex(full_path, charsmax(full_path), "%s/%s", FTP_WILDCARD_DOWNLOAD_DIR, entry);
+                delete_file(full_path);
+            }
+        }
+        while (next_file(dir, entry, charsmax(entry), type));
+
+        close_dir(dir);
+    }
+
     rmdir(FTP_WILDCARD_DOWNLOAD_DIR);
+
+    return !dir_exists(FTP_WILDCARD_DOWNLOAD_DIR);
 }
 
 public plugin_init()
@@ -150,6 +185,7 @@ public plugin_init()
 
 public plugin_end()
 {
+    cleanup_ftp_wildcard_download_dir();
     log_amx("[ez_http_test] plugin_end");
 }
 
@@ -158,14 +194,14 @@ public run_tests()
     UTEST_RUN_ASYNC(UT_VERBOSE)
 }
 
-START_ASYNC_TEST(test_get_parameters) 
+START_ASYNC_TEST(test_get_parameters)
 {
     new EzHttpOptions:opt = ezhttp_create_options();
     new url[256];
 
     ezhttp_option_add_url_parameter(opt, "MyParam1", "ParamVal1");
     ezhttp_option_add_url_parameter(opt, "MyParam2", "ParamVal2");
-    
+
     EZHTTP_OPTION_SET_TEST_DATA(opt)
 
     build_test_url(url, charsmax(url), "/get");
@@ -186,7 +222,7 @@ public test_get_parameters_complete(EzHttpRequest:request_id)
     }
 
     new EzJSON:json_args = ezjson_object_get_value(json_root, "args");
-    
+
     server_print("test_get_parameters request elapsed: %f", ezhttp_get_elapsed(request_id));
 
     // asserts
@@ -320,6 +356,102 @@ public test_options_reuse_concurrent_complete(EzHttpRequest:request_id, const da
     }
 }
 
+START_ASYNC_TEST(test_options_reuse_sequential)
+{
+    copy_test_state(g_TestOptionsReuseSequential, __test);
+    g_TestOptionsReuseSequentialSecondDispatchStarted = false;
+    g_TestOptionsReuseSequentialHandle = ezhttp_create_options(false);
+
+    ezhttp_option_set_header(g_TestOptionsReuseSequentialHandle, "X-Reused-Sequential", "shared-sequential");
+
+    new url[256];
+    build_test_url(url, charsmax(url), "/delay/1?request=reuse_seq_a");
+
+    new EzHttpRequest:request_id = ezhttp_get(
+        url,
+        "test_options_reuse_sequential_complete",
+        g_TestOptionsReuseSequentialHandle
+    );
+
+    _test_assert(g_TestOptionsReuseSequential, request_id != EzHttpRequest:0, __LINE__, "request id must not be zero");
+
+    if (request_id == EzHttpRequest:0)
+    {
+        ezhttp_destroy_options(g_TestOptionsReuseSequentialHandle);
+        g_TestOptionsReuseSequentialHandle = EzHttpOptions:0;
+        finish_async_aggregate_test(g_TestOptionsReuseSequential);
+    }
+}
+
+public test_options_reuse_sequential_complete(EzHttpRequest:request_id)
+{
+    new EzJSON:json_root;
+    if (!prepare_json_response(g_TestOptionsReuseSequential, request_id, json_root, __LINE__))
+    {
+        if (g_TestOptionsReuseSequentialHandle != EzHttpOptions:0)
+        {
+            ezhttp_destroy_options(g_TestOptionsReuseSequentialHandle);
+            g_TestOptionsReuseSequentialHandle = EzHttpOptions:0;
+        }
+
+        finish_async_aggregate_test(g_TestOptionsReuseSequential);
+        return;
+    }
+
+    new EzJSON:json_args = ezjson_object_get_value(json_root, "args");
+    new EzJSON:json_headers = ezjson_object_get_value(json_root, "headers");
+    new request_name[64];
+    new header_value[64];
+
+    ezjson_object_get_string(json_args, "request", request_name, charsmax(request_name));
+    ezjson_object_get_string(json_headers, "X-Reused-Sequential", header_value, charsmax(header_value));
+
+    _test_assert(g_TestOptionsReuseSequential, equal(header_value, "shared-sequential"), __LINE__, "sequential reuse must preserve headers");
+
+    if (!g_TestOptionsReuseSequentialSecondDispatchStarted)
+    {
+        _test_assert(g_TestOptionsReuseSequential, equal(request_name, "reuse_seq_a"), __LINE__, "first sequential callback returned unexpected marker");
+
+        ezjson_free(json_headers);
+        ezjson_free(json_args);
+        ezjson_free(json_root);
+
+        g_TestOptionsReuseSequentialSecondDispatchStarted = true;
+
+        new url[256];
+        build_test_url(url, charsmax(url), "/delay/1?request=reuse_seq_b");
+
+        new EzHttpRequest:request_b = ezhttp_get(
+            url,
+            "test_options_reuse_sequential_complete",
+            g_TestOptionsReuseSequentialHandle
+        );
+
+        _test_assert(g_TestOptionsReuseSequential, request_b != EzHttpRequest:0, __LINE__, "second sequential request id must not be zero");
+
+        if (request_b == EzHttpRequest:0)
+        {
+            ezhttp_destroy_options(g_TestOptionsReuseSequentialHandle);
+            g_TestOptionsReuseSequentialHandle = EzHttpOptions:0;
+            finish_async_aggregate_test(g_TestOptionsReuseSequential);
+        }
+
+        return;
+    }
+
+    _test_assert(g_TestOptionsReuseSequential, equal(request_name, "reuse_seq_b"), __LINE__, "second sequential callback returned unexpected marker");
+
+    ezjson_free(json_headers);
+    ezjson_free(json_args);
+    ezjson_free(json_root);
+
+    new bool:destroyed = ezhttp_destroy_options(g_TestOptionsReuseSequentialHandle);
+    _test_assert(g_TestOptionsReuseSequential, destroyed, __LINE__, "options with auto destroy disabled must still require explicit cleanup");
+
+    g_TestOptionsReuseSequentialHandle = EzHttpOptions:0;
+    finish_async_aggregate_test(g_TestOptionsReuseSequential);
+}
+
 START_ASYNC_TEST(test_user_data_snapshot)
 {
     copy_test_state(g_TestUserDataSnapshot, __test);
@@ -424,7 +556,7 @@ public test_post_form_complete(EzHttpRequest:request_id)
     new tmp_data[256];
 
     ASSERT_TRUE(ezjson_object_get_count(json_form) == 2);
-    
+
     ezjson_object_get_string(json_form, "MyFormEntry1", tmp_data, charsmax(tmp_data));
     ASSERT_TRUE(equal(tmp_data, "FormVal1"));
 
@@ -766,6 +898,71 @@ public test_ftp_download_complete(EzHttpRequest:request_id)
     END_ASYNC_TEST()
 }
 
+START_ASYNC_TEST(test_options_auto_destroy_default)
+{
+    copy_test_state(g_TestOptionsAutoDestroyDefault, __test);
+    g_TestOptionsAutoDestroyDefaultHandle = ezhttp_create_options();
+
+    ezhttp_option_set_header(g_TestOptionsAutoDestroyDefaultHandle, "X-Auto-Destroy-Option", "idle-cleanup");
+
+    new url[256];
+    build_test_url(url, charsmax(url), "/delay/1?request=auto_destroy_default");
+
+    new EzHttpRequest:request_id = ezhttp_get(
+        url,
+        "test_options_auto_destroy_default_complete",
+        g_TestOptionsAutoDestroyDefaultHandle
+    );
+
+    _test_assert(g_TestOptionsAutoDestroyDefault, request_id != EzHttpRequest:0, __LINE__, "request id must not be zero");
+
+    if (request_id == EzHttpRequest:0)
+    {
+        g_TestOptionsAutoDestroyDefaultHandle = EzHttpOptions:0;
+        finish_async_aggregate_test(g_TestOptionsAutoDestroyDefault);
+    }
+}
+
+public test_options_auto_destroy_default_complete(EzHttpRequest:request_id)
+{
+    new EzJSON:json_root;
+    if (!prepare_json_response(g_TestOptionsAutoDestroyDefault, request_id, json_root, __LINE__))
+    {
+        g_TestOptionsAutoDestroyDefaultHandle = EzHttpOptions:0;
+        finish_async_aggregate_test(g_TestOptionsAutoDestroyDefault);
+        return;
+    }
+
+    new EzJSON:json_args = ezjson_object_get_value(json_root, "args");
+    new EzJSON:json_headers = ezjson_object_get_value(json_root, "headers");
+    new request_name[64];
+    new header_value[64];
+
+    ezjson_object_get_string(json_args, "request", request_name, charsmax(request_name));
+    ezjson_object_get_string(json_headers, "X-Auto-Destroy-Option", header_value, charsmax(header_value));
+
+    _test_assert(g_TestOptionsAutoDestroyDefault, equal(request_name, "auto_destroy_default"), __LINE__, "auto destroy request marker mismatch");
+    _test_assert(g_TestOptionsAutoDestroyDefault, equal(header_value, "idle-cleanup"), __LINE__, "auto destroy request lost its header");
+
+    ezjson_free(json_headers);
+    ezjson_free(json_args);
+    ezjson_free(json_root);
+
+    new EzHttpOptions:reused_handle = ezhttp_create_options(false);
+    _test_assert(
+        g_TestOptionsAutoDestroyDefault,
+        reused_handle == g_TestOptionsAutoDestroyDefaultHandle,
+        __LINE__,
+        "default auto destroy must release the options handle after the request becomes idle"
+    );
+
+    if (reused_handle != EzHttpOptions:0)
+        ezhttp_destroy_options(reused_handle);
+
+    g_TestOptionsAutoDestroyDefaultHandle = EzHttpOptions:0;
+    finish_async_aggregate_test(g_TestOptionsAutoDestroyDefault);
+}
+
 START_ASYNC_TEST(test_destroy_options_after_dispatch)
 {
     new EzHttpOptions:opt = ezhttp_create_options();
@@ -796,7 +993,7 @@ public test_destroy_options_after_dispatch_complete(EzHttpRequest:request_id)
 
     ASSERT_TRUE_MSG(g_TestDestroyOptionsAfterDispatchDestroyed, "options must be destroyable after dispatch");
     ASSERT_INT_EQ(g_TestDestroyOptionsAfterDispatchRequestId, request_id);
-    
+
     new EzJSON:json_root;
     if (!prepare_json_response(__test, request_id, json_root, __LINE__))
     {
@@ -827,6 +1024,7 @@ START_ASYNC_TEST(test_ftp_download_wildcard)
     new EzHttpOptions:opt = ezhttp_create_options();
 
     cleanup_ftp_wildcard_download_dir();
+    ASSERT_TRUE_MSG(!dir_exists(FTP_WILDCARD_DOWNLOAD_DIR), "failed to clean leftover wildcard download directory before test");
     EZHTTP_OPTION_SET_TEST_DATA(opt)
 
     ezhttp_ftp_download("", "", "ftp.gnu.org", "gnu/hello/hello-2.12*.tar.gz.sig", FTP_WILDCARD_DOWNLOAD_DIR, "test_ftp_download_wildcard_complete", EZH_UNSECURE, opt);
@@ -845,6 +1043,7 @@ public test_ftp_download_wildcard_complete(EzHttpRequest:request_id)
     ASSERT_TRUE_MSG(file_exists(FTP_WILDCARD_FILE_3), "expected hello-2.12.2.tar.gz.sig to be downloaded");
 
     cleanup_ftp_wildcard_download_dir();
+    ASSERT_TRUE_MSG(!dir_exists(FTP_WILDCARD_DOWNLOAD_DIR), "wildcard download directory cleanup failed");
     END_ASYNC_TEST()
 }
 
