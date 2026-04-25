@@ -100,6 +100,7 @@ add_subdirectory(src)
 
 if (GCC)
     target_compile_options(cpr PRIVATE
+            -Wno-attribute-warning
             -Wno-error=attribute-warning
     )
 endif ()
