@@ -67,12 +67,14 @@ set(CMAKE_CXX_STANDARD 17)
 if (GCC)
     add_compile_options(
             -m32
+            -Wa,--noexecstack    # Tell assembler to mark object files as not needing executable stack
     )
 
     add_link_options(
             -m32
             -static-libstdc++    # Static linking of the GCC C++ runtime
             -static-libgcc       # Static linking of the GCC library
+            -Wl,-z,noexecstack   # Mark the final binary as not needing executable stack
     )
 elseif (MSVC)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>") # Static linking of the MSVC's C++ runtime
