@@ -96,6 +96,8 @@ endif ()
 ### Add dependencies and subprojects
 ###
 
+include(deps)
+
 add_subdirectory(dep/cpr)
 add_subdirectory(dep/parson)
 add_subdirectory(src)

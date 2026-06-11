@@ -10,14 +10,14 @@ include(FindPackageHandleStandardArgs)
 
 find_path(ZLIB_INCLUDE_DIR
         NAMES zlib.h
-        PATHS ${AMXX_EASY_HTTP_ROOT}/dep/zlib/include
+        PATHS ${AMXX_EASY_HTTP_DEPS_DIR}/zlib/include
         NO_DEFAULT_PATH
         NO_CACHE
 )
 
 find_library(ZLIB_LIBRARY
         NAMES zlib_a.lib libz.a
-        PATHS ${AMXX_EASY_HTTP_ROOT}/dep/zlib/lib
+        PATHS ${AMXX_EASY_HTTP_DEPS_DIR}/zlib/lib
         NO_DEFAULT_PATH
         NO_CACHE
 )

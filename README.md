@@ -171,3 +171,11 @@ Run the Docker container to build the module:
 ```
 docker run --rm -v .:/ezhttp amxx-ezhttp-builder
 ```
+
+## Dependencies
+
+To update the Linux dependencies:
+
+1. In AmxxEasyHttpDeps: bump `versions.env`, then push a tag. Its workflow
+   publishes a release with `amxx-ezhttp-deps-linux-i386.tar.gz` and its SHA256.
+2. Here: set `DEPS_TAG` and `DEPS_SHA256` in `.github/deps.lock` to that release.

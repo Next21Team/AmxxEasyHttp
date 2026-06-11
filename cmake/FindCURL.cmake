@@ -11,21 +11,21 @@ include(CMakeFindDependencyMacro)
 
 find_path(CURL_INCLUDE_DIR
         NAMES curl/curl.h
-        PATHS ${AMXX_EASY_HTTP_ROOT}/dep/curl/include
+        PATHS ${AMXX_EASY_HTTP_DEPS_DIR}/curl/include
         NO_DEFAULT_PATH
         NO_CACHE
 )
 
 find_library(CURL_LIBRARY
         NAMES libcurl_a.lib libcurl.a
-        PATHS ${AMXX_EASY_HTTP_ROOT}/dep/curl/lib
+        PATHS ${AMXX_EASY_HTTP_DEPS_DIR}/curl/lib
         NO_DEFAULT_PATH
         NO_CACHE
 )
 
 find_library(CURL_LIBRARY_DEBUG
         NAMES libcurl_a_debug.lib libcurl.a
-        PATHS ${AMXX_EASY_HTTP_ROOT}/dep/curl/lib
+        PATHS ${AMXX_EASY_HTTP_DEPS_DIR}/curl/lib
         NO_DEFAULT_PATH
         NO_CACHE
 )
@@ -77,11 +77,14 @@ target_compile_definitions(CURL::libcurl INTERFACE
 )
 
 if (UNIX)
+    find_package(Threads REQUIRED)
     target_link_libraries(CURL::libcurl INTERFACE
             ZLIB::ZLIB
             CARES::libcares
             OpenSSL::Crypto
             OpenSSL::SSL
+            Threads::Threads
+            ${CMAKE_DL_LIBS}
     )
 elseif (WIN32)
     target_link_libraries(CURL::libcurl INTERFACE

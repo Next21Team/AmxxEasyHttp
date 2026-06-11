@@ -1,0 +1,5 @@
+# how to update: see README "Dependencies"
+DEPS_REPO=Next21Team/AmxxEasyHttpDeps
+DEPS_TAG=deps-zlib-1.3.2_openssl-3.5.6_cares-1.34.6_curl-8.20.0
+DEPS_ASSET=amxx-ezhttp-deps-linux-i386.tar.gz
+DEPS_SHA256=a6af8e6897f3a262aabd467722c7a47ebbee94c036b7ca501938714662a4e70a

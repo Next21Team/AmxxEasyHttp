@@ -10,14 +10,14 @@ include(FindPackageHandleStandardArgs)
 
 find_path(CARES_INCLUDE_DIR
         NAMES ares.h
-        PATHS ${AMXX_EASY_HTTP_ROOT}/dep/cares/include
+        PATHS ${AMXX_EASY_HTTP_DEPS_DIR}/cares/include
         NO_DEFAULT_PATH
         NO_CACHE
 )
 
 find_library(CARES_LIBRARY
         NAMES libcares.a
-        PATHS ${AMXX_EASY_HTTP_ROOT}/dep/cares/lib
+        PATHS ${AMXX_EASY_HTTP_DEPS_DIR}/cares/lib
         NO_DEFAULT_PATH
         NO_CACHE
 )

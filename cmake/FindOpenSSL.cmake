@@ -6,21 +6,21 @@ include(FindPackageHandleStandardArgs)
 
 find_path(OPENSSL_INCLUDE_DIR
         NAMES openssl/opensslconf.h
-        PATHS ${AMXX_EASY_HTTP_ROOT}/dep/openssl/include
+        PATHS ${AMXX_EASY_HTTP_DEPS_DIR}/openssl/include
         NO_DEFAULT_PATH
         NO_CACHE
 )
 
 find_library(SSL_LIBRARY
         NAMES libssl.a
-        PATHS ${AMXX_EASY_HTTP_ROOT}/dep/openssl/lib
+        PATHS ${AMXX_EASY_HTTP_DEPS_DIR}/openssl/lib
         NO_DEFAULT_PATH
         NO_CACHE
 )
 
 find_library(CRYPTO_LIBRARY
         NAMES libcrypto.a
-        PATHS ${AMXX_EASY_HTTP_ROOT}/dep/openssl/lib
+        PATHS ${AMXX_EASY_HTTP_DEPS_DIR}/openssl/lib
         NO_DEFAULT_PATH
         NO_CACHE
 )

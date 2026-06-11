@@ -44,13 +44,33 @@ jobs:
   build-linux:
     name: Linux i386
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Restore dependencies (cache)
+        id: deps-cache
+        uses: actions/cache@v4
+        with:
+          path: .deps
+          key: deps-linux-i386-${{ hashFiles('.github/deps.lock') }}
+
+      - name: Fetch dependencies (cache miss)
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          while IFS='=' read -r k v; do
+            case "$k" in DEPS_REPO|DEPS_TAG|DEPS_ASSET|DEPS_SHA256) declare "$k=$v" ;; esac
+          done < .github/deps.lock
+          mkdir -p .deps
+          curl -fSL -o bundle.tgz "https://github.com/$DEPS_REPO/releases/download/$DEPS_TAG/$DEPS_ASSET"
+          if [ -n "${DEPS_SHA256:-}" ]; then echo "$DEPS_SHA256  bundle.tgz" | sha256sum -c -; fi
+          tar -xzf bundle.tgz -C .deps
+          rm -f bundle.tgz
 
       - name: Build in Ubuntu 14.04 container
         run: |
@@ -82,7 +102,7 @@ jobs:
             # Build
             mkdir -p build
             cd build
-            cmake .. -DCMAKE_BUILD_TYPE=Release
+            cmake .. -DCMAKE_BUILD_TYPE=Release -DFETCHCONTENT_SOURCE_DIR_AMXXDEPS=/workspace/.deps
             cmake --build . --target easy_http -j$(nproc)
           '
 
