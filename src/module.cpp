@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <memory>
 #include <utility>
 #include <fstream>
 
@@ -47,6 +48,25 @@ namespace
     {
         ezhttp::trace::SetEnabled(CVAR_GET_FLOAT("ezhttp_trace_log") != 0.0f);
     }
+
+    std::unique_ptr<cell[]> ReadCallbackData(AMX *amx, cell *params, int arg_data, int arg_data_len, int &data_len)
+    {
+        data_len = 0;
+
+        int args_passed = static_cast<int>(params[0] / sizeof(cell));
+        if (args_passed < arg_data_len)
+            return nullptr;
+
+        int requested_len = params[arg_data_len];
+        if (requested_len <= 0)
+            return nullptr;
+
+        std::unique_ptr<int[]> data = std::make_unique<cell[]>(requested_len);
+        MF_CopyAmxMemory(data.get(), MF_GetAmxAddr(amx, params[arg_data]), requested_len);
+        data_len = requested_len;
+
+        return data;
+    }
 }
 
 void CreateModules()
@@ -74,7 +94,7 @@ cell AMX_NATIVE_CALL ezhttp_create_options(AMX *amx, cell *params)
 {
     const bool auto_destroy = params[0] >= sizeof(cell)
                                   ? static_cast<bool>(params[1])
-                                  : true;
+                                  : false;
     OptionsId options_id = g_EasyHttpModule->CreateOptions(auto_destroy);
 
     return (cell)options_id;
@@ -283,20 +303,9 @@ cell AMX_NATIVE_CALL ezhttp_get(AMX *amx, cell *params)
     char *callback = MF_GetAmxString(amx, params[arg_callback], 1, &callback_len);
 
     int data_len = 0;
-    cell *data = nullptr;
-    if (params[arg_count] > 3)
-    {
-        data_len = params[arg_data_len];
-        if (data_len > 0)
-        {
-            data = new cell[data_len];
-            MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
-        }
-    }
+    std::unique_ptr<cell[]> request_data = ReadCallbackData(amx, params, arg_data, arg_data_len, data_len);
 
     auto options_id = (OptionsId)params[arg_option_id];
-
-    std::unique_ptr<cell[]> request_data(data);
     return (cell)DispatchRequest(amx, RequestMethod::HttpGet, options_id, std::string(url, url_len), std::string(callback, callback_len), std::move(request_data), data_len);
 }
 
@@ -320,20 +329,9 @@ cell AMX_NATIVE_CALL ezhttp_post(AMX *amx, cell *params)
     char *callback = MF_GetAmxString(amx, params[arg_callback], 1, &callback_len);
 
     int data_len = 0;
-    cell *data = nullptr;
-    if (params[arg_count] > 3)
-    {
-        data_len = params[arg_data_len];
-        if (data_len > 0)
-        {
-            data = new cell[data_len];
-            MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
-        }
-    }
+    std::unique_ptr<cell[]> request_data = ReadCallbackData(amx, params, arg_data, arg_data_len, data_len);
 
     auto options_id = (OptionsId)params[arg_option_id];
-
-    std::unique_ptr<cell[]> request_data(data);
     return (cell)DispatchRequest(amx, RequestMethod::HttpPost, options_id, std::string(url, url_len), std::string(callback, callback_len), std::move(request_data), data_len);
 }
 
@@ -357,20 +355,9 @@ cell AMX_NATIVE_CALL ezhttp_put(AMX *amx, cell *params)
     char *callback = MF_GetAmxString(amx, params[arg_callback], 1, &callback_len);
 
     int data_len = 0;
-    cell *data = nullptr;
-    if (params[arg_count] > 3)
-    {
-        data_len = params[arg_data_len];
-        if (data_len > 0)
-        {
-            data = new cell[data_len];
-            MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
-        }
-    }
+    std::unique_ptr<cell[]> request_data = ReadCallbackData(amx, params, arg_data, arg_data_len, data_len);
 
     auto options_id = (OptionsId)params[arg_option_id];
-
-    std::unique_ptr<cell[]> request_data(data);
     return (cell)DispatchRequest(amx, RequestMethod::HttpPut, options_id, std::string(url, url_len), std::string(callback, callback_len), std::move(request_data), data_len);
 }
 
@@ -394,20 +381,9 @@ cell AMX_NATIVE_CALL ezhttp_patch(AMX *amx, cell *params)
     char *callback = MF_GetAmxString(amx, params[arg_callback], 1, &callback_len);
 
     int data_len = 0;
-    cell *data = nullptr;
-    if (params[arg_count] > 3)
-    {
-        data_len = params[arg_data_len];
-        if (data_len > 0)
-        {
-            data = new cell[data_len];
-            MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
-        }
-    }
+    std::unique_ptr<cell[]> request_data = ReadCallbackData(amx, params, arg_data, arg_data_len, data_len);
 
     auto options_id = (OptionsId)params[arg_option_id];
-
-    std::unique_ptr<cell[]> request_data(data);
     return (cell)DispatchRequest(amx, RequestMethod::HttpPatch, options_id, std::string(url, url_len), std::string(callback, callback_len), std::move(request_data), data_len);
 }
 
@@ -431,20 +407,9 @@ cell AMX_NATIVE_CALL ezhttp_delete(AMX *amx, cell *params)
     char *callback = MF_GetAmxString(amx, params[arg_callback], 1, &callback_len);
 
     int data_len = 0;
-    cell *data = nullptr;
-    if (params[arg_count] > 3)
-    {
-        data_len = params[arg_data_len];
-        if (data_len > 0)
-        {
-            data = new cell[data_len];
-            MF_CopyAmxMemory(data, MF_GetAmxAddr(amx, params[arg_data]), data_len);
-        }
-    }
+    std::unique_ptr<cell[]> request_data = ReadCallbackData(amx, params, arg_data, arg_data_len, data_len);
 
     auto options_id = (OptionsId)params[arg_option_id];
-
-    std::unique_ptr<cell[]> request_data(data);
     return (cell)DispatchRequest(amx, RequestMethod::HttpDelete, options_id, std::string(url, url_len), std::string(callback, callback_len), std::move(request_data), data_len);
 }
 
