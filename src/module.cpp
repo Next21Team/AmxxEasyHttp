@@ -25,6 +25,8 @@ template <class TMethod>
 void SetKeyValueOption(AMX *amx, cell *params, TMethod method);
 template <class TMethod>
 void SetStringOption(AMX *amx, cell *params, TMethod method);
+template <class TMethod>
+void SetBinaryBodyOption(AMX *amx, cell *params, TMethod method);
 using OptionsConfigurer = std::function<void(OptionsData &)>;
 RequestId DispatchRequest(
     AMX *amx,
@@ -169,6 +171,20 @@ cell AMX_NATIVE_CALL ezhttp_option_set_body_from_json(AMX *amx, cell *params)
 cell AMX_NATIVE_CALL ezhttp_option_append_body(AMX *amx, cell *params)
 {
     SetStringOption(amx, params, &ezhttp::EasyHttpOptionsBuilder::AppendBody);
+    return 0;
+}
+
+// native ezhttp_option_set_body_binary(EzHttpOptions:options_id, const data[], len);
+cell AMX_NATIVE_CALL ezhttp_option_set_body_binary(AMX *amx, cell *params)
+{
+    SetBinaryBodyOption(amx, params, &ezhttp::EasyHttpOptionsBuilder::SetBody);
+    return 0;
+}
+
+// native ezhttp_option_append_body_binary(EzHttpOptions:options_id, const data[], len);
+cell AMX_NATIVE_CALL ezhttp_option_append_body_binary(AMX *amx, cell *params)
+{
+    SetBinaryBodyOption(amx, params, &ezhttp::EasyHttpOptionsBuilder::AppendBody);
     return 0;
 }
 
@@ -480,6 +496,26 @@ cell AMX_NATIVE_CALL ezhttp_get_data(AMX *amx, cell *params)
     utils::SetAmxStringUTF8CharSafe(amx, params[2], response.text.c_str(), response.text.length(), max_len);
 
     return 0;
+}
+
+// native ezhttp_get_data_binary(EzHttpRequest:request_id, buffer[], max_len);
+cell AMX_NATIVE_CALL ezhttp_get_data_binary(AMX *amx, cell *params)
+{
+    auto request_id = (RequestId)params[1];
+    cell max_len = params[3];
+
+    if (!ValidateRequestId(amx, request_id) || max_len <= 0)
+        return 0;
+
+    const Response &response = g_EasyHttpModule->GetRequest(request_id).response;
+
+    size_t to_copy = std::min(static_cast<size_t>(max_len), response.text.length());
+
+    cell *buffer = MF_GetAmxAddr(amx, params[2]);
+    for (size_t i = 0; i < to_copy; ++i)
+        buffer[i] = static_cast<unsigned char>(response.text[i]);
+
+    return static_cast<cell>(to_copy);
 }
 
 // native EzJSON:ezhttp_parse_json_response(EzHttpRequest:request_id, bool:with_comments = false);
@@ -1084,6 +1120,33 @@ void SetStringOption(AMX *amx, cell *params, TMethod method)
     (g_EasyHttpModule->GetOptions(options_id).options_builder.*method)(std::string(value, value_len));
 }
 
+template <class TMethod>
+void SetBinaryBodyOption(AMX *amx, cell *params, TMethod method)
+{
+    auto options_id = (OptionsId)params[1];
+
+    if (!ValidateOptionsId(amx, options_id))
+        return;
+
+    int data_len = params[3];
+    if (data_len < 0)
+    {
+        MF_LogError(amx, AMX_ERR_NATIVE, "Invalid binary body length: %d", data_len);
+        return;
+    }
+
+    std::string body;
+    if (data_len > 0)
+    {
+        cell *data_addr = MF_GetAmxAddr(amx, params[2]);
+        body.resize(static_cast<size_t>(data_len));
+        for (int i = 0; i < data_len; ++i)
+            body[i] = static_cast<char>(data_addr[i] & 0xFF);
+    }
+
+    (g_EasyHttpModule->GetOptions(options_id).options_builder.*method)(body);
+}
+
 AMX_NATIVE_INFO g_Natives[] =
     {
         // options
@@ -1095,6 +1158,8 @@ AMX_NATIVE_INFO g_Natives[] =
         {"ezhttp_option_set_body", ezhttp_option_set_body},
         {"ezhttp_option_set_body_from_json", ezhttp_option_set_body_from_json},
         {"ezhttp_option_append_body", ezhttp_option_append_body},
+        {"ezhttp_option_set_body_binary", ezhttp_option_set_body_binary},
+        {"ezhttp_option_append_body_binary", ezhttp_option_append_body_binary},
         {"ezhttp_option_set_header", ezhttp_option_set_header},
         {"ezhttp_option_set_cookie", ezhttp_option_set_cookie},
         {"ezhttp_option_set_timeout", ezhttp_option_set_timeout},
@@ -1119,6 +1184,7 @@ AMX_NATIVE_INFO g_Natives[] =
         // response
         {"ezhttp_get_http_code", ezhttp_get_http_code},
         {"ezhttp_get_data", ezhttp_get_data},
+        {"ezhttp_get_data_binary", ezhttp_get_data_binary},
         {"ezhttp_parse_json_response", ezhttp_parse_json_response},
         {"ezhttp_get_url", ezhttp_get_url},
         {"ezhttp_save_data_to_file", ezhttp_save_data_to_file},

@@ -17,6 +17,8 @@ TEST_LIST_ASYNC = {
     { "test_post_form",         "test post form" },
     { "test_post_body",         "test post body plain/text" },
     { "test_post_body_json",    "test post body json" },
+    { "test_post_body_binary",  "test post binary body (octet-stream, embedded null bytes)" },
+    { "test_get_data_binary",   "test get binary response data (png signature)" },
     { "test_user_agent",        "test user agent" },
     { "test_headers",           "test headers" },
     { "test_cookies",           "test cookies" },
@@ -656,6 +658,120 @@ public test_post_body_json_complete(EzHttpRequest:request_id)
 
     ezjson_free(json_data);
     ezjson_free(json_root);
+
+    END_ASYNC_TEST()
+}
+
+START_ASYNC_TEST(test_post_body_binary)
+{
+    new EzHttpOptions:opt = ezhttp_create_options();
+    new url[256];
+
+    // Body with embedded null bytes that the string-based body natives would truncate.
+    // The body is built in two parts to exercise both binary natives at once.
+    new first_chunk[3]  = { 'A', 'B', 0x00 };
+    new second_chunk[3] = { 0x00, 'C', 'D' };
+
+    ezhttp_option_set_body_binary(opt, first_chunk, sizeof(first_chunk));
+    ezhttp_option_append_body_binary(opt, second_chunk, sizeof(second_chunk));
+    ezhttp_option_set_header(opt, "Content-Type", "application/octet-stream");
+
+    EZHTTP_OPTION_SET_TEST_DATA(opt)
+
+    build_test_url(url, charsmax(url), "/post");
+    ezhttp_post(url, "test_post_body_binary_complete", opt);
+}
+
+public test_post_body_binary_complete(EzHttpRequest:request_id)
+{
+    EZHTTP_OPTION_EXTRACT_TEST_DATA(request_id)
+
+    server_print("test_post_body_binary request elapsed: %f", ezhttp_get_elapsed(request_id));
+
+    new EzJSON:json_root;
+    if (!prepare_json_response(__test, request_id, json_root, __LINE__))
+    {
+        END_ASYNC_TEST()
+        return;
+    }
+
+    new EzJSON:json_headers = ezjson_object_get_value(json_root, "headers");
+
+    // asserts
+
+    // The whole 6-byte buffer (including the two embedded null bytes) must be sent,
+    // proving the binary natives do not truncate the body at the first null byte.
+    new content_length[16];
+    ezjson_object_get_string(json_headers, "Content-Length", content_length, charsmax(content_length));
+    ASSERT_TRUE_MSG(equal(content_length, "6"), "binary body must not be truncated at null bytes");
+
+    new content_type[64];
+    ezjson_object_get_string(json_headers, "Content-Type", content_type, charsmax(content_type));
+    ASSERT_TRUE(equal(content_type, "application/octet-stream"));
+
+    //
+
+    ezjson_free(json_headers);
+    ezjson_free(json_root);
+
+    END_ASYNC_TEST()
+}
+
+START_ASYNC_TEST(test_get_data_binary)
+{
+    new EzHttpOptions:opt = ezhttp_create_options();
+    new url[256];
+
+    EZHTTP_OPTION_SET_TEST_DATA(opt)
+
+    build_test_url(url, charsmax(url), "/image/png");
+    ezhttp_get(url, "test_get_data_binary_complete", opt);
+}
+
+public test_get_data_binary_complete(EzHttpRequest:request_id)
+{
+    EZHTTP_OPTION_EXTRACT_TEST_DATA(request_id)
+
+    server_print("test_get_data_binary request elapsed: %f", ezhttp_get_elapsed(request_id));
+
+    // asserts
+
+    ASSERT_TRUE_MSG(ezhttp_get_error_code(request_id) == EZH_OK, "request must succeed");
+
+    new content_type[64];
+    ezhttp_get_headers(request_id, "Content-Type", content_type, charsmax(content_type));
+    ASSERT_TRUE_MSG(equal(content_type, "image/png"), "content type must be image/png");
+
+    // The PNG body is larger than the buffer, so the whole buffer must be filled and
+    // the raw bytes (including the high 0x89 byte) must be read without corruption.
+    new buffer[64];
+    new bytes = ezhttp_get_data_binary(request_id, buffer, sizeof(buffer));
+    ASSERT_TRUE_MSG(bytes == sizeof(buffer), "binary read must return the copied byte count");
+
+    // PNG signature: 0x89 'P' 'N' 'G' 0x0D 0x0A 0x1A 0x0A
+    ASSERT_TRUE_MSG(buffer[0] == 0x89, "byte 0 must be 0x89 (high bit preserved)");
+    ASSERT_TRUE_MSG(buffer[1] == 'P', "byte 1 must be 'P'");
+    ASSERT_TRUE_MSG(buffer[2] == 'N', "byte 2 must be 'N'");
+    ASSERT_TRUE_MSG(buffer[3] == 'G', "byte 3 must be 'G'");
+    ASSERT_TRUE_MSG(buffer[4] == 0x0D, "byte 4 must be 0x0D");
+    ASSERT_TRUE_MSG(buffer[5] == 0x0A, "byte 5 must be 0x0A");
+    ASSERT_TRUE_MSG(buffer[6] == 0x1A, "byte 6 must be 0x1A");
+    ASSERT_TRUE_MSG(buffer[7] == 0x0A, "byte 7 must be 0x0A");
+
+    // Right after the signature comes the IHDR chunk length, which is 0x0000000D in
+    // every valid PNG. Bytes 8..10 are therefore null bytes - the key proof that the
+    // binary read preserves 0x00 instead of truncating at it.
+    ASSERT_TRUE_MSG(buffer[8] == 0x00, "byte 8 must be 0x00 (null preserved)");
+    ASSERT_TRUE_MSG(buffer[9] == 0x00, "byte 9 must be 0x00 (null preserved)");
+    ASSERT_TRUE_MSG(buffer[10] == 0x00, "byte 10 must be 0x00 (null preserved)");
+    ASSERT_TRUE_MSG(buffer[11] == 0x0D, "byte 11 must be 0x0D (IHDR chunk length)");
+    ASSERT_TRUE_MSG(buffer[12] == 'I' && buffer[13] == 'H' && buffer[14] == 'D' && buffer[15] == 'R', "bytes 12..15 must be 'IHDR'");
+
+    // Contrast with the string-based native: ezhttp_get_data stops at the first null
+    // byte (offset 8), so it reads fewer bytes than the binary native.
+    new str_buffer[64];
+    ezhttp_get_data(request_id, str_buffer, charsmax(str_buffer));
+    ASSERT_TRUE_MSG(strlen(str_buffer) < bytes, "string get_data must truncate at the first null byte");
 
     END_ASYNC_TEST()
 }

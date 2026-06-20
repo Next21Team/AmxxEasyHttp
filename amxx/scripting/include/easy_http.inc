@@ -142,7 +142,38 @@ native bool:ezhttp_option_set_body_from_json(EzHttpOptions:options_id, EzJSON:js
   * @noreturn
   */
  native ezhttp_option_append_body(EzHttpOptions:options_id, const body[]);
- 
+
+/**
+ * Sets the request body from a raw binary buffer.
+ *
+ * @note                     Unlike ezhttp_option_set_body, this native reads exactly @len bytes
+ *                           and is not terminated by null bytes, so it is suitable for sending
+ *                           arbitrary binary data (e.g. application/octet-stream).
+ *                           Each cell of @data holds a single byte (0-255); only the low byte is used.
+ *                           Set the Content-Type header manually via ezhttp_option_set_header if required.
+ *
+ * @param options_id         Options identifier created via ezhttp_create_options().
+ * @param data               Buffer holding the body bytes, one byte per cell.
+ * @param len                Number of bytes to read from the buffer.
+ *
+ * @noreturn
+ */
+native ezhttp_option_set_body_binary(EzHttpOptions:options_id, const data[], len);
+
+/**
+ * Appends a raw binary buffer to the request body.
+ *
+ * @note                     Reads exactly @len bytes and is not terminated by null bytes.
+ *                           Each cell of @data holds a single byte (0-255); only the low byte is used.
+ *
+ * @param options_id         Options identifier created via ezhttp_create_options().
+ * @param data               Buffer holding the body bytes, one byte per cell.
+ * @param len                Number of bytes to read from the buffer.
+ *
+ * @noreturn
+ */
+native ezhttp_option_append_body_binary(EzHttpOptions:options_id, const data[], len);
+
  /**
   * Sets a header for the HTTP request.
   *
@@ -421,6 +452,22 @@ native ezhttp_get_http_code(EzHttpRequest:request_id);
  * @noreturn
  */
 native ezhttp_get_data(EzHttpRequest:request_id, buffer[], max_len);
+
+/**
+ * Gets the response data of the request as a raw binary buffer.
+ *
+ * @note                    This native can only be used in the on_complete callback.
+ *                          Unlike ezhttp_get_data, it copies raw bytes (one byte per cell) and
+ *                          is not terminated by null bytes, so it is suitable for binary responses
+ *                          (e.g. images, archives) whose body may contain 0x00 bytes.
+ *
+ * @param request_id        The request identifier.
+ * @param buffer            The buffer to store the bytes in, one byte per cell.
+ * @param max_len           The maximum number of bytes (cells) to write.
+ *
+ * @return                  The number of bytes written to the buffer.
+ */
+native ezhttp_get_data_binary(EzHttpRequest:request_id, buffer[], max_len);
 
 /**
  * Parses http response body to JSON.
