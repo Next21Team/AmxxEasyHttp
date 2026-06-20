@@ -1,0 +1,89 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: easy_http-windows-win32
+          path: dist/windows
+
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: easy_http-linux-i386
+          path: dist/linux
+
+      - name: Package release archives
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+
+          dll=$(find dist/windows -name 'easy_http_amxx.dll'     | head -n1)
+          pdb=$(find dist/windows -name 'easy_http_amxx.pdb'     | head -n1)
+          so=$( find dist/linux   -name 'easy_http_amxx_i386.so' | head -n1)
+          for f in "$dll" "$pdb" "$so"; do
+            [ -n "$f" ] && [ -f "$f" ] || { echo "::error::missing build output: '$f'"; exit 1; }
+          done
+
+          # Lay out the shared AMXX payload: CA bundle + scripting includes.
+          stage_common() {
+            root="$1"
+            mkdir -p "$root/addons/amxmodx/modules" \
+                     "$root/addons/amxmodx/data" \
+                     "$root/addons/amxmodx/scripting/include"
+            cp amxx/data/amxx_easy_http_cacert.pem "$root/addons/amxmodx/data/"
+            cp amxx/scripting/include/easy_http.inc \
+               amxx/scripting/include/easy_http_json.inc \
+               "$root/addons/amxmodx/scripting/include/"
+          }
+
+          stage_common stage/windows
+          cp "$dll" stage/windows/addons/amxmodx/modules/
+          (cd stage/windows && zip -r "$GITHUB_WORKSPACE/AmxxEasyHttp-$TAG-windows-win32.zip" addons)
+
+          stage_common stage/linux
+          cp "$so" stage/linux/addons/amxmodx/modules/
+          (cd stage/linux && zip -r "$GITHUB_WORKSPACE/AmxxEasyHttp-$TAG-linux-i386.zip" addons)
+
+          mkdir -p stage/pdb
+          cp "$pdb" stage/pdb/
+          (cd stage/pdb && zip -r "$GITHUB_WORKSPACE/AmxxEasyHttp-$TAG-pdb.zip" .)
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            AmxxEasyHttp-${{ github.event.release.tag_name }}-windows-win32.zip
+            AmxxEasyHttp-${{ github.event.release.tag_name }}-linux-i386.zip
+            AmxxEasyHttp-${{ github.event.release.tag_name }}-pdb.zip
+
+      - name: Upload assets to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: >
+          gh release upload "$TAG"
+          "AmxxEasyHttp-$TAG-windows-win32.zip"
+          "AmxxEasyHttp-$TAG-linux-i386.zip"
+          "AmxxEasyHttp-$TAG-pdb.zip"
+          --clobber --repo "$GITHUB_REPOSITORY"
