@@ -92,9 +92,9 @@
 // Meta query
 //#define FN_META_QUERY OnMetaQuery
 // Meta attach
-//#define FN_META_ATTACH OnMetaAttach
+#define FN_META_ATTACH OnMetaAttach
 // Meta detach
-// #define FN_META_DETACH OnMetaDetach
+#define FN_META_DETACH OnMetaDetach
 
 // (wd) are Will Day's notes
 // - GetEntityAPI2 functions

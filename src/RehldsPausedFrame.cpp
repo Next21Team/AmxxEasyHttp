@@ -10,6 +10,7 @@ namespace
     IRehldsHookRegistry_SV_Frame *frame_registry = nullptr;
     IRehldsServerData *server_data = nullptr;
     void (*paused_frame_callback)() = nullptr;
+    unsigned int dispatch_count = 0;
 
     IRehldsApi *FindRehldsApi()
     {
@@ -42,11 +43,17 @@ namespace
 
     void EXT_FUNC OnServerFrame(IRehldsHook_SV_Frame *chain)
     {
+        const auto dispatches_before_frame = dispatch_count;
         chain->callNext();
-        // Packet processing in the original frame may have changed the pause state.
-        if (server_data && server_data->IsActive() && server_data->IsPaused())
+        // A StartFrame callback may have paused the game after dispatch already began.
+        if (dispatch_count == dispatches_before_frame && server_data && server_data->IsActive() && server_data->IsPaused())
             paused_frame_callback();
     }
+}
+
+void ezhttp::MarkFrameDispatched()
+{
+    ++dispatch_count;
 }
 
 bool ezhttp::RegisterPausedFrameHook(void (*on_paused_frame)())

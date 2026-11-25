@@ -5,4 +5,5 @@ namespace ezhttp
 {
     bool RegisterPausedFrameHook(void (*on_paused_frame)());
     void UnregisterPausedFrameHook();
+    void MarkFrameDispatched();
 }

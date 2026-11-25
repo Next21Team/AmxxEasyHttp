@@ -45,6 +45,7 @@ bool g_MapChangeResetDone = false;
 
 namespace
 {
+    bool metamod_attached = false;
     cvar_t cvar_ezhttp_trace = {"ezhttp_trace_log", "0", FCVAR_SERVER | FCVAR_SPONLY};
 
     void RefreshTraceLogSetting()
@@ -56,7 +57,16 @@ namespace
     {
         RefreshTraceLogSetting();
         if (g_EasyHttpModule && !g_MapChangeResetDone)
+        {
+            ezhttp::MarkFrameDispatched();
             g_EasyHttpModule->RunFrame();
+        }
+    }
+
+    void RegisterPausedFrameHookIfReady()
+    {
+        if (metamod_attached && g_EasyHttpModule && ezhttp::RegisterPausedFrameHook(DispatchFrame))
+            ezhttp::trace::Writef("module", "Registered ReHLDS paused frame hook");
     }
 
     std::unique_ptr<cell[]> ReadCallbackData(AMX *amx, cell *params, int arg_data, int arg_data_len, int &data_len)
@@ -87,8 +97,7 @@ void CreateModules()
     g_EasyHttpModule = std::make_unique<EasyHttpModule>(MF_BuildPathname("addons/amxmodx/data/amxx_easy_http_cacert.pem"));
     g_JsonManager = std::make_unique<JSONMngr>();
     g_MapChangeResetDone = false;
-    if (ezhttp::RegisterPausedFrameHook(DispatchFrame))
-        ezhttp::trace::Writef("module", "Registered ReHLDS paused frame hook");
+    RegisterPausedFrameHookIfReady();
     ezhttp::trace::Writef("module", "CreateModules done easy_http=%p json=%p", g_EasyHttpModule.get(), g_JsonManager.get());
 }
 
@@ -1229,6 +1238,18 @@ AMX_NATIVE_INFO g_Natives[] =
 };
 
 cvar_t cvar_ezhttp_version = {"ezhttp_version", MODULE_VERSION, FCVAR_SERVER | FCVAR_SPONLY};
+
+void OnMetaAttach()
+{
+    metamod_attached = true;
+    RegisterPausedFrameHookIfReady();
+}
+
+void OnMetaDetach()
+{
+    metamod_attached = false;
+    ezhttp::UnregisterPausedFrameHook();
+}
 
 void OnAmxxAttach()
 {
