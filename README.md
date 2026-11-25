@@ -2,6 +2,8 @@ AmxxEasyHttp
 =======
 AmxxEasyHttp is a module for amxmodx which provides an easy to use API for HTTP, HTTPS and FTP requests.
 
+On ReHLDS with engine API 3.10 or newer in the 3.x series, completion callbacks run on the server thread even while the game is paused. A callback can read the response and issue another request during the pause. On stock HLDS and older ReHLDS versions, completed requests wait for the game to resume before their callbacks run.
+
 Example
 -------
 Here is a short example which shows some features of AmxxEasyHttp:

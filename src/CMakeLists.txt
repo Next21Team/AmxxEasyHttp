@@ -5,6 +5,24 @@ find_package(Threads REQUIRED)
 find_package(HLSDK REQUIRED)
 find_package(metamod REQUIRED)
 
+# Use the public ReHLDS headers only in the frame hook, separate from the HLSDK.
+include(FetchContent)
+FetchContent_Declare(rehlds_sdk
+        URL https://codeload.github.com/rehlds/ReHLDS/tar.gz/196300131858d1e087267fb2fb60cb935f8f8873
+        URL_HASH SHA256=a6e9e52f964fd325e11dd926607bf224ea3b5f919eeb865371f3d85ca90acae7
+)
+FetchContent_GetProperties(rehlds_sdk)
+if (NOT rehlds_sdk_POPULATED)
+    FetchContent_Populate(rehlds_sdk)
+endif ()
+set(REHLDS_HEADERS ${rehlds_sdk_SOURCE_DIR}/rehlds)
+set_property(SOURCE RehldsPausedFrame.cpp PROPERTY INCLUDE_DIRECTORIES
+        ${REHLDS_HEADERS}/public/rehlds ${REHLDS_HEADERS}/public ${REHLDS_HEADERS}/common)
+if (MSVC)
+    # The SDK headers contain Windows-1252 comments.
+    set_property(SOURCE RehldsPausedFrame.cpp PROPERTY COMPILE_OPTIONS /source-charset:.1252)
+endif ()
+
 if (AMXX_EASY_HTTP_BUILD_STATIC)
     set(LIBRARY_BUILD_TYPE STATIC)
     set(TARGET_LIBRARIES_SCOPE PUBLIC)
@@ -18,6 +36,8 @@ add_library(${TARGET_NAME} ${LIBRARY_BUILD_TYPE}
         sdk/amxxmodule.h
         sdk/moduleconfig.h
         module.cpp
+        RehldsPausedFrame.cpp
+        RehldsPausedFrame.h
         EasyHttpModule.cpp
         EasyHttpModule.h
         easy_http/EasyHttpInterface.h
@@ -60,6 +80,7 @@ add_library(${TARGET_NAME} ${LIBRARY_BUILD_TYPE}
 
 target_link_libraries(${TARGET_NAME} ${TARGET_LIBRARIES_SCOPE}
         Threads::Threads
+        ${CMAKE_DL_LIBS}
         cpr::cpr
         parson::parson
         HLSDK::HLSDK_includes

@@ -6,6 +6,7 @@
 #include <sdk/amxxmodule.h>
 
 #include "EasyHttpModule.h"
+#include "RehldsPausedFrame.h"
 #include "json/JsonMngr.h"
 #include "json/JsonNatives.h"
 #include "utils/ftp_utils.h"
@@ -51,6 +52,13 @@ namespace
         ezhttp::trace::SetEnabled(CVAR_GET_FLOAT("ezhttp_trace_log") != 0.0f);
     }
 
+    void DispatchFrame()
+    {
+        RefreshTraceLogSetting();
+        if (g_EasyHttpModule && !g_MapChangeResetDone)
+            g_EasyHttpModule->RunFrame();
+    }
+
     std::unique_ptr<cell[]> ReadCallbackData(AMX *amx, cell *params, int arg_data, int arg_data_len, int &data_len)
     {
         data_len = 0;
@@ -79,11 +87,14 @@ void CreateModules()
     g_EasyHttpModule = std::make_unique<EasyHttpModule>(MF_BuildPathname("addons/amxmodx/data/amxx_easy_http_cacert.pem"));
     g_JsonManager = std::make_unique<JSONMngr>();
     g_MapChangeResetDone = false;
+    if (ezhttp::RegisterPausedFrameHook(DispatchFrame))
+        ezhttp::trace::Writef("module", "Registered ReHLDS paused frame hook");
     ezhttp::trace::Writef("module", "CreateModules done easy_http=%p json=%p", g_EasyHttpModule.get(), g_JsonManager.get());
 }
 
 void DestroyModules()
 {
+    ezhttp::UnregisterPausedFrameHook();
     ezhttp::trace::Writef("module", "DestroyModules begin easy_http=%p json=%p", g_EasyHttpModule.get(), g_JsonManager.get());
     g_EasyHttpModule.reset();
     g_JsonManager.reset();
@@ -1259,11 +1270,7 @@ void ServerActivate(edict_t * /*pEdictList*/, int /*edictCount*/, int /*clientMa
 
 void StartFrame()
 {
-    RefreshTraceLogSetting();
-
-    if (g_EasyHttpModule)
-        g_EasyHttpModule->RunFrame();
-
+    DispatchFrame();
     SET_META_RESULT(MRES_IGNORED);
 }
 
