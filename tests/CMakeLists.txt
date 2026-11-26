@@ -4,6 +4,7 @@ include(GoogleTest)
 
 add_executable(${TARGET_NAME}
         easy_http_module_tests.cpp
+        frame_dispatch_tests.cpp
         ftp_utils_tests.cpp
         session_cache_tests.cpp
         CurlHolderComparer.h
@@ -18,5 +19,7 @@ target_link_libraries(${TARGET_NAME} PRIVATE
         GTest::gmock_main
         easy_http::easy_http
 )
+
+target_compile_definitions(${TARGET_NAME} PRIVATE HAVE_STDINT_H NOMINMAX)
 
 gtest_discover_tests(${TARGET_NAME})

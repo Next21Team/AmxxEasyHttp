@@ -1,9 +1,10 @@
 #pragma once
 
-// The callback runs on the engine thread while an active game is paused.
 namespace ezhttp
 {
-    bool RegisterPausedFrameHook(void (*on_paused_frame)());
+    // Returns a diagnostic for the AMXX log. All queries run on the engine thread.
+    const char *RegisterPausedFrameHook(void (*on_frame_end)(bool active_and_paused));
     void UnregisterPausedFrameHook();
-    void MarkFrameDispatched();
+    bool SupportsDispatchWhilePaused();
+    bool IsServerPaused();
 }

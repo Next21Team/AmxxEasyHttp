@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "EasyHttpInterface.h"
+#include "CompletionQueue.h"
 #include "EasyHttpOptionsBuilder.h"
 #include "session_cache/CprSessionCache.h"
 
@@ -43,7 +44,7 @@ namespace ezhttp
         std::deque<PendingRequest> pending_requests_;
 
         std::mutex completed_requests_mutex_;
-        std::deque<CompletedRequest> completed_requests_;
+        CompletionQueue<CompletedRequest> completed_requests_;
 
         mutable std::mutex requests_mutex_;
         std::vector<std::thread> worker_threads_;
@@ -55,7 +56,7 @@ namespace ezhttp
         ~EasyHttp() override;
 
         std::shared_ptr<RequestControl> SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const ResponseCallback &on_complete) override;
-        void RunFrame() override;
+        void RunFrame(GetCallbackDelivery get_delivery) override;
         int GetActiveRequestCount() override
         {
             std::lock_guard lock_guard(requests_mutex_);
@@ -67,7 +68,7 @@ namespace ezhttp
 
     private:
         void WorkerLoop();
-        bool TryPopCompletedRequest(CompletedRequest &completed_request);
+        bool TryPopCompletedRequest(CompletedRequest &completed_request, CallbackDelivery delivery);
         void ClearTrackedRequestsWithoutCallbacks();
         void TrackRequest(const std::shared_ptr<RequestControl>& request_control);
         void FinishTrackedRequest(const std::shared_ptr<RequestControl>& request_control);

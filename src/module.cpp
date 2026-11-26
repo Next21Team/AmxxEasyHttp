@@ -6,6 +6,7 @@
 #include <sdk/amxxmodule.h>
 
 #include "EasyHttpModule.h"
+#include "FramePump.h"
 #include "RehldsPausedFrame.h"
 #include "json/JsonMngr.h"
 #include "json/JsonNatives.h"
@@ -53,20 +54,48 @@ namespace
         ezhttp::trace::SetEnabled(CVAR_GET_FLOAT("ezhttp_trace_log") != 0.0f);
     }
 
-    void DispatchFrame()
+    FramePump frame_pump;
+
+    CallbackDelivery StartFrameDelivery()
     {
+        if (!metamod_attached)
+            return CallbackDelivery::Suspended;
+        return ezhttp::IsServerPaused() ? CallbackDelivery::OptedIn : CallbackDelivery::All;
+    }
+
+    CallbackDelivery PausedFrameDelivery()
+    {
+        // A Pawn callback can resume the game or detach the hook mid-batch.
+        return ezhttp::IsServerPaused() ? CallbackDelivery::OptedIn : CallbackDelivery::Suspended;
+    }
+
+    void DispatchFrame(FrameSource source)
+    {
+        if (!g_EasyHttpModule || !frame_pump.ShouldDispatch(source))
+            return;
+
         RefreshTraceLogSetting();
-        if (g_EasyHttpModule && !g_MapChangeResetDone)
-        {
-            ezhttp::MarkFrameDispatched();
-            g_EasyHttpModule->RunFrame();
-        }
+        if (source == FrameSource::StartFrame)
+            g_EasyHttpModule->RunFrame(StartFrameDelivery);
+        else if (!g_MapChangeResetDone)
+            g_EasyHttpModule->RunFrame(PausedFrameDelivery);
+    }
+
+    void OnEngineFrameEnd(bool active_and_paused)
+    {
+        DispatchFrame(active_and_paused ? FrameSource::PausedEngineFrameEnd : FrameSource::EngineFrameEnd);
     }
 
     void RegisterPausedFrameHookIfReady()
     {
-        if (metamod_attached && g_EasyHttpModule && ezhttp::RegisterPausedFrameHook(DispatchFrame))
-            ezhttp::trace::Writef("module", "Registered ReHLDS paused frame hook");
+        if (!metamod_attached || !g_EasyHttpModule || ezhttp::SupportsDispatchWhilePaused())
+            return;
+
+        frame_pump = {};
+        const char *status = IS_DEDICATED_SERVER()
+            ? ezhttp::RegisterPausedFrameHook(OnEngineFrameEnd)
+            : "unavailable (requires a dedicated server)";
+        MF_Log("Paused callback delivery: %s", status);
     }
 
     std::unique_ptr<cell[]> ReadCallbackData(AMX *amx, cell *params, int arg_data, int arg_data_len, int &data_len)
@@ -300,6 +329,19 @@ cell AMX_NATIVE_CALL ezhttp_option_set_plugin_end_behaviour(AMX *amx, cell *para
         return 0;
 
     g_EasyHttpModule->GetOptions(options_id).plugin_end_behaviour = plugin_end_behaviour;
+    return 0;
+}
+
+cell AMX_NATIVE_CALL ezhttp_supports_dispatch_while_paused(AMX *, cell *)
+{
+    return ezhttp::SupportsDispatchWhilePaused();
+}
+
+cell AMX_NATIVE_CALL ezhttp_option_set_dispatch_while_paused(AMX *amx, cell *params)
+{
+    auto options_id = static_cast<OptionsId>(params[1]);
+    if (ValidateOptionsId(amx, options_id))
+        g_EasyHttpModule->GetOptionsBuilder(options_id).SetDispatchWhilePaused(params[2] != 0);
     return 0;
 }
 
@@ -1189,6 +1231,8 @@ AMX_NATIVE_INFO g_Natives[] =
         {"ezhttp_option_set_auth", ezhttp_option_set_auth},
         {"ezhttp_option_set_user_data", ezhttp_option_set_user_data},
         {"ezhttp_option_set_plugin_end_behaviour", ezhttp_option_set_plugin_end_behaviour},
+        {"ezhttp_supports_dispatch_while_paused", ezhttp_supports_dispatch_while_paused},
+        {"ezhttp_option_set_dispatch_while_paused", ezhttp_option_set_dispatch_while_paused},
         {"ezhttp_option_set_queue", ezhttp_option_set_queue},
 
         // requests
@@ -1291,7 +1335,7 @@ void ServerActivate(edict_t * /*pEdictList*/, int /*edictCount*/, int /*clientMa
 
 void StartFrame()
 {
-    DispatchFrame();
+    DispatchFrame(FrameSource::StartFrame);
     SET_META_RESULT(MRES_IGNORED);
 }
 

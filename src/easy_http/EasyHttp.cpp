@@ -209,10 +209,10 @@ void EasyHttp::WorkerLoop()
             forgotten = pending_request.request_control->forgotten.load();
             if (!forgotten)
             {
-                completed_requests_.push_back(CompletedRequest{
+                completed_requests_.Push(CompletedRequest{
                     pending_request.request_control,
                     std::move(response),
-                    std::move(pending_request.on_complete)});
+                    std::move(pending_request.on_complete)}, pending_request.options.dispatch_while_paused);
                 ezhttp::trace::Writef("EasyHttp", "WorkerLoop queued completion this=%p control=%p completed=%zu", this, pending_request.request_control.get(), completed_requests_.size());
                 continue;
             }
@@ -224,15 +224,10 @@ void EasyHttp::WorkerLoop()
     }
 }
 
-bool EasyHttp::TryPopCompletedRequest(CompletedRequest &completed_request)
+bool EasyHttp::TryPopCompletedRequest(CompletedRequest &completed_request, CallbackDelivery delivery)
 {
     std::lock_guard lock_guard(completed_requests_mutex_);
-    if (completed_requests_.empty())
-        return false;
-
-    completed_request = std::move(completed_requests_.front());
-    completed_requests_.pop_front();
-    return true;
+    return completed_requests_.Pop(completed_request, delivery);
 }
 
 void EasyHttp::DropCompletedRequestsWithoutCallbacks()
@@ -242,7 +237,8 @@ void EasyHttp::DropCompletedRequestsWithoutCallbacks()
     {
         std::lock_guard lock_guard(completed_requests_mutex_);
         completed_request_controls.reserve(completed_requests_.size());
-        for (auto &completed_request : completed_requests_)
+        CompletedRequest completed_request;
+        while (completed_requests_.Pop(completed_request, CallbackDelivery::All))
         {
             if (completed_request.request_control)
             {
@@ -251,8 +247,6 @@ void EasyHttp::DropCompletedRequestsWithoutCallbacks()
                 completed_request_controls.emplace_back(completed_request.request_control);
             }
         }
-
-        completed_requests_.clear();
     }
 
     for (auto &request_control : completed_request_controls)
@@ -277,23 +271,26 @@ void EasyHttp::ClearTrackedRequestsWithoutCallbacks()
     requests_.clear();
 }
 
-void EasyHttp::RunFrame()
+void EasyHttp::RunFrame(GetCallbackDelivery get_delivery)
 {
     for (int i = 0; i < kMaxTasksExecPerFrame; ++i)
     {
         CompletedRequest completed_request;
-        if (!TryPopCompletedRequest(completed_request))
+        // A preceding callback can change the pause state within this batch.
+        const CallbackDelivery delivery = get_delivery();
+        if (!TryPopCompletedRequest(completed_request, delivery))
             break;
 
         ezhttp::trace::Writef(
             "EasyHttp",
-            "RunFrame pop this=%p control=%p forgotten=%d canceled=%d status=%ld error=%d",
+            "RunFrame pop this=%p control=%p forgotten=%d canceled=%d status=%ld error=%d paused_only=%d",
             this,
             completed_request.request_control.get(),
             completed_request.request_control->forgotten.load(),
             completed_request.request_control->canceled.load(),
             completed_request.response.status_code,
-            static_cast<int>(completed_request.response.error.code)
+            static_cast<int>(completed_request.response.error.code),
+            delivery == CallbackDelivery::OptedIn
         );
         completed_request.request_control->completed.store(true);
 

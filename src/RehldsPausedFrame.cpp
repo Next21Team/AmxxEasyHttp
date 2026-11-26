@@ -5,30 +5,29 @@
 #include <custom.h>
 #include <rehlds_api.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
+
 namespace
 {
+    // IsActive() and IsPaused() were introduced in API 3.10.
+    constexpr int kMinPausedFrameMinorVersion = 10;
     IRehldsHookRegistry_SV_Frame *frame_registry = nullptr;
     IRehldsServerData *server_data = nullptr;
-    void (*paused_frame_callback)() = nullptr;
-    unsigned int dispatch_count = 0;
+    void (*frame_end_callback)(bool) = nullptr;
 
     IRehldsApi *FindRehldsApi()
     {
 #ifdef _WIN32
-        for (const char *name : {"swds.dll", "sw.dll", "hw.dll"})
-        {
-            HMODULE module = GetModuleHandleA(name);
-            if (!module)
-                continue;
+        HMODULE module = GetModuleHandleA("swds.dll");
+        if (!module)
+            return nullptr;
 
-            auto factory = reinterpret_cast<CreateInterfaceFn>(GetProcAddress(module, CREATEINTERFACE_PROCNAME));
-            if (factory)
-            {
-                if (auto *api = factory(VREHLDS_HLDS_API_VERSION, nullptr))
-                    return reinterpret_cast<IRehldsApi *>(api);
-            }
-        }
-        return nullptr;
+        auto factory = reinterpret_cast<CreateInterfaceFn>(GetProcAddress(module, CREATEINTERFACE_PROCNAME));
+        return factory ? reinterpret_cast<IRehldsApi *>(factory(VREHLDS_HLDS_API_VERSION, nullptr)) : nullptr;
 #else
         void *module = dlopen("engine_i486.so", RTLD_NOW | RTLD_NOLOAD);
         if (!module)
@@ -43,34 +42,35 @@ namespace
 
     void EXT_FUNC OnServerFrame(IRehldsHook_SV_Frame *chain)
     {
-        const auto dispatches_before_frame = dispatch_count;
         chain->callNext();
-        // A StartFrame callback may have paused the game after dispatch already began.
-        if (dispatch_count == dispatches_before_frame && server_data && server_data->IsActive() && server_data->IsPaused())
-            paused_frame_callback();
+        if (frame_end_callback)
+            frame_end_callback(ezhttp::IsServerPaused());
     }
 }
 
-void ezhttp::MarkFrameDispatched()
+bool ezhttp::SupportsDispatchWhilePaused()
 {
-    ++dispatch_count;
+    return frame_registry != nullptr;
 }
 
-bool ezhttp::RegisterPausedFrameHook(void (*on_paused_frame)())
+bool ezhttp::IsServerPaused()
 {
-    if (frame_registry)
-        return true;
+    return server_data && server_data->IsActive() && server_data->IsPaused();
+}
 
+const char *ezhttp::RegisterPausedFrameHook(void (*on_frame_end)(bool))
+{
     IRehldsApi *api = FindRehldsApi();
-    // IsActive() and IsPaused() were added in API 3.10.
-    if (!api || api->GetMajorVersion() != 3 || api->GetMinorVersion() < 10)
-        return false;
+    if (!api)
+        return "unavailable (ReHLDS API not found)";
+    if (api->GetMajorVersion() != REHLDS_API_VERSION_MAJOR || api->GetMinorVersion() < kMinPausedFrameMinorVersion)
+        return "unavailable (requires ReHLDS API 3.x, minimum 3.10)";
 
     server_data = api->GetServerData();
     frame_registry = api->GetHookchains()->SV_Frame();
-    paused_frame_callback = on_paused_frame;
+    frame_end_callback = on_frame_end;
     frame_registry->registerHook(OnServerFrame);
-    return true;
+    return "available (ReHLDS SV_Frame hook registered)";
 }
 
 void ezhttp::UnregisterPausedFrameHook()
@@ -80,5 +80,5 @@ void ezhttp::UnregisterPausedFrameHook()
 
     frame_registry = nullptr;
     server_data = nullptr;
-    paused_frame_callback = nullptr;
+    frame_end_callback = nullptr;
 }

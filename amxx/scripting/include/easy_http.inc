@@ -293,6 +293,32 @@ native ezhttp_option_set_plugin_end_behaviour(
 native ezhttp_option_set_queue(EzHttpOptions:options_id, EzHttpQueue:queue_id);
 
 /**
+ * Returns true when this server can deliver completion callbacks during a pause.
+ * This requires a dedicated ReHLDS server with engine API 3.10 or later in the
+ * 3.x series and an active frame hook. The result reports capability, regardless
+ * of whether the game is currently paused.
+ */
+native bool:ezhttp_supports_dispatch_while_paused();
+
+/**
+ * Allows this request's completion callback to run while the server is paused.
+ * The default is false. Options are copied when sending each HTTP or FTP request.
+ *
+ * HLDS and ReHLDS suspend StartFrame during a pause. Network transfers continue.
+ * By default, or when ezhttp_supports_dispatch_while_paused() is false, completed
+ * requests wait for the next normal game frame. An opted-in callback on a supported
+ * server may run on the server thread while get_gametime() is frozen and set_task
+ * and think callbacks are suspended. It can read the response and send another request.
+ * A sequential queue still runs transfers in order. During a pause an opted-in
+ * callback may run before an earlier completion that is waiting for resume.
+ *
+ * @param options_id         Options identifier created via ezhttp_create_options().
+ * @param enabled            Whether requests using these options allow paused delivery.
+ * @noreturn
+ */
+native ezhttp_option_set_dispatch_while_paused(EzHttpOptions:options_id, bool:enabled);
+
+/**
  * Creates a new HTTP request queue. Requests in the queue are executed sequentially.
  *
  * @return                  EzHttpQueue queue handle.

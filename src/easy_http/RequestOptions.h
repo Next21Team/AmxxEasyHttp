@@ -19,6 +19,7 @@ namespace ezhttp
         std::optional<std::string> proxy_url;
         std::optional<std::pair<std::string, std::string>> proxy_auth;
         std::optional<cpr::Authentication> auth;
+        bool dispatch_while_paused = false;
         bool require_secure = false;
         std::optional<std::string> file_path; // for ftp and multipart/form-data in future
     };

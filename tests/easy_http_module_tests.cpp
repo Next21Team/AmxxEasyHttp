@@ -33,3 +33,17 @@ TEST(EasyHttpModuleTest, SendRequestRejectsInvalidPluginEndBehaviour)
 
     EXPECT_EQ(RequestId::Null, request_id);
 }
+
+TEST(EasyHttpModuleTest, PausedDeliveryIsOffByDefaultAndCopiedForEachRequest)
+{
+    EasyHttpModule module("test-ca.pem");
+    const auto options = module.CreateOptions(false);
+    auto &builder = module.GetOptionsBuilder(options);
+    EXPECT_FALSE(builder.BuildOptions().dispatch_while_paused);
+    builder.SetDispatchWhilePaused(true);
+    auto first = module.CreateOptionsSnapshot(options);
+    builder.SetDispatchWhilePaused(false);
+    auto second = module.CreateOptionsSnapshot(options);
+    EXPECT_TRUE(first.options_builder.BuildOptions().dispatch_while_paused);
+    EXPECT_FALSE(second.options_builder.BuildOptions().dispatch_while_paused);
+}
