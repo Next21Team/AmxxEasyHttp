@@ -116,6 +116,12 @@ public ftp_download_by_mask()
 }
 ```
 
+### Callbacks while the server is paused
+
+HLDS and ReHLDS suspend game frames during a pause. Transfers continue, and by default completion callbacks wait until the game resumes. On dedicated ReHLDS servers with engine API 3.10 or later in the 3.x series, a plugin can opt in for individual requests. For example, a match plugin can poll its backend during a pause and read the response before deciding when to resume.
+
+Check `ezhttp_supports_dispatch_while_paused()` and set `ezhttp_option_set_dispatch_while_paused(options, true)` before sending each request that needs this behaviour. The [Pawn API](amxx/scripting/include/easy_http.inc) documents timing and queue ordering.
+
 ## Features
 
 * Non blocking mode

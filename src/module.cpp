@@ -6,6 +6,8 @@
 #include <sdk/amxxmodule.h>
 
 #include "EasyHttpModule.h"
+#include "FramePump.h"
+#include "RehldsPausedFrame.h"
 #include "json/JsonMngr.h"
 #include "json/JsonNatives.h"
 #include "utils/ftp_utils.h"
@@ -44,11 +46,56 @@ bool g_MapChangeResetDone = false;
 
 namespace
 {
+    bool metamod_attached = false;
     cvar_t cvar_ezhttp_trace = {"ezhttp_trace_log", "0", FCVAR_SERVER | FCVAR_SPONLY};
 
     void RefreshTraceLogSetting()
     {
         ezhttp::trace::SetEnabled(CVAR_GET_FLOAT("ezhttp_trace_log") != 0.0f);
+    }
+
+    FramePump frame_pump;
+
+    CallbackDelivery StartFrameDelivery()
+    {
+        if (!metamod_attached)
+            return CallbackDelivery::Suspended;
+        return ezhttp::IsServerPaused() ? CallbackDelivery::OptedIn : CallbackDelivery::All;
+    }
+
+    CallbackDelivery PausedFrameDelivery()
+    {
+        // A Pawn callback can resume the game or detach the hook mid-batch.
+        return ezhttp::IsServerPaused() ? CallbackDelivery::OptedIn : CallbackDelivery::Suspended;
+    }
+
+    void DispatchFrame(FrameSource source)
+    {
+        if (!g_EasyHttpModule || !frame_pump.ShouldDispatch(source))
+            return;
+
+        RefreshTraceLogSetting();
+        if (source == FrameSource::StartFrame)
+            g_EasyHttpModule->RunFrame(StartFrameDelivery);
+        else if (!g_MapChangeResetDone)
+            g_EasyHttpModule->RunFrame(PausedFrameDelivery);
+    }
+
+    void OnEngineFrameEnd(bool active_and_paused)
+    {
+        DispatchFrame(active_and_paused ? FrameSource::PausedEngineFrameEnd : FrameSource::EngineFrameEnd);
+    }
+
+    void RegisterPausedFrameHookIfReady()
+    {
+        if (!metamod_attached || !g_EasyHttpModule || ezhttp::SupportsDispatchWhilePaused())
+            return;
+
+        frame_pump = {};
+        const char *status = IS_DEDICATED_SERVER()
+            ? ezhttp::RegisterPausedFrameHook(OnEngineFrameEnd)
+            : "unavailable (requires a dedicated server)";
+        MF_Log("Paused callback delivery: %s", status);
     }
 
     std::unique_ptr<cell[]> ReadCallbackData(AMX *amx, cell *params, int arg_data, int arg_data_len, int &data_len)
@@ -79,11 +126,13 @@ void CreateModules()
     g_EasyHttpModule = std::make_unique<EasyHttpModule>(MF_BuildPathname("addons/amxmodx/data/amxx_easy_http_cacert.pem"));
     g_JsonManager = std::make_unique<JSONMngr>();
     g_MapChangeResetDone = false;
+    RegisterPausedFrameHookIfReady();
     ezhttp::trace::Writef("module", "CreateModules done easy_http=%p json=%p", g_EasyHttpModule.get(), g_JsonManager.get());
 }
 
 void DestroyModules()
 {
+    ezhttp::UnregisterPausedFrameHook();
     ezhttp::trace::Writef("module", "DestroyModules begin easy_http=%p json=%p", g_EasyHttpModule.get(), g_JsonManager.get());
     g_EasyHttpModule.reset();
     g_JsonManager.reset();
@@ -280,6 +329,21 @@ cell AMX_NATIVE_CALL ezhttp_option_set_plugin_end_behaviour(AMX *amx, cell *para
         return 0;
 
     g_EasyHttpModule->GetOptions(options_id).plugin_end_behaviour = plugin_end_behaviour;
+    return 0;
+}
+
+// native bool:ezhttp_supports_dispatch_while_paused();
+cell AMX_NATIVE_CALL ezhttp_supports_dispatch_while_paused(AMX *, cell *)
+{
+    return ezhttp::SupportsDispatchWhilePaused();
+}
+
+// native ezhttp_option_set_dispatch_while_paused(EzHttpOptions:options_id, bool:enabled);
+cell AMX_NATIVE_CALL ezhttp_option_set_dispatch_while_paused(AMX *amx, cell *params)
+{
+    auto options_id = static_cast<OptionsId>(params[1]);
+    if (ValidateOptionsId(amx, options_id))
+        g_EasyHttpModule->GetOptionsBuilder(options_id).SetDispatchWhilePaused(params[2] != 0);
     return 0;
 }
 
@@ -1169,6 +1233,8 @@ AMX_NATIVE_INFO g_Natives[] =
         {"ezhttp_option_set_auth", ezhttp_option_set_auth},
         {"ezhttp_option_set_user_data", ezhttp_option_set_user_data},
         {"ezhttp_option_set_plugin_end_behaviour", ezhttp_option_set_plugin_end_behaviour},
+        {"ezhttp_supports_dispatch_while_paused", ezhttp_supports_dispatch_while_paused},
+        {"ezhttp_option_set_dispatch_while_paused", ezhttp_option_set_dispatch_while_paused},
         {"ezhttp_option_set_queue", ezhttp_option_set_queue},
 
         // requests
@@ -1219,6 +1285,18 @@ AMX_NATIVE_INFO g_Natives[] =
 
 cvar_t cvar_ezhttp_version = {"ezhttp_version", MODULE_VERSION, FCVAR_SERVER | FCVAR_SPONLY};
 
+void OnMetaAttach()
+{
+    metamod_attached = true;
+    RegisterPausedFrameHookIfReady();
+}
+
+void OnMetaDetach()
+{
+    metamod_attached = false;
+    ezhttp::UnregisterPausedFrameHook();
+}
+
 void OnAmxxAttach()
 {
     MF_AddNatives(g_Natives);
@@ -1259,11 +1337,7 @@ void ServerActivate(edict_t * /*pEdictList*/, int /*edictCount*/, int /*clientMa
 
 void StartFrame()
 {
-    RefreshTraceLogSetting();
-
-    if (g_EasyHttpModule)
-        g_EasyHttpModule->RunFrame();
-
+    DispatchFrame(FrameSource::StartFrame);
     SET_META_RESULT(MRES_IGNORED);
 }
 

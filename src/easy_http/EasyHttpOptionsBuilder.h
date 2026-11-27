@@ -14,6 +14,10 @@ namespace ezhttp
         RequestOptions options_;
 
     public:
+        void SetDispatchWhilePaused(bool enabled) {
+            options_.dispatch_while_paused = enabled;
+        }
+
         void SetUserAgent(const std::string& user_agent) {
             options_.user_agent = cpr::UserAgent(user_agent);
         }

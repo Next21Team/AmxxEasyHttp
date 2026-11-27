@@ -1,0 +1,1 @@
+Public headers used by the optional server frame hook, copied from [ReHLDS 3.15.0.896](https://github.com/rehlds/ReHLDS/tree/196300131858d1e087267fb2fb60cb935f8f8873/rehlds). Original license notices are included with the headers.

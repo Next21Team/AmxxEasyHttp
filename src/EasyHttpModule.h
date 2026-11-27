@@ -94,7 +94,7 @@ public:
     explicit EasyHttpModule(std::string ca_cert_path);
     ~EasyHttpModule();
 
-    void RunFrame();
+    void RunFrame(ezhttp::GetCallbackDelivery get_delivery);
     void ServerDeactivate();
 
     RequestId SendRequest(
@@ -129,7 +129,7 @@ private:
     void ReleaseAutoDestroyOptions(const RequestData &request);
     void ShutdownWithoutCallbacks();
     void ResetForMapChangeWithoutCallbacks();
-    void RunFrameEasyHttp();
+    void RunFrameEasyHttp(ezhttp::GetCallbackDelivery get_delivery);
     void RunCleanupFrameForForgottenEasyHttp();
     std::unique_ptr<ezhttp::EasyHttpInterface> &GetEasyHttp(QueueId queue_id, PluginEndBehaviour end_map_behaviour);
 };

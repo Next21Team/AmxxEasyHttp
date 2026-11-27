@@ -39,9 +39,9 @@ EasyHttpModule::~EasyHttpModule()
     ezhttp::trace::Writef("EasyHttpModule", "dtor end this=%p", this);
 }
 
-void EasyHttpModule::RunFrame()
+void EasyHttpModule::RunFrame(ezhttp::GetCallbackDelivery get_delivery)
 {
-    RunFrameEasyHttp();
+    RunFrameEasyHttp(get_delivery);
     RunCleanupFrameForForgottenEasyHttp();
     CleanupCompletedForgottenRequests();
 }
@@ -339,7 +339,7 @@ void EasyHttpModule::ResetForMapChangeWithoutCallbacks()
     ezhttp::trace::Writef("EasyHttpModule", "ResetForMapChangeWithoutCallbacks end forgotten=%zu queues=%zu requests=%zu options=%zu", forgotten_easy_http_.size(), easy_http_pack_.size(), requests_.size(), options_.size());
 }
 
-void EasyHttpModule::RunFrameEasyHttp()
+void EasyHttpModule::RunFrameEasyHttp(ezhttp::GetCallbackDelivery get_delivery)
 {
     for (auto &pack_kv : easy_http_pack_)
     {
@@ -347,10 +347,10 @@ void EasyHttpModule::RunFrameEasyHttp()
         auto &forgettable_ez = pack_kv.second.forgettable_easy_http;
 
         if (terminating_ez)
-            terminating_ez->RunFrame();
+            terminating_ez->RunFrame(get_delivery);
 
         if (forgettable_ez)
-            forgettable_ez->RunFrame();
+            forgettable_ez->RunFrame(get_delivery);
     }
 }
 

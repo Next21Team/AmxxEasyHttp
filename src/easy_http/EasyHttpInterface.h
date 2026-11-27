@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 
+#include "CallbackDelivery.h"
 #include "Response.h"
 #include "RequestOptions.h"
 #include "RequestMethod.h"
@@ -17,7 +18,7 @@ namespace ezhttp
         virtual ~EasyHttpInterface() = default;
 
         virtual std::shared_ptr<RequestControl> SendRequest(RequestMethod method, const cpr::Url &url, const RequestOptions &options, const ResponseCallback& on_complete) = 0;
-        virtual void RunFrame() = 0;
+        virtual void RunFrame(GetCallbackDelivery get_delivery) = 0;
         virtual int GetActiveRequestCount() = 0;
         virtual void DropCompletedRequestsWithoutCallbacks() = 0;
 
