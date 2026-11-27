@@ -309,6 +309,8 @@ native bool:ezhttp_supports_dispatch_while_paused();
  * requests wait for the next normal game frame. An opted-in callback on a supported
  * server may run on the server thread while get_gametime() is frozen and set_task
  * and think callbacks are suspended. It can read the response and send another request.
+ * When polling from a callback during a pause, use long polling or have the backend
+ * delay its reply to avoid sending a new request after every short round trip.
  * A sequential queue still runs transfers in order. During a pause an opted-in
  * callback may run before an earlier completion that is waiting for resume.
  *

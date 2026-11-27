@@ -4,14 +4,26 @@ set(OUTPUT_NAME easy_http_amxx)
 find_package(Threads REQUIRED)
 find_package(HLSDK REQUIRED)
 find_package(metamod REQUIRED)
-
 find_package(ReHLDS REQUIRED)
 
+# Both the module and its ReHLDS adapter use these compiler settings.
+add_compile_definitions(NOMINMAX HAVE_STDINT_H NO_MSVC8_AUTO_COMPAT)
+if (UNIX)
+    add_compile_definitions(LINUX)
+else ()
+    add_compile_definitions(_WIN32 WIN32 _WIN32_WINNT=0x0600 WINVER=0x0600)
+endif ()
+
+if (GCC)
+    add_compile_options(-fno-rtti -Werror)
+elseif (MSVC)
+    add_compile_options(/GR- /WX /EHsc $<$<CONFIG:Release>:/Zi>)
+endif ()
+
 add_library(rehlds_frame OBJECT RehldsPausedFrame.cpp)
-target_link_libraries(rehlds_frame PRIVATE ReHLDS::headers)
+target_link_libraries(rehlds_frame PRIVATE ReHLDS::ReHLDS_includes)
 set_target_properties(rehlds_frame PROPERTIES POSITION_INDEPENDENT_CODE ON)
 if (MSVC)
-    target_compile_definitions(rehlds_frame PRIVATE NOMINMAX)
     target_compile_options(rehlds_frame PRIVATE /source-charset:.1252)
 endif ()
 
@@ -84,38 +96,7 @@ target_include_directories(${TARGET_NAME} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_compile_definitions(${TARGET_NAME} PRIVATE
-        NOMINMAX
-        HAVE_STDINT_H
-        NO_MSVC8_AUTO_COMPAT
-)
-
-if (UNIX)
-    target_compile_definitions(${TARGET_NAME} PRIVATE
-            LINUX
-    )
-else ()
-    target_compile_definitions(${TARGET_NAME} PRIVATE
-            _WIN32
-            _WIN32_WINNT=0x0600
-            WIN32
-            WINVER=0x0600
-    )
-endif ()
-
-if (GCC)
-    target_compile_options(${TARGET_NAME} PRIVATE
-            -fno-rtti  # disable rtti to reduce the library size
-            -Werror    # treat all warnings as error
-    )
-elseif (MSVC)
-    target_compile_options(${TARGET_NAME} PRIVATE
-            /GR-       # disable rtti to reduce the library size
-            /WX        # treat all warnings as error
-            /EHsc      # NEVER catch SEH exceptions by catch(...); c functions cannot throw exceptions
-            $<$<CONFIG:Release>:/Zi>  # produce a PDB file for release builds
-    )
-
+if (MSVC)
     target_link_options(${TARGET_NAME} PRIVATE
             $<$<CONFIG:Release>:/LTCG>            # enables whole program optimization on link-time
             $<$<CONFIG:Release>:/INCREMENTAL:NO>  # /INCREMENTAL is not compatible with /LTCG

@@ -332,11 +332,13 @@ cell AMX_NATIVE_CALL ezhttp_option_set_plugin_end_behaviour(AMX *amx, cell *para
     return 0;
 }
 
+// native bool:ezhttp_supports_dispatch_while_paused();
 cell AMX_NATIVE_CALL ezhttp_supports_dispatch_while_paused(AMX *, cell *)
 {
     return ezhttp::SupportsDispatchWhilePaused();
 }
 
+// native ezhttp_option_set_dispatch_while_paused(EzHttpOptions:options_id, bool:enabled);
 cell AMX_NATIVE_CALL ezhttp_option_set_dispatch_while_paused(AMX *amx, cell *params)
 {
     auto options_id = static_cast<OptionsId>(params[1]);
